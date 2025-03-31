@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Detallada: Creación y Gestión de Base de Datos en Laravel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            page-break-before: always;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+            page-break-after: avoid;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            page-break-after: avoid;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #e74c3c;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 4px solid #2ecc71;
+            page-break-inside: avoid;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+        .concept {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            page-break-inside: avoid;
+        }
+        ul li {
+            margin: 8px 0;
+        }
+        .example {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border-left: 4px solid #9b59b6;
+            page-break-inside: avoid;
+        }
+        .correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: #c0392b;
+            font-weight: bold;
+        }
+        .naming-convention {
+            background-color: #f5f6fa;
+            border: 1px solid #dcdde1;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+        .convention-title {
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guía Detallada: Creación y Gestión de Base de Datos en Laravel</h1>
+
+    <h2>0. Conceptos Básicos</h2>
+
+    <div class="concept">
+        <h3>¿Qué es un Modelo?</h3>
+        <p>Un Modelo en Laravel es una clase que representa una tabla de la base de datos. Es parte del patrón MVC (Modelo-Vista-Controlador) y:</p>
+        <ul>
+            <li>Cada modelo se corresponde con una tabla específica</li>
+            <li>Maneja la lógica de datos y las reglas de negocio</li>
+            <li>Permite interactuar con la base de datos de forma orientada a objetos</li>
+            <li>Se encuentra en la carpeta <code>app/Models</code></li>
+        </ul>
+        <div class="example">
+            <p>Ejemplo:</p>
+            <pre>
+// El modelo Product representa la tabla 'products'
+class Product extends Model
+{
+    // Definimos qué campos pueden ser llenados masivamente
+    protected $fillable = ['name', 'description'];
+}</pre>
+        </div>
+    </div>
+
+    <div class="concept">
+        <h3>¿Qué es Eloquent?</h3>
+        <p>Eloquent es el ORM (Object-Relational Mapping) de Laravel que:</p>
+        <ul>
+            <li>Convierte las tablas en clases PHP (Modelos)</li>
+            <li>Convierte los registros en objetos</li>
+            <li>Permite escribir consultas usando PHP en lugar de SQL</li>
+            <li>Maneja las relaciones entre tablas (uno a uno, uno a muchos, etc.)</li>
+        </ul>
+        <div class="example">
+            <p>Ejemplos de uso:</p>
+            <pre>
+// SQL: SELECT * FROM products;
+$products = Product::all();
+
+// SQL: SELECT * FROM products WHERE price > 100;
+$products = Product::where('price', '>', 100)->get();
+
+// SQL: INSERT INTO products (name, price) VALUES ('Laptop', 999);
+Product::create(['name' => 'Laptop', 'price' => 999]);</pre>
+        </div>
+    </div>
+
+    <div class="concept">
+        <h3>¿Qué es una Migración?</h3>
+        <p>Una migración es como un "control de versiones" para tu base de datos que:</p>
+        <ul>
+            <li>Define la estructura de las tablas usando código PHP</li>
+            <li>Permite crear/modificar/eliminar tablas y columnas</li>
+            <li>Hace que los cambios en la base de datos sean reproducibles</li>
+            <li>Se encuentra en la carpeta <code>database/migrations</code></li>
+        </ul>
+        <div class="example">
+            <p>Ejemplo:</p>
+            <pre>
+// Esta migración crea una tabla 'products'
+public function up()
+{
+    Schema::create('products', function (Blueprint $table) {
+        $table->id();                 // Columna ID autoincremental
+        $table->string('name');       // Columna VARCHAR para el nombre
+        $table->text('description');  // Columna TEXT para la descripción
+        $table->timestamps();         // Columnas created_at y updated_at
+    });
+}</pre>
+        </div>
+    </div>
+
+    <div class="concept">
+        <h3>¿Qué es un Seeder?</h3>
+        <p>Un Seeder es una clase que:</p>
+        <ul>
+            <li>Se usa para poblar la base de datos con datos de prueba</li>
+            <li>Permite tener datos iniciales en la aplicación</li>
+            <li>Es útil para desarrollo y pruebas</li>
+            <li>Se encuentra en la carpeta <code>database/seeders</code></li>
+        </ul>
+        <div class="example">
+            <p>Ejemplo:</p>
+            <pre>
+class ProductSeeder extends Seeder
+{
+    public function run()
+    {
+        // Crea productos de prueba
+        Product::create([
+            'name' => 'Producto 1',
+            'description' => 'Descripción 1'
+        ]);
+    }
+}</pre>
+        </div>
+    </div>
+
+    <div class="concept">
+        <h3>¿Qué es una Factory?</h3>
+        <p>Una Factory es una clase que:</p>
+        <ul>
+            <li>Genera datos falsos pero realistas para pruebas</li>
+            <li>Usa la librería Faker para generar datos aleatorios</li>
+            <li>Permite crear grandes cantidades de datos de prueba</li>
+            <li>Se encuentra en la carpeta <code>database/factories</code></li>
+        </ul>
+        <div class="example">
+            <p>Ejemplo:</p>
+            <pre>
+class ProductFactory extends Factory
+{
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->word,
+            'description' => $this->faker->sentence,
+            'price' => $this->faker->randomFloat(2, 10, 1000)
+        ];
+    }
+}</pre>
+        </div>
+    </div>
+
+    <div class="concept">
+        <h3>Ciclo de Vida de los Datos</h3>
+        <ol>
+            <li><strong>Migración</strong>: Define la estructura de la tabla</li>
+            <li><strong>Modelo</strong>: Define cómo interactuar con la tabla</li>
+            <li><strong>Factory</strong>: Define cómo generar datos falsos (opcional)</li>
+            <li><strong>Seeder</strong>: Inserta datos iniciales o de prueba</li>
+            <li><strong>Eloquent</strong>: Se usa para realizar operaciones CRUD (Create, Read, Update, Delete)</li>
+        </ol>
+    </div>
+
+    <h2>1. Configuración Inicial</h2>
+    <h3>1.1 Configurar el archivo .env</h3>
+    <pre>
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=nombre_de_tu_base_de_datos
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_contraseña</pre>
+
+    <h3>1.2 Crear la base de datos</h3>
+    <pre>
+# Acceder a MySQL
+mysql -u root -p
+
+# Crear la base de datos
+CREATE DATABASE nombre_de_tu_base_de_datos;</pre>
+
+    <h2>2. Crear el Modelo y la Migración</h2>
+    <h3>2.1 Crear el modelo con su migración</h3>
+    <pre>php artisan make:model Product -m</pre>
+    <p>Este comando crea:</p>
+    <ul>
+        <li><code>app/Models/Product.php</code></li>
+        <li><code>database/migrations/YYYY_MM_DD_HHMMSS_create_products_table.php</code></li>
+    </ul>
+
+    <h3>2.2 Configurar la migración</h3>
+    <p>Archivo: <code>database/migrations/YYYY_MM_DD_HHMMSS_create_products_table.php</code></p>
+    <pre>
+public function up(): void
+{
+    Schema::create('products', function (Blueprint $table) {
+        $table->id();
+        $table->string('name');
+        $table->text('description');
+        $table->timestamps();
+    });
+}</pre>
+
+    <h3>2.3 Configurar el modelo</h3>
+    <p>Archivo: <code>app/Models/Product.php</code></p>
+    <pre>
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    protected $fillable = [
+        'name',
+        'description'
+    ];
+}</pre>
+
+    <h2>3. Crear el Seeder</h2>
+    <h3>3.1 Crear el seeder</h3>
+    <pre>php artisan make:seeder ProductSeeder</pre>
+
+    <h3>3.2 Configurar el seeder</h3>
+    <p>Archivo: <code>database/seeders/ProductSeeder.php</code></p>
+    <pre>
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Product;
+use Illuminate\Database\Seeder;
+
+class ProductSeeder extends Seeder
+{
+    public function run(): void
+    {
+        Product::create([
+            'name' => 'Product 1',
+            'description' => 'Description 1',
+        ]);
+        Product::create([
+            'name' => 'Product 2',
+            'description' => 'Description 2',
+        ]);
+    }
+}</pre>
+
+    <h3>3.3 Registrar el seeder</h3>
+    <p>Archivo: <code>database/seeders/DatabaseSeeder.php</code></p>
+    <pre>
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $this->call(ProductSeeder::class);
+    }
+}</pre>
+
+    <h2>4. Ejecutar Migraciones y Seeders</h2>
+    <pre>php artisan migrate:fresh --seed</pre>
+
+    <h2>5. Crear la Ruta</h2>
+    <p>Archivo: <code>routes/web.php</code></p>
+    <pre>
+<?php
+
+use App\Models\Product;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    $products = Product::find(1);  // Obtiene el primer producto
+    return view('welcome', ['products' => $products]);
+});</pre>
+
+    <h2>6. Crear la Vista</h2>
+    <p>Archivo: <code>resources/views/welcome.blade.php</code></p>
+    <pre>
+@extends('layouts.app')
+
+@section('content')
+<div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="p-6 text-gray-900 dark:text-gray-100">
+                <h1 class="text-2xl font-bold mb-4">Product Information</h1>
+                
+                <div class="mt-6">
+                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                        <p><strong>Name:</strong> {{ $products->name }}</p>
+                        <p><strong>Description:</strong> {{ $products->description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection</pre>
+
+    <h2>7. Comandos Útiles para Gestionar la Base de Datos</h2>
+    <pre>
+# Ver el estado de las migraciones
+php artisan migrate:status
+
+# Revertir todas las migraciones
+php artisan migrate:rollback
+
+# Revertir y volver a ejecutar migraciones
+php artisan migrate:refresh
+
+# Eliminar todas las tablas y volver a migrar
+php artisan migrate:fresh
+
+# Ejecutar solo los seeders
+php artisan db:seed</pre>
+
+    <h2>8. Consultas Eloquent Útiles</h2>
+    <pre>
+// Obtener todos los productos
+$products = Product::all();
+
+// Obtener el primer producto
+$product = Product::first();
+
+// Obtener un producto por ID
+$product = Product::find(1);
+
+// Obtener productos con condiciones
+$products = Product::where('name', 'Product 1')->get();
+
+// Crear un nuevo producto
+Product::create([
+    'name' => 'Nuevo Producto',
+    'description' => 'Nueva Descripción'
+]);
+
+// Actualizar un producto
+$product = Product::find(1);
+$product->update([
+    'name' => 'Nombre Actualizado'
+]);
+
+// Eliminar un producto
+$product = Product::find(1);
+$product->delete();</pre>
+
+    <h2>9. Verificar los Datos en la Base de Datos</h2>
+    <h3>9.1 Usando Tinker</h3>
+    <pre>
+# Abrir Tinker
+php artisan tinker
+
+# Consultar productos
+>>> Product::all();
+>>> Product::first();</pre>
+
+    <h3>9.2 Usando MySQL directamente</h3>
+    <pre>
+# Acceder a MySQL
+mysql -u root -p
+
+# Seleccionar la base de datos
+use nombre_de_tu_base_de_datos;
+
+# Ver los productos
+SELECT * FROM products;</pre>
+
+    <h2>10. Solución de Problemas Comunes</h2>
+    <div class="note">
+        <h3>Error: Table not found</h3>
+        <ul>
+            <li>Verificar que las migraciones se ejecutaron correctamente</li>
+            <li>Verificar el nombre de la tabla en la migración</li>
+            <li>Ejecutar <code>php artisan migrate:status</code></li>
+        </ul>
+
+        <h3>Error: Column not found</h3>
+        <ul>
+            <li>Verificar que la columna existe en la migración</li>
+            <li>Verificar que el campo está en <code>$fillable</code> del modelo</li>
+            <li>Ejecutar <code>php artisan migrate:fresh</code></li>
+        </ul>
+
+        <h3>Error: Class not found</h3>
+        <ul>
+            <li>Verificar los namespaces</li>
+            <li>Ejecutar <code>composer dump-autoload</code></li>
+        </ul>
+
+        <h3>Error: Data not showing in view</h3>
+        <ul>
+            <li>Verificar que los datos existen en la base de datos</li>
+            <li>Verificar que la variable está siendo pasada a la vista</li>
+            <li>Verificar la sintaxis de Blade en la vista</li>
+        </ul>
+    </div>
+
+    <div class="concept">
+        <h2>0. Convenciones de Nombres en Laravel</h2>
+        <p>Laravel sigue una serie de convenciones de nombres que nos ayudan a mantener el código organizado y predecible. Estas convenciones son importantes porque:</p>
+        <ul>
+            <li>Hacen el código más legible y mantenible</li>
+            <li>Permiten que Laravel funcione automáticamente sin configuración adicional</li>
+            <li>Facilitan el trabajo en equipo</li>
+            <li>Reducen la necesidad de documentación extra</li>
+        </ul>
+    </div>
+
+    <div class="naming-convention">
+        <div class="convention-title">Nombres de Modelos</div>
+        <ul>
+            <li><strong>Regla:</strong> Singular y PascalCase</li>
+            <li><strong>Ubicación:</strong> <code>app/Models/</code></li>
+            <li><strong>¿Por qué singular?</strong> Representa una instancia individual de la entidad</li>
+        </ul>
+        <table>
+            <tr>
+                <th>✅ Correcto</th>
+                <th>❌ Incorrecto</th>
+                <th>Explicación</th>
+            </tr>
+            <tr>
+                <td><code>Product</code></td>
+                <td><code>Products</code></td>
+                <td>No usar plural</td>
+            </tr>
+            <tr>
+                <td><code>OrderItem</code></td>
+                <td><code>order_item</code></td>
+                <td>No usar snake_case</td>
+            </tr>
+            <tr>
+                <td><code>Category</code></td>
+                <td><code>category</code></td>
+                <td>No usar minúsculas</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="naming-convention">
+        <div class="convention-title">Nombres de Tablas</div>
+        <ul>
+            <li><strong>Regla:</strong> Plural y snake_case</li>
+            <li><strong>¿Por qué plural?</strong> Contiene múltiples registros</li>
+            <li><strong>Relación con modelo:</strong> Laravel pluraliza automáticamente el nombre del modelo</li>
+        </ul>
+        <table>
+            <tr>
+                <th>✅ Correcto</th>
+                <th>❌ Incorrecto</th>
+                <th>Modelo Relacionado</th>
+            </tr>
+            <tr>
+                <td><code>products</code></td>
+                <td><code>product</code></td>
+                <td><code>Product</code></td>
+            </tr>
+            <tr>
+                <td><code>order_items</code></td>
+                <td><code>orderItems</code></td>
+                <td><code>OrderItem</code></td>
+            </tr>
+            <tr>
+                <td><code>categories</code></td>
+                <td><code>Category</code></td>
+                <td><code>Category</code></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="naming-convention">
+        <div class="convention-title">Nombres de Migraciones</div>
+        <ul>
+            <li><strong>Formato:</strong> <code>YYYY_MM_DD_HHMMSS_create_table_name_table.php</code></li>
+            <li><strong>Verbos comunes:</strong> create, add, remove, update</li>
+        </ul>
+        <table>
+            <tr>
+                <th>✅ Correcto</th>
+                <th>❌ Incorrecto</th>
+            </tr>
+            <tr>
+                <td><code>2024_03_15_create_products_table.php</code></td>
+                <td><code>products.php</code></td>
+            </tr>
+            <tr>
+                <td><code>2024_03_15_add_price_to_products_table.php</code></td>
+                <td><code>create_products.php</code></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="naming-convention">
+        <div class="convention-title">Nombres de Columnas</div>
+        <ul>
+            <li><strong>Regla:</strong> snake_case</li>
+            <li><strong>Claves foráneas:</strong> singular_table_id</li>
+        </ul>
+        <table>
+            <tr>
+                <th>✅ Correcto</th>
+                <th>❌ Incorrecto</th>
+                <th>Tipo</th>
+            </tr>
+            <tr>
+                <td><code>first_name</code></td>
+                <td><code>firstName</code></td>
+                <td>Campo normal</td>
+            </tr>
+            <tr>
+                <td><code>product_id</code></td>
+                <td><code>productId</code></td>
+                <td>Clave foránea</td>
+            </tr>
+            <tr>
+                <td><code>created_at</code></td>
+                <td><code>createdAt</code></td>
+                <td>Timestamp</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="naming-convention">
+        <div class="convention-title">Relaciones en Modelos</div>
+        <ul>
+            <li><strong>Uno a uno:</strong> Nombre en singular</li>
+            <li><strong>Uno a muchos:</strong> Nombre en plural</li>
+            <li><strong>Muchos a muchos:</strong> Nombre en plural</li>
+        </ul>
+        <div class="example">
+            <pre>
+// Uno a uno (singular)
+public function profile()
+{
+    return $this->hasOne(Profile::class);
+}
+
+// Uno a muchos (plural)
+public function posts()
+{
+    return $this->hasMany(Post::class);
+}
+
+// Muchos a muchos (plural)
+public function roles()
+{
+    return $this->belongsToMany(Role::class);
+}</pre>
+        </div>
+    </div>
+</body>
+</html> 
