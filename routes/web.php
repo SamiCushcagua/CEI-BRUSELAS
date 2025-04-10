@@ -17,6 +17,7 @@ use App\Models\ContactForum;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\SubjectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,6 +135,14 @@ Route::middleware(['auth'])->group(function () {
             return redirect()->back()->with('error', 'Error creating product: ' . $e->getMessage());
         }
     })->name('store-test-product');
+
+    // Rutas de materias
+    Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
+    Route::get('/subjects/create', [SubjectController::class, 'create'])->name('subjects.create');
+    Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
+    Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit'])->name('subjects.edit');
+    Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
+    Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 });
 
 // Rutas de autenticación

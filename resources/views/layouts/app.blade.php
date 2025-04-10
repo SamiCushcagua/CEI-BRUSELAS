@@ -40,6 +40,7 @@
                         @if (Auth::user()->is_admin)
                             <a href="{{ route('create-test-product') }}" class="green-link">Create Test Product</a>
                             <a href="{{ route('contact-forum') }}">Contact Forum</a>
+                            <a href="{{ route('subjects.create') }}">Subjects</a>
                         @endif
                     @endauth
                 </div>
