@@ -1,89 +1,92 @@
-# E-commerce Project
+# CEI-BRUSELAS School Platform
 
-Este es un proyecto de e-commerce desarrollado con Laravel que incluye funcionalidades de carrito de compras, gestión de productos, sistema de usuarios y más.
+A school management platform under development for CEI Brussels using Laravel.
 
-## Requisitos Previos
+## Project Status
+
+🚧 **Under Development** 🚧
+
+This project is currently in active development phase, being built as a comprehensive school management system.
+
+## Prerequisites
 
 - PHP >= 8.1
 - Composer
 - MySQL
 - Node.js & NPM
 
-## Instalación
+## Installation
 
-1. Clonar el repositorio:
+1. Clone the repository:
 ```bash
-git clone <URL_DEL_REPOSITORIO>
-cd <NOMBRE_DEL_PROYECTO>
+git clone [repository_URL]
+cd CEI-BRUSELAS
 ```
 
-2. Instalar dependencias de PHP:
+2. Install dependencies:
 ```bash
 composer install
-```
-
-3. Instalar dependencias de Node.js:
-```bash
 npm install
 ```
 
-4. Copiar el archivo de entorno:
+3. Set up environment:
 ```bash
 cp .env.example .env
-```
-
-5. Generar la clave de la aplicación:
-```bash
 php artisan key:generate
 ```
 
-6. Configurar la base de datos en el archivo .env:
+4. Configure the database in .env file:
 ```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=nombre_de_tu_base_de_datos
-DB_USERNAME=tu_usuario
-DB_PASSWORD=tu_contraseña
+DB_DATABASE=your_database_name
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
 ```
 
-7. Ejecutar las migraciones y seeders:
+5. Run migrations:
 ```bash
-php artisan migrate:fresh --seed
+php artisan migrate
 ```
 
-8. Compilar los assets:
+6. Start development server:
 ```bash
 npm run dev
-```
-
-9. Iniciar el servidor:
-```bash
 php artisan serve
 ```
 
-## Credenciales por Defecto
+## Features Under Development
 
-### Usuario Administrador
+- User Authentication System
+- Student Management
+  - Student profiles
+  - Enrollment management
+  - Academic records
+- Course Management
+  - Course scheduling
+  - Curriculum planning
+  - Assignment tracking
+- Administrative Tools
+  - Staff management
+  - Resource allocation
+  - Academic calendar
+- Communication System
+  - Internal messaging
+  - Announcements
+  - Parent-teacher communication
+
+## Default Credentials
+
+### Administrator
 - Email: admin@ehb.be
-- Contraseña: Password!321
+- Password: Password!321
 
-### Usuario Normal
+### Test User
 - Email: user@example.com
-- Contraseña: user123
+- Password: user123
 
-## Características Implementadas
-
-- Sistema de autenticación completo (login, registro, recuperación de contraseña)
-- Gestión de productos (CRUD)
-- Carrito de compras
-- Panel de administración
-- Sistema de usuarios con roles (admin/user)
-- FAQ
-- Foro de contacto
-- Diseño responsive
-
-## Tecnologías Utilizadas
+## Technologies Used
 
 - Laravel 10
 - PHP 8.1
@@ -92,29 +95,13 @@ php artisan serve
 - Tailwind CSS
 - Alpine.js
 
-## Estructura del Proyecto
+## Project Structure
 
-- `app/Http/Controllers/` - Controladores de la aplicación
-- `app/Models/` - Modelos Eloquent
-- `database/migrations/` - Migraciones de la base de datos
-- `database/seeders/` - Seeders para datos de prueba
-- `resources/views/` - Vistas Blade
-- `routes/` - Definición de rutas
+- `app/Http/Controllers/` - Application controllers
+- `app/Models/` - Eloquent models
+- `database/migrations/` - Database migrations
+- `database/seeders/` - Seeders for test data
+- `resources/views/` - Blade views
+- `routes/` - Route definitions
 
-## Contribución
 
-1. Fork el proyecto
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
-
-## Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
-
-## Contacto
-
-Tu Nombre - [@tutwitter](https://twitter.com/tutwitter) - email@ejemplo.com
-
-Link del Proyecto: [https://github.com/tuusuario/turepositorio](https://github.com/tuusuario/turepositorio)
