@@ -17,7 +17,6 @@ use App\Models\ContactForum;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\SubjectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -354,8 +353,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::delete('/cart/remove/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
 });
-
-Route::resource('subjects', SubjectController::class);
 
 
 
