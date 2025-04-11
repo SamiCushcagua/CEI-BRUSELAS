@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('verjaardag')->nullable();
             $table->string('overMij')->nullable();
             $table->string('image')->nullable();
+            $table->boolean('is_profesor')->default(false);
             $table->timestamps();
         });
 

@@ -16,6 +16,10 @@
             </div>
         @endif
 
+
+
+
+
         @auth
             @if(Auth::user()->is_admin)
                 <div class="form-container">
@@ -49,7 +53,10 @@
                         <div class="form-group">
                             <label class="form-checkbox-label">
                                 <input type="checkbox" name="is_admin" value="1">
-                                Is Administrator
+                                Es Administrator
+                                <input type="checkbox" name="is_profesor" value="1">
+                                Es Profesor
+
                             </label>
                         </div>
 
@@ -60,6 +67,8 @@
                 </div>
             @endif
         @endauth
+
+        
 
         <div class="users-grid">
             @foreach($allUser as $user)
@@ -80,20 +89,31 @@
                     
                     @auth
                         @if(Auth::check() && Auth::user()->is_admin)
-                            <p><strong>Type user:</strong> {{ $user->is_admin ? 'Administrator' : 'User' }}</p>
+                            <p><strong>Tipo de usuario:</strong> 
+                                @if($user->is_admin)
+                                    Administrador
+                                @elseif($user->is_profesor)
+                                    Profesor
+                                @else
+                                    Usuario
+                                @endif
+                            </p>
                             
                             <form action="{{ route('users.edit', $user->id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 @method('PUT')
-                                <button type="submit" class="form-button edit-button">
-                                    Change to {{ $user->is_admin ? 'User' : 'Administrator' }}
-                                </button>
+                                <select name="role" class="form-select" onchange="this.form.submit()">
+                                    <option value="">Cambiar rol...</option>
+                                    <option value="admin" {{ $user->is_admin ? 'selected' : '' }}>Administrador</option>
+                                    <option value="profesor" {{ $user->is_profesor ? 'selected' : '' }}>Profesor</option>
+                                    <option value="user" {{ !$user->is_admin && !$user->is_profesor ? 'selected' : '' }}>Usuario</option>
+                                </select>
                             </form>
 
                             <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="form-button delete-button">DELETE</button>
+                                <button type="submit" class="form-button delete-button">ELIMINAR</button>
                             </form>
                         @endif
                     @endauth

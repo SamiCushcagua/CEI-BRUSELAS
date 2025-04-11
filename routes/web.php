@@ -186,10 +186,10 @@ Route::middleware(['auth'])->group(function () {
 
 // Rutas de usuarios
 Route::middleware(['auth'])->group(function () {
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::get('/users', [UserController::class, 'index'])->name('usersAllShow');
+    Route::post('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::put('/users/{id}', [UserController::class, 'edit'])->name('users.edit');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
 // Ruta de perfil dummy
@@ -266,13 +266,31 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/users/{user}/edit', function (User $user, Request $request) {
         try {
-            $user->is_admin = !$user->is_admin;
+            $role = $request->input('role');
+            
+            switch ($role) {
+                case 'admin':
+                    $user->is_admin = true;
+                    $user->is_profesor = false;
+                    break;
+                case 'profesor':
+                    $user->is_admin = false;
+                    $user->is_profesor = true;
+                    break;
+                case 'user':
+                    $user->is_admin = false;
+                    $user->is_profesor = false;
+                    break;
+                default:
+                    return redirect()->back()->with('error', 'Rol no válido');
+            }
+
             $user->save();
             
-            $newRole = $user->is_admin ? 'Administrator' : 'User';
-            return redirect()->back()->with('success', "User role updated to: {$newRole}");
+            $newRole = $user->is_admin ? 'Administrador' : ($user->is_profesor ? 'Profesor' : 'Usuario');
+            return redirect()->back()->with('success', "Rol de usuario actualizado a: {$newRole}");
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error updating user: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error actualizando usuario: ' . $e->getMessage());
         }
     })->name('users.edit');
 
