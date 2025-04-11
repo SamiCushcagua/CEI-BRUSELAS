@@ -59,7 +59,7 @@ class SubjectController extends Controller
         $subject = Subject::create($validated);
 
         // Redirigir con mensaje de éxito
-        return redirect()->route('subjects.index')
+        return redirect()->route('dashboard_cursos')
             ->with('success', 'Materia creada exitosamente.');
     }
 

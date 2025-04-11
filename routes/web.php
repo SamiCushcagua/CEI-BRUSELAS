@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\SubjectController;
+use App\Models\Subject;
 
 /*
 |--------------------------------------------------------------------------
@@ -137,12 +138,23 @@ Route::middleware(['auth'])->group(function () {
     })->name('store-test-product');
 
     // Rutas de materias
-    Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
-    Route::get('/subjects/create', [SubjectController::class, 'create'])->name('subjects.create');
-    Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
-    Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit'])->name('subjects.edit');
-    Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
-    Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
+    Route::get('/subjects', [SubjectController::class, 'index'])
+    ->name('subjects.index');
+
+    Route::get('/subjects/create', [SubjectController::class, 'create'])
+    ->name('subjects.create');
+
+    Route::post('/subjects', [SubjectController::class, 'store'])
+    ->name('subjects.store');
+
+    Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit'])
+    ->name('subjects.edit');
+
+    Route::put('/subjects/{subject}', [SubjectController::class, 'update'])
+    ->name('subjects.update');
+
+    Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])
+    ->name('subjects.destroy');
 });
 
 // Rutas de autenticación
@@ -344,6 +356,18 @@ Route::put('/FAQ/edit/{id}', function (Request $request, $id) {
 
 
 Route::post('/contact-forum', [ContactController::class, 'store'])->name('contact-forum');
+
+
+
+
+
+
+Route::get('/subjects/dashboard_cursos', function () {
+    $subjects = Subject::all();
+    return view('subjects.dashboard_cursos', ['subjects' => $subjects]);
+})->name('dashboard_cursos');   
+
+    
 
 
 
