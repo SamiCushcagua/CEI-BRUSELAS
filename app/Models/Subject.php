@@ -17,4 +17,18 @@ class Subject extends Model
         'Archivo',
         'imagen'
     ];
+
+    // Relación con profesores (many-to-many)
+    public function professors()
+    {
+        return $this->belongsToMany(User::class, 'subject_professor', 'subject_id', 'professor_id')
+            ->where('role', 'professor');
+    }
+
+    // Relación con estudiantes (many-to-many)
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'subject_student', 'subject_id', 'student_id')
+            ->where('role', 'student');
+    }
 } 

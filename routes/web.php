@@ -19,6 +19,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\SubjectController;
 use App\Models\Subject;
+use App\Http\Controllers\SubjectRelationshipController;
 
 /*
 |--------------------------------------------------------------------------
@@ -155,6 +156,20 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])
     ->name('subjects.destroy');
+
+    // Rutas para relaciones entre materias, profesores y estudiantes
+    Route::post('/subjects/{subject}/assign-professor', [SubjectRelationshipController::class, 'assignProfessor']);
+    Route::delete('/subjects/{subject}/remove-professor/{professor}', [SubjectRelationshipController::class, 'removeProfessor']);
+    Route::get('/professors/{professor}/subjects', [SubjectRelationshipController::class, 'getProfessorSubjects']);
+    Route::get('/professors/{professor}/students', [SubjectRelationshipController::class, 'getProfessorStudents']);
+    Route::post('/professors/{professor}/assign-student', [SubjectRelationshipController::class, 'assignStudentToProfessor']);
+    Route::delete('/professors/{professor}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudentFromProfessor']);
+
+    // Rutas para estudiantes
+    Route::post('/subjects/{subject}/enroll-student', [SubjectRelationshipController::class, 'enrollStudent']);
+    Route::delete('/subjects/{subject}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudent']);
+    Route::get('/students/{student}/subjects', [SubjectRelationshipController::class, 'getStudentSubjects']);
+    Route::get('/students/{student}/professors', [SubjectRelationshipController::class, 'getStudentProfessors']);
 });
 
 // Rutas de autenticación

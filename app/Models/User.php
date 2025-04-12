@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -26,7 +27,8 @@ class User extends Authenticatable
         'UsernameDummy',
         'verjaardag',
         'overMij',
-        'image'
+        'image',
+        'role',
     ];
 
     /**
@@ -68,5 +70,29 @@ class User extends Authenticatable
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    // Relaciones para profesores
+    public function subjectsAsProfessor()
+    {
+        return $this->belongsToMany(Subject::class, 'subject_professor', 'professor_id', 'subject_id');
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'professor_student', 'professor_id', 'student_id')
+            ->where('role', 'student');
+    }
+
+    // Relaciones para estudiantes
+    public function subjectsAsStudent()
+    {
+        return $this->belongsToMany(Subject::class, 'subject_student', 'student_id', 'subject_id');
+    }
+
+    public function professors()
+    {
+        return $this->belongsToMany(User::class, 'professor_student', 'student_id', 'professor_id')
+            ->where('role', 'professor');
     }
 }
