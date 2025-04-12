@@ -6,12 +6,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -73,7 +72,7 @@ class User extends Authenticatable
     }
 
     // Relaciones para profesores
-    public function subjectsAsProfessor()
+    public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'subject_professor', 'professor_id', 'subject_id');
     }

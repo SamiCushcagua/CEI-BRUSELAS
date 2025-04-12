@@ -20,6 +20,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\SubjectController;
 use App\Models\Subject;
 use App\Http\Controllers\SubjectRelationshipController;
+use App\Http\Controllers\ProfessorController;
+use App\Http\Controllers\StudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,12 +86,6 @@ Route::get('/Contact/{name?}', [ContactController::class, 'show'])->name('Contac
 Route::get('/profile/{user}', function (User $user) {
     return view('Profiel_page', ['user' => $user]);
 })->name('profile.public');
-
-// Users list public route
-Route::get('/usersAllShow', function () {
-    $allUser = User::all();
-    return view('usersAllShow', ['allUser' => $allUser]);
-})->name('usersAllShow');
 
 
 /*
@@ -170,6 +166,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/subjects/{subject}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudent']);
     Route::get('/students/{student}/subjects', [SubjectRelationshipController::class, 'getStudentSubjects']);
     Route::get('/students/{student}/professors', [SubjectRelationshipController::class, 'getStudentProfessors']);
+
+    // Professor routes
+    Route::get('/professors/{professor}/subjects', [ProfessorController::class, 'subjects'])->name('professors.subjects');
+    Route::get('/professors/{professor}/students', [ProfessorController::class, 'students'])->name('professors.students');
 });
 
 // Rutas de autenticación
@@ -201,7 +201,11 @@ Route::middleware(['auth'])->group(function () {
 
 // Rutas de usuarios
 Route::middleware(['auth'])->group(function () {
-    Route::get('/users', [UserController::class, 'index'])->name('usersAllShow');
+    Route::get('/usersAllShow', function () {
+        $allUser = User::all();
+        return view('usersAllShow', ['allUser' => $allUser]);
+    })->name('usersAllShow');
+    
     Route::post('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::put('/users/{id}', [UserController::class, 'edit'])->name('users.edit');
     Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
@@ -419,6 +423,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::delete('/cart/remove/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
 });
+
+// Rutas para profesores
+Route::resource('professors', ProfessorController::class);
+
+// Rutas para estudiantes
+Route::resource('students', StudentController::class);
 
 
 

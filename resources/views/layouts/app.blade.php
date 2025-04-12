@@ -42,6 +42,16 @@
                             <a href="{{ route('contact-forum') }}">Contact Forum</a>
                             <a href="{{ route('subjects.create') }}">Subjects</a>
                             <a href="{{ route('dashboard_cursos') }}">Dashboard Cursos</a>
+                            <a href="{{ route('professors.index') }}">Professors</a>
+                            <a href="{{ route('students.index') }}">Students</a>
+                        @endif
+                        @if (Auth::user()->is_professor)
+                            <a href="{{ route('professors.subjects', Auth::user()) }}">My Subjects</a>
+                            <a href="{{ route('professors.students', Auth::user()) }}">My Students</a>
+                        @endif
+                        @if (Auth::user()->is_student)
+                            <a href="{{ route('students.subjects', Auth::user()) }}">My Subjects</a>
+                            <a href="{{ route('students.professors', Auth::user()) }}">My Professors</a>
                         @endif
                     @endauth
                 </div>
