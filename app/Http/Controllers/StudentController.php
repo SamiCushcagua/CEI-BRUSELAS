@@ -12,7 +12,9 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = User::where('is_profesor', false)->where('is_admin', false)->get();
+        $students = User::where('is_profesor', false)
+                       ->where('is_admin', false)
+                       ->get();
         return view('students.index', compact('students'));
     }
 

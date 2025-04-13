@@ -1,10 +1,8 @@
 <?php
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TodoController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +14,6 @@ use App\Models\FAQ;
 use App\Models\ContactForum;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\CartController;
 use App\Http\Controllers\SubjectController;
 use App\Models\Subject;
 use App\Http\Controllers\SubjectRelationshipController;
@@ -31,10 +28,8 @@ use App\Http\Controllers\StudentController;
 
 // Home page
 Route::get('/', function () {
-    $products = Product::all();
     $users = User::all();
     return view('welcome', [
-        'products' => $products,
         'users' => $users
     ]);
 })->name('welcome');
@@ -86,54 +81,8 @@ Route::get('/Contact/{name?}', [ContactController::class, 'show'])->name('Contac
 Route::get('/profile/{user}', function (User $user) {
     return view('Profiel_page', ['user' => $user]);
 })->name('profile.public');
-
-
-/*
-|--------------------------------------------------------------------------
-| Product Routes
-|--------------------------------------------------------------------------
-*/
-
-// Rutas públicas de productos
-Route::get('/create-test-product', function () {
-    return view('create-test-product');
-})->name('create-test-product');
-
-// Rutas protegidas de productos
-Route::middleware(['auth'])->group(function () {
-    // Rutas de productos usando el controlador
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-    Route::post('/products', [ProductController::class, 'store'])->name('store-product');
-    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit.form');
-    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-
-    // Ruta para crear producto de prueba
-    Route::post('/store-test-product', function (Request $request) {
-        try {
-            $request->validate([
-                'name' => 'required|max:255',
-                'prijs' => 'required|numeric|min:0',
-                'description' => 'required',
-                'title' => 'required|max:255',
-                'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-                'created_date' => 'required|date'
-            ]);
-
-            $data = $request->only(['name', 'prijs', 'description', 'title', 'created_date']);
-            
-            if ($request->hasFile('image')) {
-                $data['image'] = $request->file('image')->store('products', 'public');
-            }
-
-            $product = Product::create($data);
-            return redirect()->route('welcome')->with('success', 'Product created successfully: ' . $product->name);
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error creating product: ' . $e->getMessage());
-        }
-    })->name('store-test-product');
-
+ 
+    
     // Rutas de materias
     Route::get('/subjects', [SubjectController::class, 'index'])
     ->name('subjects.index');
@@ -164,13 +113,13 @@ Route::middleware(['auth'])->group(function () {
     // Rutas para estudiantes
     Route::post('/subjects/{subject}/enroll-student', [SubjectRelationshipController::class, 'enrollStudent']);
     Route::delete('/subjects/{subject}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudent']);
-    Route::get('/students/{student}/subjects', [SubjectRelationshipController::class, 'getStudentSubjects']);
-    Route::get('/students/{student}/professors', [SubjectRelationshipController::class, 'getStudentProfessors']);
+    Route::get('/students/{student}/subjects', [SubjectRelationshipController::class, 'getStudentSubjects'])->name('students.subjects');
+    Route::get('/students/{student}/professors', [SubjectRelationshipController::class, 'getStudentProfessors'])->name('students.professors');
 
     // Professor routes
     Route::get('/professors/{professor}/subjects', [ProfessorController::class, 'subjects'])->name('professors.subjects');
     Route::get('/professors/{professor}/students', [ProfessorController::class, 'students'])->name('professors.students');
-});
+
 
 // Rutas de autenticación
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])
@@ -250,7 +199,79 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
+    // Rutas de materias
+    Route::get('/subjects', [SubjectController::class, 'index'])
+    ->name('subjects.index');
+
+    Route::get('/subjects/create', [SubjectController::class, 'create'])
+    ->name('subjects.create');
+
+    Route::post('/subjects', [SubjectController::class, 'store'])
+    ->name('subjects.store');
+
+    Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit'])
+    ->name('subjects.edit');
+
+    Route::put('/subjects/{subject}', [SubjectController::class, 'update'])
+    ->name('subjects.update');
+
+    Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])
+    ->name('subjects.destroy');
+
+    // Rutas para relaciones entre materias, profesores y estudiantes
+    Route::post('/subjects/{subject}/assign-professor', [SubjectRelationshipController::class, 'assignProfessor']);
+    Route::delete('/subjects/{subject}/remove-professor/{professor}', [SubjectRelationshipController::class, 'removeProfessor']);
+    Route::get('/professors/{professor}/subjects', [SubjectRelationshipController::class, 'getProfessorSubjects']);
+    Route::get('/professors/{professor}/students', [SubjectRelationshipController::class, 'getProfessorStudents']);
+    Route::post('/professors/{professor}/assign-student', [SubjectRelationshipController::class, 'assignStudentToProfessor']);
+    Route::delete('/professors/{professor}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudentFromProfessor']);
+
+    // Rutas para estudiantes
+    Route::post('/subjects/{subject}/enroll-student', [SubjectRelationshipController::class, 'enrollStudent']);
+    Route::delete('/subjects/{subject}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudent']);
+    Route::get('/students/{student}/subjects', [SubjectRelationshipController::class, 'getStudentSubjects'])->name('students.subjects');
+    Route::get('/students/{student}/professors', [SubjectRelationshipController::class, 'getStudentProfessors'])->name('students.professors');
+
+    // Professor routes
+    Route::get('/professors/{professor}/subjects', [ProfessorController::class, 'subjects'])->name('professors.subjects');
+    Route::get('/professors/{professor}/students', [ProfessorController::class, 'students'])->name('professors.students');
+
+    // Rutas de autenticación
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+        ->name('login')
+        ->middleware('guest');
+
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('guest');
+
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+        ->name('logout')
+        ->middleware('auth');
+
+    // Rutas de registro
+    Route::get('/register', [RegisteredUserController::class, 'create'])
+        ->name('register')
+        ->middleware('guest');
+
+    Route::post('/register', [RegisteredUserController::class, 'store'])
+        ->middleware('guest');
+
+    // Rutas de perfil
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Rutas de usuarios
+    Route::get('/usersAllShow', function () {
+        $allUser = User::all();
+        return view('usersAllShow', ['allUser' => $allUser]);
+    })->name('usersAllShow');
+    
+    Route::post('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::put('/users/{id}', [UserController::class, 'edit'])->name('users.edit');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+
     // User Management Routes
     Route::post('/users/create', function (Request $request) {
         try {
@@ -312,41 +333,7 @@ Route::middleware('auth')->group(function () {
             return redirect()->back()->with('error', 'Error actualizando usuario: ' . $e->getMessage());
         }
     })->name('users.edit');
-
-    // Product Management Routes
-    Route::put('/products/{product}/update', function (Product $product, Request $request) {
-        try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'prijs' => 'required|numeric|min:0',
-                'description' => 'required',
-                'title' => 'required|max:255',
-                'created_date' => 'required|date',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-            ]);
-            
-            $data = $request->only(['name', 'prijs', 'description', 'title', 'created_date']);
-
-            if ($request->hasFile('image')) {
-                // Eliminar imagen anterior si existe
-                if ($product->image) {
-                    Storage::disk('public')->delete($product->image);
-                }
-                // Guardar nueva imagen
-                $data['image'] = $request->file('image')->store('products', 'public');
-            }
-
-            $product->update($data);
-            return redirect()->route('welcome')->with('success', 'Product updated successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error updating product: ' . $e->getMessage());
-        }
-
-
-        return view('welcome');
-    })->name('products.update');
 });
-
 
 Route::post('/FAQ', function (Request $request) {
     $request->validate([    
@@ -416,13 +403,6 @@ Route::get('/subjects/dashboard_cursos', function () {
 */
 
 require __DIR__.'/auth.php';
-
-// Cart routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-    Route::delete('/cart/remove/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
-});
 
 // Rutas para profesores
 Route::resource('professors', ProfessorController::class);

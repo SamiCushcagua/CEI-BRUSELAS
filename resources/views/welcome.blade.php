@@ -52,51 +52,7 @@
         <!-- Products Section -->
         <h1 class="page-title">Products Information</h1>
         <div class="products-grid">
-            @foreach($products as $product)
-            <div class="product-card">
-                @if($product->image)
-                    <div class="product-image">
-                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-                    </div>
-                @endif
-                <div class="product-info">
-                    <h2 class="product-title">{{ $product->title }}</h2>
-                    <p><strong>Name:</strong> {{ $product->name }}</p>
-                    <p><strong>Price:</strong> €{{ number_format($product->prijs, 2) }}</p>
-                    @if($product->description)
-                        <p><strong>Description:</strong> {{ $product->description }}</p>
-                    @endif
-                    @if($product->created_date)
-                        <p><strong>Created Date:</strong> {{ $product->created_date }}</p>
-                    @endif
-
-                    @auth
-                        <form action="{{ route('cart.add', $product) }}" method="POST" style="margin-top: 10px;">
-                            @csrf
-                            <button type="submit" class="add-to-cart-button">Agregar al carrito</button>
-                        </form>
-
-                        @if(Auth::check() && Auth::user()->is_admin)
-                            <div class="button-container">
-                                <form action="{{ route('products.edit.form', $product->id) }}" method="GET" style="width: 50%;">
-                                    @csrf
-                                    <button type="submit" class="edit-button">
-                                        Edit
-                                    </button>
-                                </form>
-                                <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="width: 50%;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this product?')">
-                                        Delete
-                                    </button>
-                                </form>
-                            </div>
-                        @endif
-                    @endauth
-                </div>
-            </div>
-            @endforeach
+            
         </div>
     </div>
 </div>
