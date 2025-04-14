@@ -100,19 +100,6 @@ CEI-BRUSELAS/
 - CSRF-bescherming / Protección CSRF
 - XSS-bescherming / Protección XSS
 
-## 🤝 Bijdragen / Contribuciones
-1. Fork het project / Haz un fork del proyecto
-2. Maak een feature branch / Crea una rama de características
-3. Commit je wijzigingen / Haz commit de tus cambios
-4. Push naar de branch / Push a la rama
-5. Open een Pull Request / Abre un Pull Request
-
-## 📄 Licentie / Licencia
-Dit project is gelicentieerd onder de MIT-licentie / Este proyecto está licenciado bajo la licencia MIT.
-
-## 📞 Contact / Contacto
-Voor vragen of ondersteuning, neem contact op met / Para preguntas o soporte, contacta con:
-- Email: info@cei-bruselas.be
 - Website: www.cei-bruselas.be
 
 
