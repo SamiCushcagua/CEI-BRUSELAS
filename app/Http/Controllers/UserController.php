@@ -5,9 +5,39 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function index()
+    {
+        $users = User::all();
+        return view('usersAllShow', ['allUser' => $users]);
+    }
+
+    public function create(Request $request)
+    {
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('usersAllShow')->with('error', 'No tienes permiso para realizar esta acción.');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'is_admin' => $request->has('is_admin'),
+            'is_profesor' => $request->has('is_profesor')
+        ]);
+
+        return redirect()->route('usersAllShow')->with('success', 'Usuario creado correctamente.');
+    }
+
     public function edit(Request $request, $id)
     {
         $user = User::findOrFail($id);

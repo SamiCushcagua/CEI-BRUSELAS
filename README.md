@@ -1,120 +1,116 @@
-# E-commerce Project
+# CEI-BRUSELAS
 
-Este es un proyecto de e-commerce desarrollado con Laravel que incluye funcionalidades de carrito de compras, gestión de productos, sistema de usuarios y más.
+## 📝 Beschrijving / Descripción
+Dit is een Laravel-project voor het Centrum Evangelístico Internacional in Bruselas. Het project omvat een volledig functioneel webplatform met verschillende modules voor het beheer van studenten, professoren, vakken en gebruikers.
 
-## Requisitos Previos
+Este es un proyecto Laravel para el Centro Evangelístico Internacional en Bruselas. El proyecto incluye una plataforma web completamente funcional con varios módulos para la gestión de estudiantes, profesores, materias y usuarios.
 
-- PHP >= 8.1
+## 🚀 Functies / Características
+- Gebruikersbeheer (admin, professor, student) / Gestión de usuarios (admin, profesor, estudiante)
+- Vakkenbeheer / Gestión de materias
+- Relaties tussen studenten en professoren / Relaciones entre estudiantes y profesores
+- Contactformulier / Formulario de contacto
+- FAQ-systeem / Sistema de FAQ
+- Dashboard voor cursussen / Dashboard para cursos
+
+## 🛠️ Technische vereisten / Requisitos técnicos
+- PHP 8.1 of hoger / PHP 8.1 o superior
 - Composer
 - MySQL
-- Node.js & NPM
+- Node.js en NPM
+- Laravel 10.x
 
-## Instalación
+## 🚀 Installatie / Instalación
 
-1. Clonar el repositorio:
+### 1. Kloon de repository / Clona el repositorio
 ```bash
-git clone <URL_DEL_REPOSITORIO>
-cd <NOMBRE_DEL_PROYECTO>
+git clone https://github.com/uw-gebruikersnaam/CEI-BRUSELAS.git
+cd CEI-BRUSELAS
 ```
 
-2. Instalar dependencias de PHP:
+### 2. Installeer PHP-afhankelijkheden / Instala las dependencias de PHP
 ```bash
 composer install
 ```
 
-3. Instalar dependencias de Node.js:
+### 3. Installeer JavaScript-afhankelijkheden / Instala las dependencias de JavaScript
 ```bash
 npm install
 ```
 
-4. Copiar el archivo de entorno:
+### 4. Configureer de omgeving / Configura el entorno
 ```bash
 cp .env.example .env
-```
-
-5. Generar la clave de la aplicación:
-```bash
 php artisan key:generate
 ```
 
-6. Configurar la base de datos en el archivo .env:
-```
+### 5. Configureer de database / Configura la base de datos
+Wijzig de database-instellingen in het .env-bestand / Modifica la configuración de la base de datos en el archivo .env:
+```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=nombre_de_tu_base_de_datos
-DB_USERNAME=tu_usuario
-DB_PASSWORD=tu_contraseña
+DB_DATABASE=cei_bruselas
+DB_USERNAME=root
+DB_PASSWORD=
 ```
 
-7. Ejecutar las migraciones y seeders:
+### 6. Voer de migraties uit / Ejecuta las migraciones
 ```bash
-php artisan migrate:fresh --seed
+php artisan migrate
 ```
 
-8. Compilar los assets:
-```bash
-npm run dev
-```
-
-9. Iniciar el servidor:
+### 7. Start de server / Inicia el servidor
 ```bash
 php artisan serve
 ```
 
-## Credenciales por Defecto
+## 📁 Projectstructuur / Estructura del proyecto
+```
+CEI-BRUSELAS/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── StudentController.php
+│   │   │   ├── ProfessorController.php
+│   │   │   ├── SubjectController.php
+│   │   │   └── ...
+│   │   └── Middleware/
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Subject.php
+│   │   └── ...
+│   └── ...
+├── database/
+│   ├── migrations/
+│   └── seeders/
+├── resources/
+│   ├── views/
+│   │   ├── students/
+│   │   ├── professors/
+│   │   ├── subjects/
+│   │   └── ...
+│   └── ...
+└── ...
+```
 
-### Usuario Administrador
-- Email: admin@ehb.be
-- Contraseña: Password!321
+## 🔒 Beveiliging / Seguridad
+- Gebruikersauthenticatie met Laravel Breeze / Autenticación de usuarios con Laravel Breeze
+- Rolgebaseerde toegangscontrole / Control de acceso basado en roles
+- CSRF-bescherming / Protección CSRF
+- XSS-bescherming / Protección XSS
 
-### Usuario Normal
-- Email: user@example.com
-- Contraseña: user123
+## 🤝 Bijdragen / Contribuciones
+1. Fork het project / Haz un fork del proyecto
+2. Maak een feature branch / Crea una rama de características
+3. Commit je wijzigingen / Haz commit de tus cambios
+4. Push naar de branch / Push a la rama
+5. Open een Pull Request / Abre un Pull Request
 
-## Características Implementadas
+## 📄 Licentie / Licencia
+Dit project is gelicentieerd onder de MIT-licentie / Este proyecto está licenciado bajo la licencia MIT.
 
-- Sistema de autenticación completo (login, registro, recuperación de contraseña)
-- Gestión de productos (CRUD)
-- Carrito de compras
-- Panel de administración
-- Sistema de usuarios con roles (admin/user)
-- FAQ
-- Foro de contacto
-- Diseño responsive
-
-## Tecnologías Utilizadas
-
-- Laravel 10
-- PHP 8.1
-- MySQL
-- Blade Templates
-- Tailwind CSS
-- Alpine.js
-
-## Estructura del Proyecto
-
-- `app/Http/Controllers/` - Controladores de la aplicación
-- `app/Models/` - Modelos Eloquent
-- `database/migrations/` - Migraciones de la base de datos
-- `database/seeders/` - Seeders para datos de prueba
-- `resources/views/` - Vistas Blade
-- `routes/` - Definición de rutas
-
-## Contribución
-
-1. Fork el proyecto
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
-
-## Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
-
-## Contacto
-
-Tu Nombre - [@tutwitter](https://twitter.com/tutwitter) - email@ejemplo.com
-
-Link del Proyecto: [https://github.com/tuusuario/turepositorio](https://github.com/tuusuario/turepositorio)
+## 📞 Contact / Contacto
+Voor vragen of ondersteuning, neem contact op met / Para preguntas o soporte, contacta con:
+- Email: info@cei-bruselas.be
+- Website: www.cei-bruselas.be

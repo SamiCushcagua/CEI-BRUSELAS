@@ -27,23 +27,22 @@
                     </a>
                 </div>
                 <div class="nav-center">
-                    <a href="{{ route('welcome') }}">Home</a>
+                    <a href="{{ route('welcome') }}" class="nav-link">Home</a>
                     <a href="{{ route('about') }}">About Us</a>
                     <a href="{{ route('Contact') }}">Contact</a>
                     <a href="{{ route('usersAllShow') }}">All Users</a>
                     <a href="{{ route('FAQ') }}">FAQ</a>
                     
                     @auth
-                        <a href="{{ route('cart.index') }}">Cart</a>
                         <a href="{{ route('profile') }}">Profile</a>
                         <a href="{{ route('profile.edit', Auth::user()) }}">Edit Profile</a>
                         @if (Auth::user()->is_admin)
-                            <a href="{{ route('create-test-product') }}" class="green-link">Create Test Product</a>
+                      
                             <a href="{{ route('contact-forum') }}">Contact Forum</a>
                             <a href="{{ route('subjects.create') }}">Subjects</a>
                             <a href="{{ route('dashboard_cursos') }}">Dashboard Cursos</a>
-                            <a href="{{ route('professors.index') }}">Professors</a>
-                            <a href="{{ route('students.index') }}">Students</a>
+                            <a href="{{ route('professors.index') }}" class="nav-link">Professors</a>
+                            <a href="{{ route('students.index') }}" class="nav-link">Students</a>
                         @endif
                         @if (Auth::user()->is_professor)
                             <a href="{{ route('professors.subjects', Auth::user()) }}">My Subjects</a>

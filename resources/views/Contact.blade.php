@@ -7,7 +7,9 @@
     <!-- Main Content -->
     <div class="main-container static-content">
         <h1>Contact Us</h1>
-        <p>Welcome, {{ $name }}</p>
+        @if($name !== 'Default value')
+            <p>Welcome, {{ $name }}</p>
+        @endif
         
         @if(session('success'))
             <div class="alert alert-success">

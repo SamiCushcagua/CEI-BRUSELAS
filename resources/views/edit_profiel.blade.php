@@ -17,7 +17,7 @@
             </div>
         @endif
 
-        <form action="{{ route('users.edit.dummy', $user) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('users.edit', $user) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
