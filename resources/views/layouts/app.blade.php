@@ -43,7 +43,9 @@
                             <a href="{{ route('dashboard_cursos') }}">Dashboard Cursos</a>
                             <a href="{{ route('professors.index') }}" class="nav-link">Professors</a>
                             <a href="{{ route('students.index') }}" class="nav-link">Students</a>
-                        @endif
+                            <a href="{{ route('calificaciones.index') }}" class="nav-link">Calificaciones</a>
+
+                            @endif
                         @if (Auth::user()->is_professor)
                             <a href="{{ route('professors.subjects', Auth::user()) }}">My Subjects</a>
                             <a href="{{ route('professors.students', Auth::user()) }}">My Students</a>
