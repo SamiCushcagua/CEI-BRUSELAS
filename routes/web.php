@@ -17,7 +17,7 @@ use App\Http\Controllers\SubjectRelationshipController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\FAQController;
-
+use App\Http\Controllers\CalificacionesController;
 // Public Routes
 Route::get('/', function () {
     return view('welcome', ['users' => User::all()]);
@@ -106,10 +106,20 @@ Route::get('/profile/{user}/edit', function (User $user) {
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/{student}/subjects', [SubjectRelationshipController::class, 'getStudentSubjects'])->name('students.subjects');
     Route::get('/students/{student}/professors', [SubjectRelationshipController::class, 'getStudentProfessors'])->name('students.professors');
+
+// Calificaciones
+Route::get('/calificaciones', [CalificacionesController::class, 'index'])
+->name('calificaciones.index');
+
+Route::get('/calificaciones/create', [CalificacionesController::class, 'create'])
+->name('calificaciones.create');
+
+Route::post('/calificaciones', [CalificacionesController::class, 'store'])
+->name('calificaciones.store');
+
+
+
 });
 
-Route::get('/create-test-product', function () {
-    return view('create-test-product');
-})->name('create-test-product');
 
 require __DIR__.'/auth.php';
