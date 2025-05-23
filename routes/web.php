@@ -58,25 +58,10 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
     // Profile Routes
-Route::get('/profile', function () {
-        return view('Profiel_page', ['user' => Auth::user()]);
-})->name('profile');
-
-Route::get('/profile/{user}/edit', function (User $user) {
-    return view('edit_profiel', ['user' => $user]);
-})->name('profile.edit');
-
-    Route::get('/profile/{user}', function (User $user) {
-        return view('Profiel_page', ['user' => $user]);
-    })->name('profile.public');
-
-
-
-//edita usuario propio
-
-Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-
-
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.public');
 
     // User Management
     Route::get('/users', [UserController::class, 'index'])->name('usersAllShow');
@@ -123,8 +108,6 @@ Route::get('/calificaciones/create', [CalificacionesController::class, 'create']
 
 Route::post('/calificaciones', [CalificacionesController::class, 'store'])
 ->name('calificaciones.store');
-
-
 
 });
 

@@ -26,10 +26,10 @@
                 <input type="text" 
                        name="UsernameDummy" 
                        id="UsernameDummy" 
-                       class="form-control @error('UsernameDummy') is-invalid @enderror"
+                       class="form-input @error('UsernameDummy') form-input-error @enderror" 
                        value="{{ old('UsernameDummy', $user->UsernameDummy) }}">
                 @error('UsernameDummy')
-                    <span class="invalid-feedback">{{ $message }}</span>
+                    <div class="error-message">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -38,10 +38,10 @@
                 <input type="date" 
                        name="verjaardag" 
                        id="verjaardag" 
-                       class="form-control @error('verjaardag') is-invalid @enderror"
+                       class="form-input @error('verjaardag') form-input-error @enderror" 
                        value="{{ old('verjaardag', $user->verjaardag) }}">
                 @error('verjaardag')
-                    <span class="invalid-feedback">{{ $message }}</span>
+                    <div class="error-message">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -49,10 +49,9 @@
                 <label for="overMij">About Me</label>
                 <textarea name="overMij" 
                           id="overMij" 
-                          class="form-control @error('overMij') is-invalid @enderror"
-                          rows="4">{{ old('overMij', $user->overMij) }}</textarea>
+                          class="form-input @error('overMij') form-input-error @enderror">{{ old('overMij', $user->overMij) }}</textarea>
                 @error('overMij')
-                    <span class="invalid-feedback">{{ $message }}</span>
+                    <div class="error-message">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -97,7 +96,7 @@
     margin-bottom: 1.5rem;
 }
 
-.form-control {
+.form-input {
     width: 100%;
     padding: 0.5rem;
     border: 1px solid #ddd;
@@ -105,11 +104,11 @@
     margin-top: 0.5rem;
 }
 
-.form-control.is-invalid {
+.form-input-error {
     border-color: #dc3545;
 }
 
-.invalid-feedback {
+.error-message {
     color: #dc3545;
     font-size: 0.875rem;
     margin-top: 0.25rem;
