@@ -17,9 +17,9 @@
             </div>
         @endif
 
-        <form action="{{ route('users.edit', $user) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            @method('PUT')
+            @method('patch')
 
             <div class="form-group">
                 <label for="UsernameDummy">Pseudo name</label>

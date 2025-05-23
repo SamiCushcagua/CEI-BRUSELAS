@@ -52,6 +52,9 @@
         <!-- Products Section -->
         <h1 class="page-title">Products Information</h1>
         <div class="products-grid">
+
+
+        
             
         </div>
     </div>

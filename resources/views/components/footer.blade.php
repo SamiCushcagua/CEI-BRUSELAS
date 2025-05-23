@@ -1,8 +1,8 @@
 <footer class="footer">
     <div class="footer-content">
         <div class="footer-section">
-            <h3>CP Atelier</h3>
-            <p>Your trusted partner in quality products and services.</p>
+            <h3>Centro Evangelistico Internacional</h3>
+            <p>In God we trust</p>
         </div>
         <div class="footer-section">
             <h3>Quick Links</h3>
@@ -15,20 +15,20 @@
         </div>
         <div class="footer-section">
             <h3>Contact Info</h3>
-            <p>Email: info@cpatelier.com</p>
-            <p>Phone: +1 234 567 890</p>
+            <p>Email: info@CEI-BRUSELAS.com</p>
+            <p>Phone: 0800 800 800</p>
             <p>Address: 123 Business Street</p>
         </div>
         <div class="footer-section">
             <h3>Follow Us</h3>
             <div class="social-links">
                 <a href="#" class="social-link">Facebook</a>
-                <a href="#" class="social-link">Twitter</a>
+          
                 <a href="#" class="social-link">Instagram</a>
             </div>
         </div>
     </div>
     <div class="footer-bottom">
-        <p>&copy; {{ date('Y') }} CP Atelier. All rights reserved.</p>
+        <p>&copy; {{ date('Y') }} Glory-Tech. All rights reserved.</p>
     </div>
 </footer> 

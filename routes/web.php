@@ -70,9 +70,16 @@ Route::get('/profile/{user}/edit', function (User $user) {
         return view('Profiel_page', ['user' => $user]);
     })->name('profile.public');
 
+
+
+//edita usuario propio
+
+Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+
+
     // User Management
     Route::get('/users', [UserController::class, 'index'])->name('usersAllShow');
-
     Route::post('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::put('/users/{id}', [UserController::class, 'edit'])->name('users.edit');
     Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');

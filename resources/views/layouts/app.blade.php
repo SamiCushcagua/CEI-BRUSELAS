@@ -8,7 +8,7 @@
         <title>{{ config('app.name', 'CP Atelier') }}</title>
 
         <!-- Favicon -->
-        <link rel="icon" type="image/svg+xml" href="{{ asset('images/logoCP.svg') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-cei.svg') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -23,7 +23,7 @@
             <nav class="nav-menu">
                 <div class="nav-left">
                     <a href="{{ route('welcome') }}" class="logo-link">
-                        <img src="{{ asset('images/logoCP.svg') }}" alt="Logo" class="application-logo">
+                        <img src="{{ asset('images/logo-cei.svg') }}" alt="Logo" class="application-logo">
                     </a>
                 </div>
                 <div class="nav-center">
