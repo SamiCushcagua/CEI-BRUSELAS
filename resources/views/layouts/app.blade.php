@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'CP Atelier') }}</title>
+        <title>{{ config('app.name', 'CEI-Bruselas') }}</title>
 
         <!-- Favicon -->
         <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo-cei.svg') }}">
@@ -35,7 +35,7 @@
                     
                     @auth
                         <a href="{{ route('profile') }}">Profile</a>
-                        <a href="{{ route('profile.edit', Auth::user()) }}">Edit Profile</a>
+                    
                         @if (Auth::user()->is_admin)
                       
                             <a href="{{ route('contact-forum') }}">Contact Forum</a>
