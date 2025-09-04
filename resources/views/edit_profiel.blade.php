@@ -3,7 +3,17 @@
 @section('content')
 <div class="container">
     <div class="edit-profile-card">
-        <h1>Edit Profile: {{ $user->name }}</h1>
+        @php
+            $isAdminEditingOtherUser = Auth::check() && Auth::user()->is_admin && Auth::user()->id !== $user->id;
+        @endphp
+        
+        <h1>
+            @if($isAdminEditingOtherUser)
+                Edit User Profile: {{ $user->name }}
+            @else
+                Edit Profile: {{ $user->name }}
+            @endif
+        </h1>
 
         @if(session('success'))
             <div class="alert alert-success">
@@ -20,6 +30,38 @@
         <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('patch')
+            
+            @php
+                $isAdminEditingOtherUser = Auth::check() && Auth::user()->is_admin && Auth::user()->id !== $user->id;
+            @endphp
+            
+            @if($isAdminEditingOtherUser)
+                <input type="hidden" name="user_id" value="{{ $user->id }}">
+            @endif
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" 
+                       name="name" 
+                       id="name" 
+                       class="form-input @error('name') form-input-error @enderror" 
+                       value="{{ old('name', $user->name) }}">
+                @error('name')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" 
+                       name="email" 
+                       id="email" 
+                       class="form-input @error('email') form-input-error @enderror" 
+                       value="{{ old('email', $user->email) }}">
+                @error('email')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
+            </div>
 
             <div class="form-group">
                 <label for="UsernameDummy">Pseudo name</label>
@@ -75,7 +117,13 @@
             </div>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Update Profile</button>
+                <button type="submit" class="btn btn-primary">
+                    @if($isAdminEditingOtherUser)
+                        Update User Profile
+                    @else
+                        Update Profile
+                    @endif
+                </button>
                 <a href="{{ route('profile.public', $user) }}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>

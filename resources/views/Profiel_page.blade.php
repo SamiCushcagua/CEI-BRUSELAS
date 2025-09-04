@@ -4,66 +4,97 @@
     <div class="container">
         <div class="profile-card">
             <div class="profile-header">
-                @if(Auth::user()->image)
+                @if($user->image)
                     @php
-                        $imagePath = 'storage/' . Auth::user()->image;
+                        $imagePath = 'storage/' . $user->image;
                         $fullPath = public_path($imagePath);
                     @endphp
                     
                     @if(file_exists($fullPath))
-                        <img src="{{ asset($imagePath) }}" alt="{{ Auth::user()->name }}'s profile picture" class="profile-image">
+                        <img src="{{ asset($imagePath) }}" alt="{{ $user->name }}'s profile picture" class="profile-image">
                     @else
                         <div class="debug-info">
                             <p>Image file not found at: {{ $fullPath }}</p>
-                            <p>DB Image path: {{ Auth::user()->image }}</p>
+                            <p>DB Image path: {{ $user->image }}</p>
                         </div>
                         <div class="profile-image-placeholder">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            {{ strtoupper(substr($user->name, 0, 1)) }}
                         </div>
                     @endif
                 @else
                     <div class="profile-image-placeholder">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        {{ strtoupper(substr($user->name, 0, 1)) }}
                     </div>
                 @endif
-                <h1>My Profile</h1>
+                <h1>{{ $user->name }}'s Profile</h1>
             </div>
 
             <div class="profile-info">
                 <div class="info-item">
                     <label>Name:</label>
-                    <span>{{ Auth::user()->name }}</span>
+                    <span>{{ $user->name }}</span>
                 </div>
 
                 <div class="info-item">
                     <label>Email:</label>
-                    <span>{{ Auth::user()->email }}</span>
+                    <span>{{ $user->email }}</span>
                 </div>
 
-                @if(Auth::user()->UsernameDummy)
-                    <div class="info-item">
-                        <label>Pseudo name:</label>
-                        <span>{{ Auth::user()->UsernameDummy }}</span>
-                    </div>
-                @endif
+                <div class="info-item">
+                    <label>Pseudo name:</label>
+                    <span>{{ $user->UsernameDummy ?? 'Not specified' }}</span>
+                </div>
 
-                @if(Auth::user()->verjaardag)
-                    <div class="info-item">
-                        <label>Birthday:</label>
-                        <span>{{ Auth::user()->verjaardag }}</span>
-                    </div>
-                @endif
+                <div class="info-item">
+                    <label>Birthday:</label>
+                    <span>
+                        @if($user->verjaardag)
+                            {{ \Carbon\Carbon::parse($user->verjaardag)->format('d/m/Y') }}
+                        @else
+                            Not specified
+                        @endif
+                    </span>
+                </div>
 
-                @if(Auth::user()->overMij)
-                    <div class="info-item">
-                        <label>About Me:</label>
-                        <p>{{ Auth::user()->overMij }}</p>
+                <div class="info-item">
+                    <label>About Me:</label>
+                    <p>{{ $user->overMij ?? 'Not specified' }}</p>
+                </div>
+
+                <div class="info-item">
+                    <label>Profile Photo:</label>
+                    <div class="photo-display">
+                        @if($user->image)
+                            <img src="{{ asset('storage/' . $user->image) }}" alt="Profile photo" class="profile-photo">
+                        @else
+                            <span class="no-photo">No profile photo uploaded</span>
+                        @endif
                     </div>
-                @endif
+                </div>
+
+                <div class="info-item">
+                    <label>User Type:</label>
+                    <span>
+                        @if($user->is_admin)
+                            <span class="user-type admin-type">👑 Administrador</span>
+                        @elseif($user->is_profesor)
+                            <span class="user-type profesor-type">🎓 Profesor</span>
+                        @else
+                            <span class="user-type user-type-normal">👤 Usuario</span>
+                        @endif
+                    </span>
+                </div>
             </div>
 
             <div class="profile-actions">
-                <a href="{{ route('profile.edit', Auth::user()) }}" class="edit-button">Edit Profile</a>
+                @auth
+                    @if(Auth::user()->id === $user->id)
+                        <a href="{{ route('profile.edit') }}" class="edit-button">Edit Profile</a>
+                    @elseif(Auth::user()->is_admin)
+                        <a href="{{ route('profile.edit') }}?user_id={{ $user->id }}" class="edit-button admin-edit">Edit User Profile</a>
+                    @endif
+                @endauth
+                <a href="{{ route('usersAllShow') }}" class="back-button">← Volver a Usuarios</a>
             </div>
         </div>
     </div>
@@ -158,6 +189,68 @@
 
     .edit-button:hover {
         background-color: #4338ca;
+    }
+
+    .admin-edit {
+        background-color: #dc3545;
+    }
+
+    .admin-edit:hover {
+        background-color: #c82333;
+    }
+
+    .back-button {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: background-color 0.2s;
+        margin-left: 1rem;
+    }
+
+    .back-button:hover {
+        background-color: #545b62;
+    }
+
+    .user-type {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        color: white;
+        display: inline-block;
+    }
+
+    .admin-type {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+    }
+
+    .profesor-type {
+        background: linear-gradient(135deg, #28a745, #20c997);
+    }
+
+    .user-type-normal {
+        background: linear-gradient(135deg, #6c757d, #495057);
+    }
+
+    .photo-display {
+        margin-top: 0.5rem;
+    }
+
+    .profile-photo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e9ecef;
+    }
+
+    .no-photo {
+        color: #6c757d;
+        font-style: italic;
     }
 
     @media (max-width: 640px) {

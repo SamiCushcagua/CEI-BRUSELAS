@@ -27,32 +27,32 @@
                     </a>
                 </div>
                 <div class="nav-center">
-                    <a href="{{ route('welcome') }}" class="nav-link">Home</a>
-                    <a href="{{ route('about') }}">About Us</a>
-                    <a href="{{ route('Contact') }}">Contact</a>
-                    <a href="{{ route('usersAllShow') }}">All Users</a>
-                    <a href="{{ route('FAQ') }}">FAQ</a>
+                    <a href="{{ route('welcome') }}" class="nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}">Home</a>
+                    <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">About Us</a>
+                    <a href="{{ route('Contact') }}" class="{{ request()->routeIs('Contact') ? 'active' : '' }}">Contact</a>
+                    <a href="{{ route('usersAllShow') }}" class="{{ request()->routeIs('usersAllShow') ? 'active' : '' }}">All Users</a>
+                    <a href="{{ route('FAQ') }}" class="{{ request()->routeIs('FAQ') ? 'active' : '' }}">FAQ</a>
                     
                     @auth
-                        <a href="{{ route('profile') }}">Profile</a>
+                        <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">Profile</a>
                     
                         @if (Auth::user()->is_admin)
                       
-                            <a href="{{ route('contact-forum') }}">Contact Forum</a>
-                            <a href="{{ route('subjects.create') }}">Subjects</a>
-                            <a href="{{ route('dashboard_cursos') }}">Dashboard Cursos</a>
-                            <a href="{{ route('professors.index') }}" class="nav-link">Professors</a>
-                            <a href="{{ route('students.index') }}" class="nav-link">Students</a>
-                            <a href="{{ route('calificaciones.index') }}" class="nav-link">Calificaciones</a>
+                            <a href="{{ route('contact-forum') }}" class="{{ request()->routeIs('contact-forum') ? 'active' : '' }}">Contact Forum</a>
+                            <a href="{{ route('subjects.create') }}" class="{{ request()->routeIs('subjects.create') ? 'active' : '' }}">Subjects</a>
+                            <a href="{{ route('dashboard_cursos') }}" class="{{ request()->routeIs('dashboard_cursos') ? 'active' : '' }}">Dashboard Cursos</a>
+                            <a href="{{ route('professors.index') }}" class="nav-link {{ request()->routeIs('professors.index') ? 'active' : '' }}">Professors</a>
+                            <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.index') ? 'active' : '' }}">Students</a>
+                            <a href="{{ route('calificaciones.index') }}" class="nav-link {{ request()->routeIs('calificaciones.index') ? 'active' : '' }}">Calificaciones</a>
 
                             @endif
                         @if (Auth::user()->is_professor)
-                            <a href="{{ route('professors.subjects', Auth::user()) }}">My Subjects</a>
-                            <a href="{{ route('professors.students', Auth::user()) }}">My Students</a>
+                            <a href="{{ route('professors.subjects', Auth::user()) }}" class="{{ request()->routeIs('professors.subjects') ? 'active' : '' }}">My Subjects</a>
+                            <a href="{{ route('professors.students', Auth::user()) }}" class="{{ request()->routeIs('professors.students') ? 'active' : '' }}">My Students</a>
                         @endif
                         @if (Auth::user()->is_student)
-                            <a href="{{ route('students.subjects', Auth::user()) }}">My Subjects</a>
-                            <a href="{{ route('students.professors', Auth::user()) }}">My Professors</a>
+                            <a href="{{ route('students.subjects', Auth::user()) }}" class="{{ request()->routeIs('students.subjects') ? 'active' : '' }}">My Subjects</a>
+                            <a href="{{ route('students.professors', Auth::user()) }}" class="{{ request()->routeIs('students.professors') ? 'active' : '' }}">My Professors</a>
                         @endif
                     @endauth
                 </div>
@@ -63,8 +63,8 @@
                             <button type="submit" style="background: none; border: none; color: #2563eb; text-decoration: none; cursor: pointer;">Logout</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}">Login</a>
-                        <a href="{{ route('register') }}">Register</a>
+                        <a href="{{ route('login') }}" class="{{ request()->routeIs('login') ? 'active' : '' }}">Login</a>
+                        <a href="{{ route('register') }}" class="{{ request()->routeIs('register') ? 'active' : '' }}">Register</a>
                     @endauth
                 </div>
             </nav>

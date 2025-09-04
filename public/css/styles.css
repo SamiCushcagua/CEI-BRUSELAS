@@ -86,10 +86,23 @@ body {
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
+    padding: 8px 12px;
+    border-radius: 6px;
 }
 
 .nav-menu a:hover {
     color: #1e40af;
+    background-color: #eff6ff;
+}
+
+.nav-menu a.active {
+    color: #ffffff;
+    background-color: #3b82f6;
+    font-weight: 600;
+}
+
+.nav-menu a.active:hover {
+    background-color: #2563eb;
 }
 
 .nav-menu a.green-link {
