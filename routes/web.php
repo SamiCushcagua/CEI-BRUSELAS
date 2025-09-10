@@ -112,5 +112,6 @@ Route::post('/calificaciones', [CalificacionesController::class, 'store'])
 
 });
 
+Route::post('/subjects/{subject}/assign-professors', [SubjectController::class, 'assignProfessors'])->name('subjects.assign-professors');
 
 require __DIR__.'/auth.php';

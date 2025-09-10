@@ -13,16 +13,16 @@ class Subject extends Model
         'name',
         'description',
         'Nivel',
-        'profesor_asignado',
         'Archivo',
-        'imagen'
+        'imagen',
+       
     ];
 
     // Relación con profesores (many-to-many)
     public function professors()
     {
         return $this->belongsToMany(User::class, 'subject_professor', 'subject_id', 'professor_id')
-            ->where('role', 'professor');
+            ->where('is_profesor', true);
     }
 
     // Relación con estudiantes (many-to-many)
