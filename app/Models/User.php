@@ -95,4 +95,15 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class, 'professor_student', 'student_id', 'professor_id')
             ->where('role', 'professor');
     }
+
+
+    // Relación: Un estudiante puede tener MUCHOS diplomas
+public function diplomas()
+{
+    return $this->belongsToMany(Diploma::class, 'student_diplomas', 'student_id', 'diploma_id')
+        ->withPivot('fecha_obtencion', 'calificacion', 'estado')
+        ->withTimestamps();
+}
+
+
 }
