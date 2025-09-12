@@ -18,6 +18,7 @@ use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\CalificacionesController;
+use Illuminate\Support\Facades\DB;
 // Public Routes
 Route::get('/', function () {
     return view('welcome', ['users' => User::all()]);
@@ -74,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');
     Route::get('/subjects/create', [SubjectController::class, 'create'])->name('subjects.create');
     Route::post('/subjects', [SubjectController::class, 'store'])->name('subjects.store');
+    Route::get('/subjects/{subject}', [SubjectController::class, 'show'])->name('subjects.show');
     Route::get('/subjects/{subject}/edit', [SubjectController::class, 'edit'])->name('subjects.edit');
     Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
     Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
@@ -113,5 +115,7 @@ Route::post('/calificaciones', [CalificacionesController::class, 'store'])
 });
 
 Route::post('/subjects/{subject}/assign-professors', [SubjectController::class, 'assignProfessors'])->name('subjects.assign-professors');
+Route::post('/subjects/{subject}/enroll-student', [SubjectController::class, 'enrollStudent'])->name('subjects.enroll-student');
+Route::delete('/subjects/{subject}/remove-student/{student}', [SubjectController::class, 'removeStudent'])->name('subjects.remove-student');
 
 require __DIR__.'/auth.php';

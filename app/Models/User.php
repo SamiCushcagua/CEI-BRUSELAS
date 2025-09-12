@@ -80,7 +80,8 @@ class User extends Authenticatable
     public function students()
     {
         return $this->belongsToMany(User::class, 'professor_student', 'professor_id', 'student_id')
-            ->where('role', 'student');
+            ->where('is_profesor', false)
+            ->where('is_admin', false);
     }
 
     // Relaciones para estudiantes

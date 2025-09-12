@@ -9,8 +9,10 @@
             <div class="product-card">
                 @if($subject->imagen)
                     <div class="product-image">
-                        <img src="{{ asset('storage/' . $subject->imagen) }}" 
-                             alt="{{ $subject->name }}">
+                        <a href="{{ route('subjects.show', $subject) }}">
+                            <img src="{{ asset('storage/' . $subject->imagen) }}" 
+                                 alt="{{ $subject->name }}">
+                        </a>
                     </div>
                 @endif
                 <div class="product-info">
@@ -163,6 +165,18 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.product-image a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+}
+
+.product-image a:hover {
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
 }
 
 .product-info {

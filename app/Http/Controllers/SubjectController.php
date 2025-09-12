@@ -6,6 +6,7 @@ use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class SubjectController extends Controller
 {
@@ -62,7 +63,16 @@ class SubjectController extends Controller
      */
     public function show(Subject $subject)
     {
-        //
+        // Obtener todos los estudiantes que NO están inscritos en NINGUNA materia
+        $availableStudents = User::where('is_profesor', false)
+            ->where('is_admin', false)
+            ->whereDoesntHave('subjectsAsStudent')
+            ->get();
+        
+        // Obtener estudiantes ya inscritos en esta materia
+        $enrolledStudents = $subject->students;
+        
+        return view('subjects.show_subject_student', compact('subject', 'availableStudents', 'enrolledStudents'));
     }
 
     /**
@@ -157,5 +167,49 @@ class SubjectController extends Controller
 
         return redirect()->route('dashboard_cursos')
             ->with('success', 'Profesores asignados exitosamente.');
+    }
+
+    /**
+     * Inscribir estudiante en una materia
+     */
+    public function enrollStudent(Request $request, Subject $subject)
+    {
+        $validated = $request->validate([
+            'student_id' => 'required|integer|exists:users,id',
+        ]);
+
+        // Verificar que el usuario sea estudiante
+        $student = User::find($validated['student_id']);
+        if (!$student || $student->is_profesor || $student->is_admin) {
+            return redirect()->route('subjects.show', $subject)
+                ->with('error', 'El usuario seleccionado no es un estudiante.');
+        }
+
+        // Verificar que el estudiante no esté ya inscrito en otra materia
+        $existingEnrollment = DB::table('subject_student')
+            ->where('student_id', $validated['student_id'])
+            ->first();
+
+        if ($existingEnrollment) {
+            return redirect()->route('subjects.show', $subject)
+                ->with('error', 'Este estudiante ya está inscrito en otra materia.');
+        }
+
+        // Inscribir al estudiante
+        $subject->students()->attach($validated['student_id']);
+
+        return redirect()->route('subjects.show', $subject)
+            ->with('success', 'Estudiante inscrito exitosamente.');
+    }
+
+    /**
+     * Desinscribir estudiante de una materia
+     */
+    public function removeStudent(Subject $subject, User $student)
+    {
+        $subject->students()->detach($student->id);
+
+        return redirect()->route('subjects.show', $subject)
+            ->with('success', 'Estudiante eliminado exitosamente.');
     }
 } 
