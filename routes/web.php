@@ -42,7 +42,7 @@ Route::get('/contact-forum', function () {
     return view('contact-forum', ['contactForum' => $contactForum]);
 })->name('contact-forum');
 Route::post('/send-email', [ContactController::class, 'store'])->name('send-email');
-Route::post('/contact-forum', [ContactController::class, 'store'])->name('contact-forum');
+Route::post('/contact-forum', [ContactController::class, 'store'])->name('contact-forum.store');
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
