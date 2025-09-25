@@ -69,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('usersAllShow');
     Route::post('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::put('/users/{id}', [UserController::class, 'edit'])->name('users.edit');
-    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{id}/delete', [UserController::class, 'destroy'])->name('users.destroy');
 
     // Subject Routes
     Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');

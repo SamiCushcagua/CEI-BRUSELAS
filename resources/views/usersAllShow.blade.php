@@ -110,8 +110,7 @@
 
                                     <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display: inline;">
                                         @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="form-button delete-button">ELIMINAR</button>
+                                        <button type="submit" class="form-button delete-button" onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">ELIMINAR</button>
                                     </form>
                                 @endif
                             @endauth
@@ -161,8 +160,7 @@
 
                                     <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display: inline;">
                                         @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="form-button delete-button">ELIMINAR</button>
+                                        <button type="submit" class="form-button delete-button" onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">ELIMINAR</button>
                                     </form>
                                 @endif
                             @endauth
@@ -212,8 +210,7 @@
 
                                     <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display: inline;">
                                         @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="form-button delete-button">ELIMINAR</button>
+                                        <button type="submit" class="form-button delete-button" onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">ELIMINAR</button>
                                     </form>
                                 @endif
                             @endauth

@@ -72,4 +72,23 @@ class UserController extends Controller
 
         return redirect()->route('usersAllShow')->with('success', 'Rol de usuario actualizado correctamente.');
     }
+
+    public function destroy($id)
+    {
+        // Validar que el usuario actual sea administrador
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('usersAllShow')->with('error', 'No tienes permiso para realizar esta acción.');
+        }
+
+        $user = User::findOrFail($id);
+        
+        // Prevenir que el usuario se elimine a sí mismo
+        if ($user->id === Auth::id()) {
+            return redirect()->route('usersAllShow')->with('error', 'No puedes eliminar tu propia cuenta.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('usersAllShow')->with('success', 'Usuario eliminado correctamente.');
+    }
 } 
