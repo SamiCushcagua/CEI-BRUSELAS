@@ -26,7 +26,8 @@
                         <img src="{{ asset('images/logo-cei.svg') }}" alt="Logo" class="application-logo">
                     </a>
                 </div>
-                <div class="nav-center">
+                
+                <div class="nav-center" id="nav-links">
                     <a href="{{ route('welcome') }}" class="nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}">Home</a>
                     <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">About Us</a>
                     <a href="{{ route('Contact') }}" class="{{ request()->routeIs('Contact') ? 'active' : '' }}">Contact</a>
@@ -66,6 +67,13 @@
                         <a href="{{ route('login') }}" class="{{ request()->routeIs('login') ? 'active' : '' }}">Login</a>
                         <a href="{{ route('register') }}" class="{{ request()->routeIs('register') ? 'active' : '' }}">Register</a>
                     @endauth
+                    
+                    <!-- Mobile menu toggle button -->
+                    <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Abrir menú">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
                 </div>
             </nav>
 
@@ -81,5 +89,6 @@
             <!-- Footer -->
             <x-footer />
         </div>
-    </body>
+        <script src="{{ asset('js/mobile-menu.js') }}"></script>
+        </body>
 </html>
