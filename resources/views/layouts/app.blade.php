@@ -30,7 +30,7 @@
                 <div class="nav-center" id="nav-links">
                     <a href="{{ route('welcome') }}" class="nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}">Home</a>
                     <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">About Us</a>
-                    <a href="{{ route('Contact') }}" class="{{ request()->routeIs('Contact') ? 'active' : '' }}">Contact</a>
+                 <!--   <a href="{{ route('Contact') }}" class="{{ request()->routeIs('Contact') ? 'active' : '' }}">Contact</a>--> <!-- CAhun no esta funcionando bien en el contacto -->
                     <a href="{{ route('usersAllShow') }}" class="{{ request()->routeIs('usersAllShow') ? 'active' : '' }}">All Users</a>
                     <a href="{{ route('FAQ') }}" class="{{ request()->routeIs('FAQ') ? 'active' : '' }}">FAQ</a>
                     
