@@ -14,6 +14,16 @@
                                  alt="{{ $subject->name }}">
                         </a>
                     </div>
+                @else
+                    <!-- Enlace alternativo cuando no hay imagen -->
+                    <div class="product-image">
+                        <a href="{{ route('subjects.show', $subject) }}" class="no-image-link">
+                            <div class="placeholder-content">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Gestionar Estudiantes</span>
+                            </div>
+                        </a>
+                    </div>
                 @endif
                 <div class="product-info">
                     <h2 class="product-title">{{ $subject->name }}</h2>
@@ -477,6 +487,33 @@
     .btn-arrow i {
         font-size: 0.8rem;
     }
+}
+
+.no-image-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-decoration: none;
+    color: white;
+}
+
+.placeholder-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.placeholder-content i {
+    font-size: 2rem;
+    opacity: 0.8;
+}
+
+.placeholder-content span {
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 /* Responsive */
