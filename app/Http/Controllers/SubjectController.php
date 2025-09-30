@@ -36,7 +36,7 @@ class SubjectController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'Nivel' => 'required|numeric|min:1|max:20',
-            'Archivo' => 'nullable|file|mimes:pdf,doc,docx|max:50000',
+            'Archivo' => 'nullable|file|mimes:pdf,doc,docx|max:5000',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
