@@ -34,13 +34,13 @@
                 @enderror
             </div>
 
-            <!-- Remember Me -->
+            <!-- Remember Me 
             <div>
                 <label class="auth-checkbox-label">
                     <input type="checkbox" class="auth-checkbox" name="remember">
                     <span>Remember me</span>
                 </label>
-            </div>
+            </div>-->
 
             <div class="auth-footer">
                 @if (Route::has('password.request'))
