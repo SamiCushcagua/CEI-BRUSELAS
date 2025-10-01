@@ -43,11 +43,11 @@
             </div>-->
 
             <div class="auth-footer">
-                @if (Route::has('password.request'))
+              <!--  @if (Route::has('password.request'))
                     <a class="auth-link" href="{{ route('password.request') }}">
                         Forgot your password?
                     </a>
-                @endif
+                @endif-->
 
                 <button type="submit" class="auth-button">
                     Log in

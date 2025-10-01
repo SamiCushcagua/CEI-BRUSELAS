@@ -29,31 +29,31 @@
                 
                 <div class="nav-center" id="nav-links">
                     <a href="{{ route('welcome') }}" class="nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}">Home</a>
-                    <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">About Us</a>
+                    <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">Sobre nosotros</a>
                  <!--   <a href="{{ route('Contact') }}" class="{{ request()->routeIs('Contact') ? 'active' : '' }}">Contact</a>--> <!-- CAhun no esta funcionando bien en el contacto -->
-                    <a href="{{ route('usersAllShow') }}" class="{{ request()->routeIs('usersAllShow') ? 'active' : '' }}">All Users</a>
+                    <a href="{{ route('usersAllShow') }}" class="{{ request()->routeIs('usersAllShow') ? 'active' : '' }}">Todos los usuarios</a>
                     <a href="{{ route('FAQ') }}" class="{{ request()->routeIs('FAQ') ? 'active' : '' }}">FAQ</a>
                     
                     @auth
-                        <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">Profile</a>
+                        <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">Perfil</a>
                     
                         @if (Auth::user()->is_admin)
                       
-                            <a href="{{ route('contact-forum') }}" class="{{ request()->routeIs('contact-forum') ? 'active' : '' }}">Contact Forum</a>
-                            <a href="{{ route('subjects.create') }}" class="{{ request()->routeIs('subjects.create') ? 'active' : '' }}">Subjects</a>
+                            <a href="{{ route('contact-forum') }}" class="{{ request()->routeIs('contact-forum') ? 'active' : '' }}">Contacto</a>
+                            <a href="{{ route('subjects.create') }}" class="{{ request()->routeIs('subjects.create') ? 'active' : '' }}">Materias</a>
                             <a href="{{ route('dashboard_cursos') }}" class="{{ request()->routeIs('dashboard_cursos') ? 'active' : '' }}">Dashboard Cursos</a>
-                            <a href="{{ route('professors.index') }}" class="nav-link {{ request()->routeIs('professors.index') ? 'active' : '' }}">Professors</a>
-                            <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.index') ? 'active' : '' }}">Students</a>
+                            <a href="{{ route('professors.index') }}" class="nav-link {{ request()->routeIs('professors.index') ? 'active' : '' }}">Profesores</a>
+                            <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.index') ? 'active' : '' }}">Estudiantes</a>
                             <a href="{{ route('calificaciones.index') }}" class="nav-link {{ request()->routeIs('calificaciones.index') ? 'active' : '' }}">Calificaciones</a>
 
                             @endif
                         @if (Auth::user()->is_professor)
-                            <a href="{{ route('professors.subjects', Auth::user()) }}" class="{{ request()->routeIs('professors.subjects') ? 'active' : '' }}">My Subjects</a>
-                            <a href="{{ route('professors.students', Auth::user()) }}" class="{{ request()->routeIs('professors.students') ? 'active' : '' }}">My Students</a>
+                            <a href="{{ route('professors.subjects', Auth::user()) }}" class="{{ request()->routeIs('professors.subjects') ? 'active' : '' }}">Mi materia</a>
+                            <a href="{{ route('professors.students', Auth::user()) }}" class="{{ request()->routeIs('professors.students') ? 'active' : '' }}">Mis estudiantes</a>
                         @endif
                         @if (Auth::user()->is_student)
-                            <a href="{{ route('students.subjects', Auth::user()) }}" class="{{ request()->routeIs('students.subjects') ? 'active' : '' }}">My Subjects</a>
-                            <a href="{{ route('students.professors', Auth::user()) }}" class="{{ request()->routeIs('students.professors') ? 'active' : '' }}">My Professors</a>
+                            <a href="{{ route('students.subjects', Auth::user()) }}" class="{{ request()->routeIs('students.subjects') ? 'active' : '' }}">Mi curso</a>
+                            <a href="{{ route('students.professors', Auth::user()) }}" class="{{ request()->routeIs('students.professors') ? 'active' : '' }}">Mis profesores</a>
                         @endif
                     @endauth
                 </div>

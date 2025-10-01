@@ -40,7 +40,7 @@
             @endif
 
             <div class="form-group">
-                <label for="name">Name</label>
+                <label for="name">Nombre</label>
                 <input type="text" 
                        name="name" 
                        id="name" 
@@ -64,7 +64,7 @@
             </div>
 
             <div class="form-group">
-                <label for="UsernameDummy">Pseudo name</label>
+                <label for="UsernameDummy">Nombre psaudo</label>
                 <input type="text" 
                        name="UsernameDummy" 
                        id="UsernameDummy" 
@@ -76,7 +76,7 @@
             </div>
 
             <div class="form-group">
-                <label for="verjaardag">Birthday</label>
+                <label for="verjaardag">Cumpleaños</label>
                 <input type="date" 
                        name="verjaardag" 
                        id="verjaardag" 
@@ -88,7 +88,7 @@
             </div>
 
             <div class="form-group">
-                <label for="overMij">About Me</label>
+                <label for="overMij">Sobre mi</label>
                 <textarea name="overMij" 
                           id="overMij" 
                           class="form-input @error('overMij') form-input-error @enderror">{{ old('overMij', $user->overMij) }}</textarea>
@@ -98,7 +98,7 @@
             </div>
 
             <div class="form-group">
-                <label for="image" class="form-label">Profile Photo</label>
+                <label for="image" class="form-label">Foto de perfil</label>
                 <input type="file" 
                        name="image" 
                        id="image" 
@@ -107,10 +107,10 @@
                 @if($user->image)
                     <div class="current-image">
                         <img src="{{ asset('storage/' . $user->image) }}" alt="Current profile photo" class="preview-image">
-                        <p>Current photo</p>
+                        <p>Foto actual</p>
                     </div>
                 @endif
-                <small class="form-help">Upload a profile photo (JPG, PNG, GIF, max 2MB)</small>
+                <small class="form-help">Subir una foto de perfil (JPG, PNG, GIF, max 2MB)</small>
                 @error('image')
                     <div class="error-message">{{ $message }}</div>
                 @enderror
@@ -119,12 +119,12 @@
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">
                     @if($isAdminEditingOtherUser)
-                        Update User Profile
+                        Actualizar Perfil de Usuario
                     @else
-                        Update Profile
+                        Actualizar Perfil
                     @endif
                 </button>
-                <a href="{{ route('profile.public', $user) }}" class="btn btn-secondary">Cancel</a>
+                <a href="{{ route('profile.public', $user) }}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>

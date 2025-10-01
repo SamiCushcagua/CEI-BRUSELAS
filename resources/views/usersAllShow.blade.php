@@ -23,11 +23,11 @@
         @auth
             @if(Auth::user()->is_admin)
                 <div class="form-container">
-                    <h2>Create New User</h2>
+                    <h2>Crear Nuevo Usuario</h2>
                     <form action="{{ route('users.create') }}" method="POST">
                         @csrf
                         <div class="form-group">
-                            <label for="name">Name</label>
+                            <label for="name">Nombre</label>
                             <input type="text" name="name" id="name" class="form-input @error('name') form-input-error @enderror" value="{{ old('name') }}" required>
                             @error('name')
                                 <div class="error-message">{{ $message }}</div>
@@ -43,7 +43,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="password">Password</label>
+                            <label for="password">Contraseña</label>
                             <input type="password" name="password" id="password" class="form-input @error('password') form-input-error @enderror" required>
                             @error('password')
                                 <div class="error-message">{{ $message }}</div>
@@ -53,7 +53,7 @@
                         <div class="form-group">
                             <label class="form-checkbox-label">
                                 <input type="checkbox" name="is_admin" value="1">
-                                Es Administrator
+                                Es Administrador
                                 <input type="checkbox" name="is_profesor" value="1">
                                 Es Profesor
 
@@ -61,7 +61,7 @@
                         </div>
 
                         <div class="form-group">
-                            <button type="submit" class="form-button">Create User</button>
+                            <button type="submit" class="form-button">Crear Usuario</button>
                         </div>
                     </form>
                 </div>
