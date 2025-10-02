@@ -33,7 +33,7 @@
                  <!--   <a href="{{ route('Contact') }}" class="{{ request()->routeIs('Contact') ? 'active' : '' }}">Contact</a>--> <!-- CAhun no esta funcionando bien en el contacto -->
                     <a href="{{ route('usersAllShow') }}" class="{{ request()->routeIs('usersAllShow') ? 'active' : '' }}">Todos los usuarios</a>
                     <a href="{{ route('FAQ') }}" class="{{ request()->routeIs('FAQ') ? 'active' : '' }}">FAQ</a>
-                    
+                    <a href="{{ route('bible.index') }}" class="{{ request()->routeIs('bible.*') ? 'active' : '' }}">Biblia</a>
                     @auth
                         <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">Perfil</a>
                     

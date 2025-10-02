@@ -19,6 +19,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\CalificacionesController;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\BibleController;
 // Public Routes
 Route::get('/', function () {
     return view('welcome', ['users' => User::all()]);
@@ -113,6 +114,22 @@ Route::post('/calificaciones', [CalificacionesController::class, 'store'])
 ->name('calificaciones.store');
 
 });
+
+
+// Bible Routes
+Route::prefix('bible')->name('bible.')->group(function () {
+    Route::get('/', [BibleController::class, 'index'])->name('index');
+    Route::get('/books', [BibleController::class, 'books'])->name('books');
+    Route::get('/book/{book}', [BibleController::class, 'book'])->name('book');
+    Route::get('/chapter/{chapter}', [BibleController::class, 'chapter'])->name('chapter');
+    Route::post('/chapter/{chapter}/mark-read', [BibleController::class, 'markChapterAsRead'])->name('mark-read');
+    Route::get('/favorites', [BibleController::class, 'favorites'])->name('favorites');
+    Route::post('/verse/{verse}/favorite', [BibleController::class, 'addToFavorites'])->name('add-favorite');
+    Route::delete('/verse/{verse}/favorite', [BibleController::class, 'removeFromFavorites'])->name('remove-favorite');
+    Route::get('/progress', [BibleController::class, 'progress'])->name('progress');
+});
+
+
 
 Route::post('/subjects/{subject}/assign-professors', [SubjectController::class, 'assignProfessors'])->name('subjects.assign-professors');
 Route::post('/subjects/{subject}/enroll-student', [SubjectController::class, 'enrollStudent'])->name('subjects.enroll-student');

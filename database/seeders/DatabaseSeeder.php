@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->call([
-           
+            BibleSeeder::class,
             FAQSeeder::class,
             ContactForumSeeder::class
         ]);

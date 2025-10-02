@@ -23,7 +23,7 @@
                 @method('PUT')
 
                 <div class="form-group">
-                    <label for="name">Name</label>
+                    <label for="name">Nombre</label>
                     <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" 
                            value="{{ old('name', $user->name) }}" required>
                     @error('name')
@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password">New Password (leave empty to keep current)</label>
+                    <label for="password">Nueva Contraseña (dejar vacía para mantener la actual)</label>
                     <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror">
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -49,28 +49,28 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="password_confirmation">Confirm New Password</label>
+                    <label for="password_confirmation">Confirmar Nueva Contraseña</label>
                     <input type="password" name="password_confirmation" id="password_confirmation" class="form-control">
                 </div>
 
                 @if(Auth::user()->is_admin)
                     <div class="form-group">
-                        <label class="form-check-label">User Role</label>
+                        <label class="form-check-label">Rol de Usuario</label>
                         <div class="form-check">
                             <input type="checkbox" name="is_admin" id="is_admin" class="form-check-input" 
                                    value="1" {{ $user->is_admin ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_admin">Administrator</label>
+                            <label class="form-check-label" for="is_admin">Administrador</label>
                         </div>
                         <div class="form-check">
                             <input type="checkbox" name="is_profesor" id="is_profesor" class="form-check-input" 
                                    value="1" {{ $user->is_profesor ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_profesor">Professor</label>
+                            <label class="form-check-label" for="is_profesor">Profesor</label>
                         </div>
                     </div>
                 @endif
 
                 <div class="form-group">
-                    <label for="image">Profile Image</label>
+                    <label for="image">Foto de Perfil</label>
                     <input type="file" name="image" id="image" class="form-control-file @error('image') is-invalid @enderror">
                     @error('image')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -80,15 +80,15 @@
                 @if($user->image)
                     <div class="form-group">
                         <div class="current-image">
-                            <p>Current Image:</p>
+                            <p>Foto actual:</p>
                             <img src="{{ asset('storage/' . $user->image) }}" alt="Current profile image" class="img-thumbnail" style="max-width: 200px">
                         </div>
                     </div>
                 @endif
 
                 <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
-                    <a href="{{ route('usersAllShow') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Actualizar Perfil</button>
+                    <a href="{{ route('usersAllShow') }}" class="btn btn-secondary">Cancelar</a>
                 </div>
             </form>
         </div>

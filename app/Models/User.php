@@ -106,4 +106,29 @@ public function diplomas()
 }
 
 
+// Relaciones para la Biblia
+public function bibleReadings()
+{
+    return $this->hasMany(UserBibleReading::class);
+}
+
+public function favoriteVerses()
+{
+    return $this->hasMany(UserFavoriteVerse::class);
+}
+
+// Método para verificar si un usuario ha leído un capítulo
+public function hasReadChapter($chapterId)
+{
+    return $this->bibleReadings()->where('chapter_id', $chapterId)->exists();
+}
+
+// Método para marcar un capítulo como leído
+public function markChapterAsRead($chapterId)
+{
+    return $this->bibleReadings()->updateOrCreate(
+        ['chapter_id' => $chapterId],
+        ['read_at' => now()]
+    );
+}
 }
