@@ -30,4 +30,10 @@ class BibleBook extends Model
     {
         return $query->where('testament', 'new');
     }
+
+    // Accessor para obtener el número real de capítulos
+    public function getChaptersCountAttribute()
+    {
+        return $this->chapters()->count();
+    }
 }

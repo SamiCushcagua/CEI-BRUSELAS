@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserBibleReading extends Model
 {
@@ -16,15 +17,13 @@ class UserBibleReading extends Model
         'read_at' => 'datetime'
     ];
 
-    // Relación: Una lectura pertenece a un usuario
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relación: Una lectura pertenece a un capítulo
-    public function chapter()
+    public function chapter(): BelongsTo
     {
-        return $this->belongsTo(BibleChapter::class);
+        return $this->belongsTo(BibleChapter::class, 'chapter_id');
     }
 }

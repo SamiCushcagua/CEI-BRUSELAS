@@ -37,18 +37,18 @@
                 <div class="bible-book-progress-header">
                     <h3 class="bible-book-progress-name">{{ $book->name }}</h3>
                     <span class="bible-book-progress-count">
-                        {{ $book->chapters->where('userReadings', '!=', null)->count() }}/{{ $book->chapters_count }}
+                        {{ $book->chapters->whereIn('id', $readChapterIds)->count() }}/{{ $book->chapters_count }}
                     </span>
                 </div>
                 <div class="bible-chapters-progress">
                     @foreach($book->chapters as $chapter)
-                    <div class="bible-chapter-progress-item {{ $chapter->userReadings->count() > 0 ? 'read' : 'unread' }}">
+                    <div class="bible-chapter-progress-item {{ in_array($chapter->id, $readChapterIds) ? 'read' : 'unread' }}">
                         <a href="{{ route('bible.chapter', $chapter) }}" class="bible-chapter-progress-link">
                             Cap. {{ $chapter->chapter_number }}
                         </a>
-                        @if($chapter->userReadings->count() > 0)
+                        @if(in_array($chapter->id, $readChapterIds))
                             <span class="bible-chapter-read-date">
-                                {{ $chapter->userReadings->first()->read_at->format('d/m') }}
+                                Leído
                             </span>
                         @endif
                     </div>

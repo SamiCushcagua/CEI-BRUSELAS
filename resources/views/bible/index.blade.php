@@ -4,7 +4,15 @@
 <div class="container">
     <div class="main-container">
         <h1 class="page-title">La Santa Biblia</h1>
-        
+        <!-- Navegación adicional -->
+        <div class="bible-navigation">
+            <a href="{{ route('bible.favorites') }}" class="form-button bible-nav-button">
+                Mis Versículos Favoritos
+            </a>
+            <a href="{{ route('bible.progress') }}" class="form-button bible-nav-button">
+                Mi Progreso de Lectura
+            </a>
+        </div>
         <!-- Antiguo Testamento -->
         <div class="bible-section">
             <h2 class="bible-section-title old-testament">Antiguo Testamento</h2>
@@ -31,15 +39,7 @@
             </div>
         </div>
 
-        <!-- Navegación adicional -->
-        <div class="bible-navigation">
-            <a href="{{ route('bible.favorites') }}" class="form-button bible-nav-button">
-                Mis Versículos Favoritos
-            </a>
-            <a href="{{ route('bible.progress') }}" class="form-button bible-nav-button">
-                Mi Progreso de Lectura
-            </a>
-        </div>
+        
     </div>
 </div>
 @endsection

@@ -109,7 +109,7 @@ public function diplomas()
 // Relaciones para la Biblia
 public function bibleReadings()
 {
-    return $this->hasMany(UserBibleReading::class);
+    return $this->hasMany(UserBibleReading::class, 'user_id');
 }
 
 public function favoriteVerses()

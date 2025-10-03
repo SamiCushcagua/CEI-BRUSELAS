@@ -45,6 +45,9 @@
             <div class="success-message bible-read-message">
                 ✅ Capítulo leído
             </div>
+            <button onclick="unmarkChapterAsRead({{ $chapter->id }})" class="form-button bible-unread-button">
+                Desmarcar como Leído
+            </button>
         </div>
         @endif
     </div>
@@ -54,6 +57,22 @@
 function markChapterAsRead(chapterId) {
     fetch(`/bible/chapter/${chapterId}/mark-read`, {
         method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function unmarkChapterAsRead(chapterId) {
+    fetch(`/bible/chapter/${chapterId}/mark-read`, {
+        method: 'DELETE',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             'Content-Type': 'application/json',

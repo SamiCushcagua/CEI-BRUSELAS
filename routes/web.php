@@ -123,6 +123,7 @@ Route::prefix('bible')->name('bible.')->group(function () {
     Route::get('/book/{book}', [BibleController::class, 'book'])->name('book');
     Route::get('/chapter/{chapter}', [BibleController::class, 'chapter'])->name('chapter');
     Route::post('/chapter/{chapter}/mark-read', [BibleController::class, 'markChapterAsRead'])->name('mark-read');
+    Route::delete('/chapter/{chapter}/mark-read', [BibleController::class, 'unmarkChapterAsRead'])->name('unmark-read');
     Route::get('/favorites', [BibleController::class, 'favorites'])->name('favorites');
     Route::post('/verse/{verse}/favorite', [BibleController::class, 'addToFavorites'])->name('add-favorite');
     Route::delete('/verse/{verse}/favorite', [BibleController::class, 'removeFromFavorites'])->name('remove-favorite');

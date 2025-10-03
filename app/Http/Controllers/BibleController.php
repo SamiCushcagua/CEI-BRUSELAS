@@ -13,7 +13,7 @@ class BibleController extends Controller
 {
     public function index()
     {
-        $books = BibleBook::orderBy('order')->get();
+        $books = BibleBook::with('chapters')->orderBy('order')->get();
         $oldTestament = $books->where('testament', 'old');
         $newTestament = $books->where('testament', 'new');
         
@@ -60,6 +60,16 @@ class BibleController extends Controller
         ]);
     }
 
+    public function unmarkChapterAsRead(BibleChapter $chapter)
+    {
+        auth()->user()->bibleReadings()->where('chapter_id', $chapter->id)->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Capítulo desmarcado como leído'
+        ]);
+    }
+
     public function favorites()
     {
         $favorites = auth()->user()->favoriteVerses()->with('verse.chapter.book')->get();
@@ -88,7 +98,6 @@ class BibleController extends Controller
             'message' => 'Versículo removido de favoritos'
         ]);
     }
-
     public function progress()
     {
         $user = auth()->user();
@@ -96,10 +105,12 @@ class BibleController extends Controller
         $readChapters = $user->bibleReadings()->count();
         $progress = $totalChapters > 0 ? ($readChapters / $totalChapters) * 100 : 0;
         
-        $books = BibleBook::with(['chapters.userReadings' => function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        }])->get();
+        // Obtener todos los libros con sus capítulos
+        $books = BibleBook::with('chapters')->get();
         
-        return view('bible.progress', compact('books', 'totalChapters', 'readChapters', 'progress'));
+        // Obtener los capítulos leídos por el usuario
+        $readChapterIds = $user->bibleReadings()->pluck('chapter_id')->toArray();
+        
+        return view('bible.progress', compact('books', 'totalChapters', 'readChapters', 'progress', 'readChapterIds'));
     }
 }
