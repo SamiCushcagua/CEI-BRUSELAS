@@ -18,6 +18,27 @@
             <p class="bible-chapter-subtitle">{{ $chapter->title }}</p>
         @endif
 
+        <!-- Navegación entre capítulos -->
+        <div class="bible-chapter-navigation">
+            @if($previousChapter)
+                <a href="{{ route('bible.chapter', $previousChapter) }}" class="bible-nav-button bible-nav-prev">
+                    ← {{ $previousChapter->book->name }} {{ $previousChapter->chapter_number }}
+                </a>
+            @endif
+            
+            <div class="bible-nav-center">
+                <a href="{{ route('bible.book', $chapter->book) }}" class="bible-nav-button bible-nav-book">
+                    {{ $chapter->book->name }}
+                </a>
+            </div>
+            
+            @if($nextChapter)
+                <a href="{{ route('bible.chapter', $nextChapter) }}" class="bible-nav-button bible-nav-next">
+                    {{ $nextChapter->book->name }} {{ $nextChapter->chapter_number }} →
+                </a>
+            @endif
+        </div>
+
         <!-- Versículos -->
         <div class="bible-verses-container">
             @foreach($verses as $verse)
@@ -32,6 +53,29 @@
             </div>
             @endforeach
         </div>
+
+
+          <!-- Navegación entre capítulos -->
+          <div class="bible-chapter-navigation">
+            @if($previousChapter)
+                <a href="{{ route('bible.chapter', $previousChapter) }}" class="bible-nav-button bible-nav-prev">
+                    ← {{ $previousChapter->book->name }} {{ $previousChapter->chapter_number }}
+                </a>
+            @endif
+            
+            <div class="bible-nav-center">
+                <a href="{{ route('bible.book', $chapter->book) }}" class="bible-nav-button bible-nav-book">
+                    {{ $chapter->book->name }}
+                </a>
+            </div>
+            
+            @if($nextChapter)
+                <a href="{{ route('bible.chapter', $nextChapter) }}" class="bible-nav-button bible-nav-next">
+                    {{ $nextChapter->book->name }} {{ $nextChapter->chapter_number }} →
+                </a>
+            @endif
+        </div>
+
 
         <!-- Botón para marcar como leído -->
         @if(!$isRead)

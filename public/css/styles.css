@@ -1499,6 +1499,82 @@ body {
     background: #dc2626;
 }
 
+/* Navegación entre capítulos */
+.bible-chapter-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.bible-nav-button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: #3b82f6;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    min-width: 120px;
+}
+
+.bible-nav-button:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.bible-nav-prev {
+    background: #6b7280;
+}
+
+.bible-nav-prev:hover {
+    background: #4b5563;
+}
+
+.bible-nav-next {
+    background: #10b981;
+}
+
+.bible-nav-next:hover {
+    background: #059669;
+}
+
+.bible-nav-book {
+    background: #8b5cf6;
+}
+
+.bible-nav-book:hover {
+    background: #7c3aed;
+}
+
+.bible-nav-center {
+    flex: 1;
+    text-align: center;
+}
+
+/* Responsive para navegación */
+@media (max-width: 768px) {
+    .bible-chapter-navigation {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .bible-nav-center {
+        order: -1;
+    }
+    
+    .bible-nav-button {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
 .bible-read-message {
     display: inline-block;
     padding: 0.75rem 1.5rem;

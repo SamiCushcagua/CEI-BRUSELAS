@@ -47,7 +47,43 @@ class BibleController extends Controller
         $verses = $chapter->verses()->orderBy('verse_number')->get();
         $isRead = auth()->check() ? auth()->user()->hasReadChapter($chapter->id) : false;
         
-        return view('bible.chapter', compact('chapter', 'verses', 'isRead'));
+        // Obtener capítulo anterior
+        $previousChapter = BibleChapter::where('book_id', $chapter->book_id)
+            ->where('chapter_number', '<', $chapter->chapter_number)
+            ->orderBy('chapter_number', 'desc')
+            ->first();
+        
+        // Si no hay capítulo anterior en el mismo libro, buscar el último capítulo del libro anterior
+        if (!$previousChapter) {
+            $previousBook = BibleBook::where('order', '<', $chapter->book->order)
+                ->orderBy('order', 'desc')
+                ->first();
+            if ($previousBook) {
+                $previousChapter = $previousBook->chapters()
+                    ->orderBy('chapter_number', 'desc')
+                    ->first();
+            }
+        }
+        
+        // Obtener capítulo siguiente
+        $nextChapter = BibleChapter::where('book_id', $chapter->book_id)
+            ->where('chapter_number', '>', $chapter->chapter_number)
+            ->orderBy('chapter_number', 'asc')
+            ->first();
+        
+        // Si no hay capítulo siguiente en el mismo libro, buscar el primer capítulo del libro siguiente
+        if (!$nextChapter) {
+            $nextBook = BibleBook::where('order', '>', $chapter->book->order)
+                ->orderBy('order', 'asc')
+                ->first();
+            if ($nextBook) {
+                $nextChapter = $nextBook->chapters()
+                    ->orderBy('chapter_number', 'asc')
+                    ->first();
+            }
+        }
+        
+        return view('bible.chapter', compact('chapter', 'verses', 'isRead', 'previousChapter', 'nextChapter'));
     }
 
     public function markChapterAsRead(BibleChapter $chapter)
