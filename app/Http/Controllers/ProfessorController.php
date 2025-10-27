@@ -24,8 +24,16 @@ class ProfessorController extends Controller
 
     public function students(User $professor)
     {
-        $students = $professor->students;
-        return view('users.professor-students', compact('professor', 'students'));
+        $students = $professor->students()->get();
+        
+        // Obtener estudiantes disponibles para asignar (que no están ya asignados)
+        $assignedStudentIds = $students->pluck('id');
+        $availableStudents = User::where('is_profesor', false)
+            ->where('is_admin', false)
+            ->whereNotIn('id', $assignedStudentIds)
+            ->get();
+        
+        return view('users.professor-students', compact('professor', 'students', 'availableStudents'));
     }
 
     /**

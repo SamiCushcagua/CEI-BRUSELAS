@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container">
     <div class="subject-header">
         <h1 class="page-title">{{ $subject->name }}</h1>

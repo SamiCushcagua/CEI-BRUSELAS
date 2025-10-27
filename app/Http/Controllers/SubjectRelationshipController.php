@@ -10,23 +10,42 @@ use Illuminate\Support\Facades\Auth;
 class SubjectRelationshipController extends Controller
 {
     // Asignar profesor a una materia
-    public function assignProfessor(Request $request, Subject $subject)
-    {
-        $request->validate([
-            'professor_id' => 'required|exists:users,id'
-        ]);
+   // Asignar profesor a una materia
+public function assignProfessor(Request $request, Subject $subject)
+{
+    $request->validate([
+        'professor1' => 'required|exists:users,id',
+        'professor2' => 'nullable|exists:users,id'
+    ]);
 
-        $professor = User::findOrFail($request->professor_id);
-        
-        if ($professor->role !== 'professor') {
-            return back()->with('error', 'El usuario seleccionado no es un profesor.');
-        }
-
-        $subject->professors()->attach($professor->id);
-
-        return back()->with('success', 'Profesor asignado exitosamente.');
+    // Asignar primer profesor
+    $professor1 = User::findOrFail($request->professor1);
+    
+    if (!$professor1->is_profesor) {
+        return back()->with('error', 'El primer usuario seleccionado no es un profesor.');
     }
 
+    // Verificar si ya está asignado
+    if (!$subject->professors()->where('professor_id', $professor1->id)->exists()) {
+        $subject->professors()->attach($professor1->id);
+    }
+
+    // Asignar segundo profesor si se proporciona
+    if ($request->professor2) {
+        $professor2 = User::findOrFail($request->professor2);
+        
+        if (!$professor2->is_profesor) {
+            return back()->with('error', 'El segundo usuario seleccionado no es un profesor.');
+        }
+
+        // Verificar si ya está asignado
+        if (!$subject->professors()->where('professor_id', $professor2->id)->exists()) {
+            $subject->professors()->attach($professor2->id);
+        }
+    }
+
+    return back()->with('success', 'Profesores asignados exitosamente.');
+}
     // Remover profesor de una materia
     public function removeProfessor(Subject $subject, User $professor)
     {
@@ -43,10 +62,9 @@ class SubjectRelationshipController extends Controller
 
         $student = User::findOrFail($request->student_id);
         
-        if ($student->role !== 'student') {
+        if ($student->is_profesor || $student->is_admin) {
             return back()->with('error', 'El usuario seleccionado no es un estudiante.');
         }
-
         $subject->students()->attach($student->id);
 
         return back()->with('success', 'Estudiante inscrito exitosamente.');
@@ -101,14 +119,22 @@ class SubjectRelationshipController extends Controller
     // Obtener estudiantes de un profesor
     public function getProfessorStudents(User $professor)
     {
-        $students = $professor->students;
-        return view('users.professor-students', compact('students', 'professor'));
+        $students = $professor->students()->get();
+        
+        // Obtener estudiantes disponibles para asignar (que no están ya asignados)
+        $assignedStudentIds = $students->pluck('id');
+        $availableStudents = User::where('is_profesor', false)
+            ->where('is_admin', false)
+            ->whereNotIn('id', $assignedStudentIds)
+            ->get();
+        
+        return view('users.professor-students', compact('students', 'professor', 'availableStudents'));
     }
 
     // Obtener profesores de un estudiante
     public function getStudentProfessors(User $student)
     {
-        $professors = $student->professors;
+        $professors = $student->professors()->get();
         return view('users.student-professors', compact('professors', 'student'));
     }
 } 

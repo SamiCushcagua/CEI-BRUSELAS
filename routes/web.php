@@ -86,22 +86,29 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard_cursos');
 
     // Subject Relationships
-    Route::post('/subjects/{subject}/assign-professor', [SubjectRelationshipController::class, 'assignProfessor']);
-    Route::delete('/subjects/{subject}/remove-professor/{professor}', [SubjectRelationshipController::class, 'removeProfessor']);
-    Route::post('/subjects/{subject}/enroll-student', [SubjectRelationshipController::class, 'enrollStudent']);
-    Route::delete('/subjects/{subject}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudent']);
+    Route::post('/subjects/{subject}/assign-professor', [SubjectRelationshipController::class, 'assignProfessor'])->name('subjects.assign-professor');
+    Route::delete('/subjects/{subject}/remove-professor/{professor}', [SubjectRelationshipController::class, 'removeProfessor'])->name('subjects.remove-professor');
+    Route::post('/subjects/{subject}/enroll-student', [SubjectRelationshipController::class, 'enrollStudent'])->name('subjects.enroll-student');
+    Route::delete('/subjects/{subject}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudent'])->name('subjects.remove-student');
 
     // Professor Routes
     Route::get('/professors', [ProfessorController::class, 'index'])->name('professors.index');
     Route::get('/professors/{professor}/subjects', [ProfessorController::class, 'subjects'])->name('professors.subjects');
     Route::get('/professors/{professor}/students', [ProfessorController::class, 'students'])->name('professors.students');
-    Route::post('/professors/{professor}/assign-student', [SubjectRelationshipController::class, 'assignStudentToProfessor']);
-    Route::delete('/professors/{professor}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudentFromProfessor']);
+    Route::post('/professors/{professor}/assign-student', [SubjectRelationshipController::class, 'assignStudentToProfessor'])->name('professors.assign-student');
+    Route::delete('/professors/{professor}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudentFromProfessor'])->name('professors.remove-student');
 
     // Student Routes
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/{student}/subjects', [SubjectRelationshipController::class, 'getStudentSubjects'])->name('students.subjects');
     Route::get('/students/{student}/professors', [SubjectRelationshipController::class, 'getStudentProfessors'])->name('students.professors');
+
+// Rutas de asistencia
+Route::middleware(['auth'])->group(function () {
+    Route::get('/attendance', [App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
+    Route::post('/attendance', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendance.store');
+});
+
 
 // Calificaciones
 Route::get('/calificaciones', [CalificacionesController::class, 'index'])
@@ -130,10 +137,39 @@ Route::prefix('bible')->name('bible.')->group(function () {
     Route::get('/progress', [BibleController::class, 'progress'])->name('progress');
 });
 
+// Rutas para Sistema de Calificaciones
+Route::prefix('grades')->name('grades.')->middleware('auth')->group(function () {
+    // Rutas principales de calificaciones
+    Route::get('/', [App\Http\Controllers\GradeController::class, 'index'])->name('index');
+    Route::get('/subject/{subject}', [App\Http\Controllers\GradeController::class, 'show'])->name('show');
+    
+    // CRUD de calificaciones
+    Route::post('/', [App\Http\Controllers\GradeController::class, 'store'])->name('store');
+    Route::put('/{grade}', [App\Http\Controllers\GradeController::class, 'update'])->name('update');
+    Route::delete('/{grade}', [App\Http\Controllers\GradeController::class, 'destroy'])->name('destroy');
+    
+    // Rutas para AJAX
+    Route::get('/student-grades', [App\Http\Controllers\GradeController::class, 'getStudentGrades'])->name('student-grades');
+    Route::get('/statistics', [App\Http\Controllers\GradeController::class, 'getStatistics'])->name('statistics');
+    
+    // Exportar calificaciones
+    Route::get('/export/pdf', [App\Http\Controllers\GradeController::class, 'exportPdf'])->name('export.pdf');
+});
 
+// Rutas para Configuración de Calificaciones
+Route::prefix('grade-settings')->name('grade-settings.')->middleware('auth')->group(function () {
+    Route::get('/subject/{subject}', [App\Http\Controllers\GradeSettingController::class, 'index'])->name('index');
+    Route::post('/', [App\Http\Controllers\GradeSettingController::class, 'store'])->name('store');
+    Route::put('/{gradeSetting}', [App\Http\Controllers\GradeSettingController::class, 'update'])->name('update');
+    Route::delete('/{gradeSetting}', [App\Http\Controllers\GradeSettingController::class, 'destroy'])->name('destroy');
+});
 
-Route::post('/subjects/{subject}/assign-professors', [SubjectController::class, 'assignProfessors'])->name('subjects.assign-professors');
-Route::post('/subjects/{subject}/enroll-student', [SubjectController::class, 'enrollStudent'])->name('subjects.enroll-student');
-Route::delete('/subjects/{subject}/remove-student/{student}', [SubjectController::class, 'removeStudent'])->name('subjects.remove-student');
+// Rutas para Reportes de Calificaciones
+Route::prefix('grade-reports')->name('grade-reports.')->middleware('auth')->group(function () {
+    Route::get('/', [App\Http\Controllers\GradeReportController::class, 'index'])->name('index');
+    Route::get('/generate', [App\Http\Controllers\GradeReportController::class, 'generate'])->name('generate');
+    Route::get('/show', [App\Http\Controllers\GradeReportController::class, 'show'])->name('show');
+});
+
 
 require __DIR__.'/auth.php';

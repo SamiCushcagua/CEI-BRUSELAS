@@ -75,7 +75,7 @@
                         <h6 class="section-title">
                             <i class="fas fa-user-plus"></i> Asignar Profesores
                         </h6>
-                        <form action="{{ route('subjects.assign-professors', $subject) }}" method="POST" class="professor-form">
+                        <form action="{{ route('subjects.assign-professor', $subject) }}" method="POST" class="professor-form">
                             @csrf
                             <div class="form-row">
                                 <div class="form-group">
