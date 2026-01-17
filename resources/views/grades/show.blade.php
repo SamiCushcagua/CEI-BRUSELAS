@@ -26,7 +26,7 @@
             <span class="subject-info">{{ $subject->name }} - {{ $currentYear }} - Trimestre {{ $currentTrimester }}</span>
         </div>
     </div>
-    <div class="grades-table-wrapper">
+    <div class="grades-table-wrapper" style="overflow-x: auto;">
         <table class="grades-table">
             <thead>
                 <tr>
