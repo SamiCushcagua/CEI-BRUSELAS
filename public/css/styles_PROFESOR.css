@@ -190,6 +190,12 @@
     margin-bottom: 30px;
 }
 
+.grades-table-wrapper {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 450px;
+}
+
 .grades-table-header {
     padding: 20px;
     background-color: #f9fafb;
