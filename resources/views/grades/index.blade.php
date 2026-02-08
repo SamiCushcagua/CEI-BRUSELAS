@@ -5,6 +5,9 @@
 <script src="{{ asset('js/profesor-calificacion.js') }}"></script>
 
 <div class="grades-container">
+    <div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
     <div class="grades-header">
         <div>
             <h1 class="grades-title">Sistema de Calificaciones</h1>

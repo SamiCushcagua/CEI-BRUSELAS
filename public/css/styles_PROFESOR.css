@@ -6,6 +6,12 @@
     margin: 0 auto;
     padding: 20px;
 }
+
+/* Botón Página principal - siempre visible arriba */
+.page-main-btn-wrapper {
+    margin-bottom: 20px;
+}
+
 /* Encabezado de páginas */
 .grades-header {
     display: flex;

@@ -4,6 +4,9 @@
 <link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}">
 
 <div class="grades-container">
+    <div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
     <div class="grades-header">
         <div>
             <h1 class="grades-title">Materias del Estudiante: {{ $student->name }}</h1>
