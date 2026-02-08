@@ -101,13 +101,31 @@
             <a href="{{ route('grades.index') }}" class="welcome-btn">
                 📝 Calificaciones
             </a>
-            <a href="{{ route('grade-reports.index') }}" class="welcome-btn">
+         <!--   <a href="{{ route('grade-reports.index') }}" class="welcome-btn">
                 📊 Reportes
+            </a>-->
+
+            <a href="{{ route('attendance.index') }}" class="welcome-btn">
+                📅 Asistencia 
             </a>
+            
         </div>
         @endif
         @endauth
 
+@auth
+        @if (Auth::user()->isStudent())
+                <div class="welcome-quick-buttons">
+                    <a href="{{ route('students.subjects', Auth::user()) }}" class="welcome-btn">
+                        📚 Mi curso
+                    </a>
+                    <a href="{{ route('students.professors', Auth::user()) }}" class="welcome-btn">
+                        👥 Mis profesores
+                    </a>
+                    <a href="{{ route('attendance.index') }}" class="welcome-btn">📅 Asistencia </a>
+                </div>
+                @endif
+@endauth
         <!-- Products Section -->
         <div class="products-grid">
 
