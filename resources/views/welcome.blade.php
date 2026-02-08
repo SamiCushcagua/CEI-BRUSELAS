@@ -36,8 +36,8 @@
     /* Botones de acceso rápido - responsive para móvil */
     .welcome-quick-buttons {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
         margin: 24px 0;
         padding: 0 4px;
     }
@@ -45,13 +45,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 14px 20px;
+        padding: 18px 28px;
         background: #3b82f6;
         color: white;
         text-decoration: none;
-        border-radius: 8px;
+        border-radius: 10px;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 16px;
         transition: background 0.2s;
         box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
     }
@@ -61,13 +61,16 @@
     }
     @media (max-width: 480px) {
         .welcome-quick-buttons {
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr;
+            gap: 12px;
             margin: 20px 0;
+            padding: 0;
         }
         .welcome-btn {
-            padding: 12px 16px;
-            font-size: 13px;
+            width: 100%;
+            height: 100%;
+            padding: 18px 24px;
+            font-size: 16px;
         }
     }
 </style>
