@@ -1,9 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+
+<!-- aqui se introduce los puntos de los estudiantes y ademas se ven los resultados :) -->
 <link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}">
 <script src="{{ asset('js/profesor-calificacion.js') }}"></script>
-
+<div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
 <div class="grades-container">
     <div class="grades-header">
         <div>
@@ -30,7 +34,7 @@
         <table class="grades-table">
             <thead>
                 <tr>
-                    <th>Estudiante</th>
+                    <th class="sticky-col">Estudiante</th>
                     <th>Tareas</th>
                     <th>Examen 1</th>
                     <th>Examen 2</th>
@@ -47,7 +51,7 @@
                         $studentGrade = $grades->where('student_id', $student->id)->first();
                     @endphp
                     <tr>
-                        <td>
+                        <td class="sticky-col">
                             <div class="student-info">
                                 <div class="student-avatar">
                                     {{ substr($student->name, 0, 1) }}
@@ -122,7 +126,7 @@
             <table class="grades-table">
                 <thead>
                     <tr>
-                        <th>Estudiante</th>
+                        <th class="sticky-col">Estudiante</th>
                         <th>Tareas</th>
                         <th>Examen 1</th>
                         <th>Examen 2</th>
@@ -140,7 +144,7 @@
                     $studentGrade = $grades->where('student_id', $student->id)->first();
                     @endphp
                     <tr>
-                        <td>
+                        <td class="sticky-col">
                             <div class="student-info">
                                 <div class="student-avatar">
                                     {{ substr($student->name, 0, 1) }}

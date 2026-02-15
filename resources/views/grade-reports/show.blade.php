@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}">
 <script src="{{ asset('js/profesor-calificacion.js') }}"></script>
 
+<h1>test</h1>
 <div class="grades-container">
     <div class="grades-header">
         <div>

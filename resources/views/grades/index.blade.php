@@ -3,7 +3,7 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}">
 <script src="{{ asset('js/profesor-calificacion.js') }}"></script>
-
+<h1>Hola</h1>
 <div class="grades-container">
     <div class="page-main-btn-wrapper">
         <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>

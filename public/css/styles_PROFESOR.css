@@ -248,6 +248,44 @@
     background-color: #f9fafb;
 }
 
+/* Primera columna fija al hacer scroll horizontal */
+.grades-table th.sticky-col,
+.grades-table td.sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: white;
+    box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+}
+
+.grades-table th.sticky-col {
+    z-index: 2;
+    background: #f9fafb;
+}
+
+.grades-table tr:hover td.sticky-col {
+    background-color: #f9fafb;
+}
+
+/* Fila con más de 3 ausencias en resumen trimestre */
+.grades-table tr.row-high-absent td {
+    background-color: #fef2f2 !important;
+    border-left: 3px solid #dc2626;
+}
+
+.grades-table tr.row-high-absent td.sticky-col {
+    background-color: #fef2f2 !important;
+}
+
+.grades-table tr.row-high-absent:hover td {
+    background-color: #fee2e2 !important;
+}
+
+.grades-table tr.row-high-absent:hover td.sticky-col {
+    background-color: #fee2e2 !important;
+}
+
 .student-info {
     display: flex;
     align-items: center;

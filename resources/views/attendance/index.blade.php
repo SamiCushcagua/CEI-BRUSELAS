@@ -3,6 +3,7 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}">
 
+<!-- aqui se introduce la asistencia de los estudiantes y se ven los resultados :) -->
 <div class="grades-container">
     <div class="page-main-btn-wrapper">
         <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
@@ -87,7 +88,7 @@
                 <table class="grades-table">
                     <thead>
                         <tr>
-                            <th>Estudiante</th>
+                            <th class="sticky-col">Estudiante</th>
                             <th>Asistencia/Puntualidad</th>
                             <th>Versículo Bíblico</th>
                             <th>Notas</th>
@@ -99,7 +100,7 @@
                         $attendance = $attendanceRecords->get($student->id);
                         @endphp
                         <tr>
-                            <td>
+                            <td class="sticky-col">
                                 <div class="student-info">
                                     <div class="student-avatar">
                                         {{ substr($student->name, 0, 1) }}
@@ -169,7 +170,7 @@
             <table class="grades-table">
                 <thead>
                     <tr>
-                        <th>Estudiante</th>
+                        <th class="sticky-col">Estudiante</th>
                         @foreach($sundays as $sunday)
                         <th class="text-center">
                             {{ \Carbon\Carbon::parse($sunday)->format('d/m') }}
@@ -179,8 +180,17 @@
                 </thead>
                 <tbody>
                     @foreach($students as $student)
-                    <tr>
-                        <td>
+                    @php
+                        $absentCount = 0;
+                        $studentRecords = $attendanceData[$student->id] ?? [];
+                        foreach ($studentRecords as $sunday => $record) {
+                            if ($record && $record->attendance_status === 'absent') {
+                                $absentCount++;
+                            }
+                        }
+                    @endphp
+                    <tr class="{{ $absentCount > 3 ? 'row-high-absent' : '' }}">
+                        <td class="sticky-col">
                             <div class="student-info">
                                 <div class="student-avatar">
                                     {{ substr($student->name, 0, 1) }}

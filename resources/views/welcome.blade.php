@@ -56,7 +56,7 @@
         box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
     }
     .welcome-btn:hover {
-        background: #2563eb;
+        background:rgb(0, 238, 255);
         color: white;
     }
     @media (max-width: 480px) {
@@ -67,9 +67,9 @@
             padding: 0;
         }
         .welcome-btn {
-            width: 100%;
-            height: 100%;
-            padding: 18px 24px;
+            width: 80%;
+            height: 80%;
+            padding: 8px 24px;
             font-size: 16px;
         }
     }
