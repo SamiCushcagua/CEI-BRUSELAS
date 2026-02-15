@@ -189,7 +189,7 @@
                             }
                         }
                     @endphp
-                    <tr class="{{ $absentCount > 3 ? 'row-high-absent' : '' }}">
+                    <tr class="{{ $absentCount >= 3 ? 'row-high-absent' : '' }}">
                         <td class="sticky-col">
                             <div class="student-info">
                                 <div class="student-avatar">
