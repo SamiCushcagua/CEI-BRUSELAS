@@ -260,8 +260,22 @@
 }
 
 .grades-table th.sticky-col {
-    z-index: 2;
+    z-index: 3;
     background: #f9fafb;
+}
+
+/* Fila de encabezado fija al hacer scroll vertical */
+.grades-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f9fafb;
+    z-index: 2;
+    box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.08);
+}
+
+.grades-table thead th.sticky-col {
+    top: 0;
+    z-index: 3;
 }
 
 .grades-table tr:hover td.sticky-col {
@@ -661,6 +675,15 @@
     .grades-table th,
     .grades-table td {
         padding: 8px;
+    }
+    
+    /* Ocultar avatar del estudiante en móvil/GSM */
+    .student-avatar {
+        display: none !important;
+    }
+    
+    .student-info .student-details {
+        margin-left: 0;
     }
     
     .setting-fields {
