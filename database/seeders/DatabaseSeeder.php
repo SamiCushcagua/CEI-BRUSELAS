@@ -43,5 +43,7 @@ class DatabaseSeeder extends Seeder
             FAQSeeder::class,
             ContactForumSeeder::class
         ]);
+        
+        $this->call(PeriodSeeder::class);
     }
 }

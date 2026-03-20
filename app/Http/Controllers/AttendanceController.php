@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ClassAttendance;
 use App\Models\Subject;
 use Illuminate\Support\Facades\Log;
+use App\Models\Period;
 
 class AttendanceController extends Controller
 {
@@ -20,15 +21,12 @@ class AttendanceController extends Controller
     {
         $professor = Auth::user();
         $subjects = $professor->subjects;
-
-        // Obtener domingos del trimestre actual
-        $sundays = $this->getSundaysForCurrentTrimester();
-
-        // Obtener el domingo más cercano del trimestre actual
-        $defaultSunday = $this->getClosestSundayInCurrentTrimester();
-
-        // Obtener el trimestre actual
-        $currentTrimester = $this->getCurrentTrimester();
+        
+        $period = Period::active()->firstOrFail();
+        $currentTrimester = $period->trimester;
+        
+        $sundays = $this->getSundaysForPeriod($period);
+        $defaultSunday = $this->getClosestSunday($sundays);
 
         $selectedSubject = null;
         $selectedDate = $request->get('class_date', $defaultSunday);
@@ -41,7 +39,7 @@ class AttendanceController extends Controller
             $selectedSubject = Subject::find($request->get('subject_id'));
 
             if ($selectedSubject && $professor->subjects->contains($selectedSubject)) {
-                $students = $selectedSubject->students;
+                $students = $selectedSubject->studentsForPeriod($period)->get();
 
                 // Obtener registros de asistencia existentes
                 $attendanceRecords = ClassAttendance::where('professor_id', $professor->id)
@@ -84,7 +82,8 @@ class AttendanceController extends Controller
             'selectedDate',
             'students',
             'attendanceRecords',
-            'attendanceData' // Agregar esta línea
+            'attendanceData',
+            'period'
         ));
     }
     /**
@@ -156,49 +155,44 @@ class AttendanceController extends Controller
     /**
      * Obtener los domingos del trimestre actual
      */
-    private function getSundaysForCurrentTrimester()
+    private function getSundaysForPeriod(Period $period)
     {
-        $currentTrimester = $this->getCurrentTrimester();
-        $year = date('Y');
-
+        $year = $period->year;
+        $currentTrimester = $period->trimester;
+    
         $sundays = [];
-
-        // Definir rangos de meses por trimestre
         $monthRanges = [
-            1 => [1, 2, 3, 4],    // Enero - Abril
-            2 => [5, 6, 7, 8],    // Mayo - Agosto
-            3 => [9, 10, 11, 12]   // Septiembre - Diciembre
+            1 => [1, 2, 3, 4],
+            2 => [5, 6, 7, 8],
+            3 => [9, 10, 11, 12]
         ];
-
         $months = $monthRanges[$currentTrimester];
-
+    
         foreach ($months as $month) {
             $startDate = new \DateTime("$year-$month-01");
             $endDate = new \DateTime("$year-$month-" . $startDate->format('t'));
-
-            // Encontrar el primer domingo del mes
             while ($startDate->format('N') != 7) {
                 $startDate->add(new \DateInterval('P1D'));
             }
-
-            // Generar todos los domingos del mes
             while ($startDate <= $endDate) {
                 $sundays[] = $startDate->format('Y-m-d');
                 $startDate->add(new \DateInterval('P7D'));
             }
         }
-
         return $sundays;
     }
 
     /**
-     * Obtener el domingo más cercano del trimestre actual
+     * Obtener el domingo más cercano dentro de una lista ya calculada.
+     * Esto se usa en index() para definir la fecha por defecto al cargar la pantalla.
      */
-    private function getClosestSundayInCurrentTrimester()
+    private function getClosestSunday(array $sundays): ?string
     {
-        $sundays = $this->getSundaysForCurrentTrimester();
-        $today = new \DateTime();
+        if (empty($sundays)) {
+            return null;
+        }
 
+        $today = new \DateTime();
         $closestSunday = null;
         $minDifference = PHP_INT_MAX;
 
@@ -213,5 +207,16 @@ class AttendanceController extends Controller
         }
 
         return $closestSunday;
+    }
+
+    /**
+     * Obtener el domingo más cercano del trimestre actual
+     */
+    private function getClosestSundayInCurrentTrimester()
+    {
+        $period = Period::active()->firstOrFail();
+        $sundays = $this->getSundaysForPeriod($period);
+
+        return $this->getClosestSunday($sundays);
     }
 }

@@ -3,7 +3,9 @@
 @section('content')
 
 <h1>Crear Calificación</h1>
-
+<div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
 <form action="{{ route('calificaciones.store') }}" method="post">
 @csrf
 

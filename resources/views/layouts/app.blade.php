@@ -44,6 +44,8 @@
                 <a href="{{ route('contact-forum') }}" class="{{ request()->routeIs('contact-forum') ? 'active' : '' }}">Contacto</a>
                 <a href="{{ route('subjects.create') }}" class="{{ request()->routeIs('subjects.create') ? 'active' : '' }}">Materias</a>
                 <a href="{{ route('dashboard_cursos') }}" class="{{ request()->routeIs('dashboard_cursos') ? 'active' : '' }}">Dashboard Cursos</a>
+                <a href="{{ route('periods.index') }}" class="{{ request()->routeIs('periods.*') ? 'active' : '' }}">Periodos</a>
+                <a href="{{ route('admin.period-subject-dashboard') }}" class="{{ request()->routeIs('admin.period-subject-dashboard') ? 'active' : '' }}">Tablero Admin</a>
                 <a href="{{ route('professors.index') }}" class="nav-link {{ request()->routeIs('professors.index') ? 'active' : '' }}">Profesores</a>
                 <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.index') ? 'active' : '' }}">Estudiantes</a>
                 <a href="{{ route('grades.index') }}" class="nav-link {{ request()->routeIs('grades.*') ? 'active' : '' }}">Calificaciones</a>

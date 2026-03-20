@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Period;
+use Illuminate\Http\Request;
 
 class Subject extends Model
 {
@@ -24,7 +26,20 @@ class Subject extends Model
         return $this->belongsToMany(User::class, 'subject_professor', 'subject_id', 'professor_id')
             ->where('is_profesor', true);
     }
-
+    public function studentsForPeriod(Period $period)
+    {
+        return $this->belongsToMany(User::class, 'subject_student', 'subject_id', 'student_id')
+            ->wherePivot('period_id', $period->id)
+            ->where('is_profesor', false)
+            ->where('is_admin', false);
+    }
+    
+    public function professorsForPeriod(Period $period)
+    {
+        return $this->belongsToMany(User::class, 'subject_professor', 'subject_id', 'professor_id')
+            ->wherePivot('period_id', $period->id)
+            ->where('is_profesor', true);
+    }
     // Relación con estudiantes (many-to-many)
     public function students()
     {

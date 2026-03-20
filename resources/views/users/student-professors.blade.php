@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+
+<h1>Mis Profesores q fue</h1>
 <link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}">
 
 <div class="grades-container">

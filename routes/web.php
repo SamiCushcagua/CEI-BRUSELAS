@@ -20,6 +20,8 @@ use App\Http\Controllers\FAQController;
 use App\Http\Controllers\CalificacionesController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\BibleController;
+use App\Http\Controllers\PeriodController;
+use App\Http\Controllers\AdminPeriodSubjectDashboardController;
 // Public Routes
 Route::get('/', function () {
     return view('welcome', ['users' => User::all()]);
@@ -109,6 +111,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/attendance', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendance.store');
 });
 
+// Admin: Tablero por Periodo/Materia/Profesor (Asistencia + Calificaciones)
+Route::get('/admin/period-subject-dashboard', [AdminPeriodSubjectDashboardController::class, 'index'])
+    ->name('admin.period-subject-dashboard');
+Route::post('/admin/period-subject-dashboard/attendance/save', [AdminPeriodSubjectDashboardController::class, 'saveAttendance'])
+    ->name('admin.period-subject-dashboard.attendance.save');
+
 
 // Calificaciones
 Route::get('/calificaciones', [CalificacionesController::class, 'index'])
@@ -171,5 +179,10 @@ Route::prefix('grade-reports')->name('grade-reports.')->middleware('auth')->grou
     Route::get('/show', [App\Http\Controllers\GradeReportController::class, 'show'])->name('show');
 });
 
+
+Route::get('/periods', [PeriodController::class, 'index'])->name('periods.index');
+Route::post('/periods', [PeriodController::class, 'store'])->name('periods.store');
+Route::post('/periods/{period}/set-active', [PeriodController::class, 'setActive'])->name('periods.set-active');
+Route::post('/periods/{period}/lock', [PeriodController::class, 'lock'])->name('periods.lock');
 
 require __DIR__.'/auth.php';

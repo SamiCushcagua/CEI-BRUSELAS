@@ -9,6 +9,7 @@ use App\Models\EvaluationType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Period;
 
 class GradeController extends Controller
 {
@@ -39,9 +40,11 @@ class GradeController extends Controller
             abort(403, 'No tienes permisos para ver estas calificaciones');
         }
 
-        $students = $subject->students()->get();
-        $currentYear = date('Y');
-        $currentTrimester = $this->getCurrentTrimester();
+        $period = Period::active()->firstOrFail();
+        $currentYear = $period->year;
+        $currentTrimester = $period->trimester;
+
+        $students = $subject->studentsForPeriod($period)->get();
         
         // Obtener calificaciones agrupadas por estudiante
 
@@ -53,7 +56,7 @@ class GradeController extends Controller
         // Obtener tipos de evaluación
         $evaluationTypes = EvaluationType::active()->get();
         
-        return view('grades.show', compact('subject', 'students', 'grades', 'evaluationTypes', 'currentYear', 'currentTrimester'));
+        return view('grades.show', compact('subject', 'students', 'grades', 'evaluationTypes', 'currentYear', 'currentTrimester', 'period'));
     }
 
     /**
@@ -76,10 +79,14 @@ class GradeController extends Controller
             'notes' => 'nullable|string|max:1000'
         ]);
 
-        // Verificar que el usuario es profesor de esta materia
+        // Verificar que el usuario es profesor de esta materia o que es admin
         $subject = Subject::findOrFail($request->subject_id);
-        if (!$subject->professors()->where('professor_id', Auth::id())->exists()) {
-            abort(403, 'No tienes permisos para calificar esta materia');
+        $user = Auth::user();
+
+        if (!$user || !$user->is_admin) {
+            if (!$subject->professors()->where('professor_id', Auth::id())->exists()) {
+                abort(403, 'No tienes permisos para calificar esta materia');
+            }
         }
 
         try {

@@ -3,6 +3,9 @@
 @section('content')
 <div class="container">
     <h1 class="page-title mb-4">Dashboard de Cursos</h1>
+    @php
+        $period = \App\Models\Period::active()->firstOrFail();
+    @endphp
 
     <div class="products-grid">
         @foreach($subjects as $subject)
@@ -38,8 +41,14 @@
                         <div class="detail-item">
                             <i class="fas fa-users"></i>
                             <span>
-                                @if($subject->professors->count() > 0)
-                                    @foreach($subject->professors as $professor)
+                            @php
+                                $periodProfessors = $subject->professorsForPeriod($period)->get();
+                                $professor1SelectedId = $periodProfessors[0]->id ?? null;
+                                $professor2SelectedId = $periodProfessors[1]->id ?? null;
+                            @endphp
+
+                            @if($periodProfessors->count() > 0)
+                                @foreach($periodProfessors as $professor)
                                         {{ $professor->name }}{{ !$loop->last ? ', ' : '' }}
                                     @endforeach
                                 @else
@@ -84,7 +93,7 @@
                                         <option value="">Seleccionar...</option>
                                         @foreach(App\Models\User::where('is_profesor', true)->get() as $professor)
                                             <option value="{{ $professor->id }}" 
-                                                    {{ $subject->professors->contains($professor->id) ? 'selected' : '' }}>
+                                                    {{ ($professor1SelectedId !== null && $professor->id == $professor1SelectedId) ? 'selected' : '' }}>
                                                 {{ $professor->name }}
                                             </option>
                                         @endforeach
@@ -96,7 +105,7 @@
                                         <option value="">Seleccionar...</option>
                                         @foreach(App\Models\User::where('is_profesor', true)->get() as $professor)
                                             <option value="{{ $professor->id }}" 
-                                                    {{ $subject->professors->contains($professor->id) ? 'selected' : '' }}>
+                                                    {{ ($professor2SelectedId !== null && $professor->id == $professor2SelectedId) ? 'selected' : '' }}>
                                                 {{ $professor->name }}
                                             </option>
                                         @endforeach

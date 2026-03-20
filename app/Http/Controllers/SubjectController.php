@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Subject;
 use App\Models\User;
+use App\Models\Period;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -63,16 +64,20 @@ class SubjectController extends Controller
      */
     public function show(Subject $subject)
     {
-        // Obtener todos los estudiantes que NO están inscritos en NINGUNA materia
+        $period = Period::active()->firstOrFail();
+
+        // Estudiantes ya inscritos en esta materia para el periodo actual
+        $enrolledStudents = $subject->studentsForPeriod($period)->get();
+
+        // Estudiantes disponibles: todos los estudiantes que no están inscritos en esta materia en el periodo actual
+        $enrolledIds = $enrolledStudents->pluck('id');
+
         $availableStudents = User::where('is_profesor', false)
             ->where('is_admin', false)
-            ->whereDoesntHave('subjectsAsStudent')
+            ->whereNotIn('id', $enrolledIds)
             ->get();
-        
-        // Obtener estudiantes ya inscritos en esta materia
-        $enrolledStudents = $subject->students;
-        
-        return view('subjects.show_subject_student', compact('subject', 'availableStudents', 'enrolledStudents'));
+
+        return view('subjects.show_subject_student', compact('subject', 'availableStudents', 'enrolledStudents', 'period'));
     }
 
     /**
