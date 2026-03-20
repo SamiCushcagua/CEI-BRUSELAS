@@ -54,7 +54,8 @@ class AdminPeriodSubjectDashboardController extends Controller
         // Fechas (domingos) del periodo.
         $sundays = $this->getSundaysForPeriod($period);
         $defaultSunday = $this->getClosestSunday($sundays) ?? ($sundays[0] ?? null);
-        $selectedDate = $request->query('class_date', $defaultSunday);
+        $selectedDateRaw = $request->query('class_date', $defaultSunday);
+        $selectedDate = $selectedDateRaw ? Carbon::parse($selectedDateRaw)->format('Y-m-d') : null;
 
         $students = collect();
         $attendanceRecords = collect();
@@ -65,9 +66,10 @@ class AdminPeriodSubjectDashboardController extends Controller
             $students = $selectedSubject->studentsForPeriod($period)->get();
 
             // Registro para la fila editable (un domingo específico).
+            // whereDate + fecha normalizada Y-m-d evita desajustes con tipos DATE/Carbon
             $attendanceRecords = ClassAttendance::where('professor_id', $selectedProfessor->id)
                 ->where('subject_id', $selectedSubject->id)
-                ->where('class_date', $selectedDate)
+                ->whereDate('class_date', $selectedDate)
                 ->get()
                 ->keyBy('student_id');
 
@@ -77,9 +79,13 @@ class AdminPeriodSubjectDashboardController extends Controller
                 ->whereIn('class_date', $sundays)
                 ->get();
 
-            // Mapa: attendanceData[student_id][class_date] => record|null
+            // Mapa: attendanceData[student_id][class_date Y-m-d] => record|null
+            // Importante: class_date viene casteado a Carbon; al concatenar sin formatear la clave
+            // no coincidía con $sunday (string Y-m-d) y el resumen salía vacío.
             $map = $allAttendanceRecords->mapWithKeys(function ($r) {
-                return [$r->student_id . '|' . $r->class_date => $r];
+                $dateKey = $this->normalizeClassDateKey($r->class_date);
+
+                return [$r->student_id . '|' . $dateKey => $r];
             });
 
             foreach ($students as $student) {
@@ -183,6 +189,18 @@ class AdminPeriodSubjectDashboardController extends Controller
             'professor_id' => $professorId,
             'class_date' => $classDate,
         ]);
+    }
+
+    /**
+     * Fecha de asistencia siempre como Y-m-d para comparar con domingos del periodo.
+     */
+    private function normalizeClassDateKey($value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        return Carbon::parse($value)->format('Y-m-d');
     }
 
     private function getSundaysForPeriod(Period $period): array
