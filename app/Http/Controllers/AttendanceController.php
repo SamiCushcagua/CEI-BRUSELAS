@@ -20,10 +20,15 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         $professor = Auth::user();
-        $subjects = $professor->subjects;
-        
+
         $period = Period::active()->firstOrFail();
         $currentTrimester = $period->trimester;
+
+        // Solo materias asignadas al profesor en el periodo activo (evita duplicados por otros trimestres)
+        $subjects = $professor->subjects()
+            ->wherePivot('period_id', $period->id)
+            ->orderBy('subjects.name')
+            ->get();
         
         $sundays = $this->getSundaysForPeriod($period);
         $defaultSunday = $this->getClosestSunday($sundays);
@@ -38,7 +43,7 @@ class AttendanceController extends Controller
         if ($request->get('subject_id') && $selectedDate) {
             $selectedSubject = Subject::find($request->get('subject_id'));
 
-            if ($selectedSubject && $professor->subjects->contains($selectedSubject)) {
+            if ($selectedSubject && $subjects->contains('id', $selectedSubject->id)) {
                 $students = $selectedSubject->studentsForPeriod($period)->get();
 
                 // Obtener registros de asistencia existentes
@@ -103,9 +108,14 @@ class AttendanceController extends Controller
             'attendance.*.notes' => 'nullable|string|max:500'
         ]);
 
-        // Verificar que el profesor tenga acceso a esta materia
+        // Verificar que el profesor tenga acceso a esta materia en el periodo activo
+        $period = Period::active()->firstOrFail();
         $subject = Subject::find($validated['subject_id']);
-        if (!$professor->subjects->contains($subject)) {
+        $hasAccess = $professor->subjects()
+            ->wherePivot('period_id', $period->id)
+            ->where('subjects.id', $subject->id)
+            ->exists();
+        if (!$subject || !$hasAccess) {
             return redirect()->back()->with('error', 'No tienes acceso a esta materia.');
         }
 

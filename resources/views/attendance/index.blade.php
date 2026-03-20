@@ -12,6 +12,11 @@
         <div>
             <h1 class="grades-title">Control de Asistencia</h1>
             <p class="grades-subtitle">Registra la asistencia semanal de tus estudiantes</p>
+            @isset($period)
+            <p class="grades-subtitle" style="margin-top: 0.35rem; opacity: 0.95;">
+                📅 <strong>Periodo vigente:</strong> {{ $period->name }} — {{ $period->year }} · Trimestre {{ $period->trimester }}
+            </p>
+            @endisset
         </div>
     </div>
 
