@@ -13,6 +13,7 @@ class ClassAttendance extends Model
         'professor_id',
         'subject_id',
         'student_id',
+        'period_id',
         'class_date',
         'attendance_status',
         'bible_verse_delivered',
@@ -24,10 +25,15 @@ class ClassAttendance extends Model
         'bible_verse_delivered' => 'boolean',
     ];
 
-    // Relación con el profesor
+    // Relación con el profesor (último que guardó; puede ser null)
     public function professor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'professor_id');
+    }
+
+    public function period(): BelongsTo
+    {
+        return $this->belongsTo(Period::class, 'period_id');
     }
 
     // Relación con la materia

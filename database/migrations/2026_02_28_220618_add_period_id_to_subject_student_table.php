@@ -12,23 +12,33 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Si la columna ya existe (BD actualizada a mano o migración a medias), no volver a crearla.
+        if (Schema::hasColumn('subject_student', 'period_id')) {
+            $periodId = \App\Models\Period::orderBy('id')->value('id');
+            if ($periodId) {
+                DB::table('subject_student')->whereNull('period_id')->update(['period_id' => $periodId]);
+            }
+
+            return;
+        }
+
         Schema::table('subject_student', function (Blueprint $table) {
             $table->foreignId('period_id')
-                  ->nullable()
-                  ->after('student_id')
-                  ->constrained('periods')
-                  ->cascadeOnDelete();
+                ->nullable()
+                ->after('student_id')
+                ->constrained('periods')
+                ->cascadeOnDelete();
         });
- 
+
         $periodId = \App\Models\Period::orderBy('id')->value('id');
         if ($periodId) {
             DB::table('subject_student')->update(['period_id' => $periodId]);
         }
- 
+
         Schema::table('subject_student', function (Blueprint $table) {
             $table->foreignId('period_id')->nullable(false)->change();
         });
- 
+
         Schema::table('subject_student', function (Blueprint $table) {
             $table->dropUnique(['subject_id', 'student_id']);
             $table->unique(['subject_id', 'student_id', 'period_id']);
@@ -40,6 +50,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasColumn('subject_student', 'period_id')) {
+            return;
+        }
+
         Schema::table('subject_student', function (Blueprint $table) {
             $table->dropUnique(['subject_id', 'student_id', 'period_id']);
             $table->unique(['subject_id', 'student_id']);

@@ -62,20 +62,18 @@ class AdminPeriodSubjectDashboardController extends Controller
         $attendanceData = [];
         $grades = collect();
 
-        if ($selectedSubject && $selectedProfessor && $selectedDate) {
+        if ($selectedSubject && $selectedDate) {
             $students = $selectedSubject->studentsForPeriod($period)->get();
 
-            // Registro para la fila editable (un domingo específico).
-            // whereDate + fecha normalizada Y-m-d evita desajustes con tipos DATE/Carbon
-            $attendanceRecords = ClassAttendance::where('professor_id', $selectedProfessor->id)
-                ->where('subject_id', $selectedSubject->id)
+            // Asistencia compartida (misma fila para cualquier profesor asignado en el periodo)
+            $attendanceRecords = ClassAttendance::where('subject_id', $selectedSubject->id)
+                ->where('period_id', $period->id)
                 ->whereDate('class_date', $selectedDate)
                 ->get()
                 ->keyBy('student_id');
 
-            // Registros para el resumen (todos los domingos del periodo).
-            $allAttendanceRecords = ClassAttendance::where('professor_id', $selectedProfessor->id)
-                ->where('subject_id', $selectedSubject->id)
+            $allAttendanceRecords = ClassAttendance::where('subject_id', $selectedSubject->id)
+                ->where('period_id', $period->id)
                 ->whereIn('class_date', $sundays)
                 ->get();
 
@@ -128,7 +126,6 @@ class AdminPeriodSubjectDashboardController extends Controller
         $validated = $request->validate([
             'period_id' => 'required|exists:periods,id',
             'subject_id' => 'required|exists:subjects,id',
-            'professor_id' => 'required|exists:users,id',
             'class_date' => 'required|date',
             'attendance' => 'required|array',
             'attendance.*.student_id' => 'required|exists:users,id',
@@ -139,18 +136,6 @@ class AdminPeriodSubjectDashboardController extends Controller
 
         $period = Period::findOrFail($validated['period_id']);
         $subjectId = (int) $validated['subject_id'];
-        $professorId = (int) $validated['professor_id'];
-
-        // Asegurar que el profesor esté asignado a la materia en este periodo.
-        $isAssigned = DB::table('subject_professor')
-            ->where('subject_id', $subjectId)
-            ->where('professor_id', $professorId)
-            ->where('period_id', $period->id)
-            ->exists();
-
-        if (!$isAssigned) {
-            abort(403, 'El profesor no está asignado a la materia en este periodo');
-        }
 
         $classDate = Carbon::parse($validated['class_date'])->format('Y-m-d');
 
@@ -163,12 +148,13 @@ class AdminPeriodSubjectDashboardController extends Controller
 
                 ClassAttendance::updateOrCreate(
                     [
-                        'professor_id' => $professorId,
                         'subject_id' => $subjectId,
                         'student_id' => $studentId,
                         'class_date' => $classDate,
+                        'period_id' => $period->id,
                     ],
                     [
+                        'professor_id' => Auth::id(),
                         'attendance_status' => $studentPayload['attendance_status'],
                         'bible_verse_delivered' => $bibleDelivered,
                         'notes' => $studentPayload['notes'] ?? null,
@@ -182,11 +168,9 @@ class AdminPeriodSubjectDashboardController extends Controller
             return redirect()->back()->with('error', 'Error al guardar la asistencia');
         }
 
-        // Volver con filtros aplicados.
         return redirect()->route('admin.period-subject-dashboard', [
             'period_id' => $period->id,
             'subject_id' => $subjectId,
-            'professor_id' => $professorId,
             'class_date' => $classDate,
         ]);
     }

@@ -90,13 +90,13 @@
         </div>
     </div>
 
-    @if($selectedSubject && $selectedProfessor && $selectedDate)
+    @if($selectedSubject && $selectedDate)
 
     <!-- Asistencia editable -->
     <div class="grades-table-container">
         <div class="grades-table-header">
             <h3 class="grades-table-title">
-                Asistencia - {{ $selectedSubject->name }} - {{ $selectedProfessor->name ?? $selectedProfessor->email }} - {{ \Carbon\Carbon::parse($selectedDate)->format('d/m/Y') }}
+                Asistencia - {{ $selectedSubject->name }} @if($selectedProfessor) - {{ $selectedProfessor->name ?? $selectedProfessor->email }} @endif - {{ \Carbon\Carbon::parse($selectedDate)->format('d/m/Y') }}
             </h3>
         </div>
 
@@ -105,7 +105,6 @@
             @csrf
             <input type="hidden" name="period_id" value="{{ $period->id }}">
             <input type="hidden" name="subject_id" value="{{ $selectedSubject->id }}">
-            <input type="hidden" name="professor_id" value="{{ $selectedProfessor->id }}">
             <input type="hidden" name="class_date" value="{{ $selectedDate }}">
 
             <div class="grades-table-wrapper">
@@ -366,11 +365,11 @@
 
     @endif
 
-    @if(!$selectedSubject || !$selectedProfessor || !$selectedDate)
+    @if(!$selectedSubject || !$selectedDate)
     <div class="empty-state">
         <div class="empty-icon">🧭</div>
         <h3 class="empty-title">Selecciona un periodo</h3>
-        <p class="empty-description">Elige Periodo, Materia y Profesor para ver y modificar asistencia y calificaciones.</p>
+        <p class="empty-description">Elige Periodo, Materia y fecha de clase (domingo) para ver y modificar asistencia y calificaciones. La asistencia es compartida entre los profesores de la materia.</p>
     </div>
     @endif
 </div>

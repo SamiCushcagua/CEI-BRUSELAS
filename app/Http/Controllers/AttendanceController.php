@@ -34,7 +34,8 @@ class AttendanceController extends Controller
         $defaultSunday = $this->getClosestSunday($sundays);
 
         $selectedSubject = null;
-        $selectedDate = $request->get('class_date', $defaultSunday);
+        $selectedDateRaw = $request->get('class_date', $defaultSunday);
+        $selectedDate = $selectedDateRaw ? \Carbon\Carbon::parse($selectedDateRaw)->format('Y-m-d') : null;
         $students = collect();
         $attendanceRecords = collect();
         $attendanceData = [];
@@ -46,16 +47,15 @@ class AttendanceController extends Controller
             if ($selectedSubject && $subjects->contains('id', $selectedSubject->id)) {
                 $students = $selectedSubject->studentsForPeriod($period)->get();
 
-                // Obtener registros de asistencia existentes
-                $attendanceRecords = ClassAttendance::where('professor_id', $professor->id)
-                    ->where('subject_id', $selectedSubject->id)
-                    ->where('class_date', $selectedDate)
+                // Asistencia compartida: misma fila para todos los profesores de la materia en este periodo
+                $attendanceRecords = ClassAttendance::where('subject_id', $selectedSubject->id)
+                    ->where('period_id', $period->id)
+                    ->whereDate('class_date', $selectedDate)
                     ->get()
                     ->keyBy('student_id');
 
-                // Obtener todos los registros del trimestre para el resumen
-                $allAttendanceRecords = ClassAttendance::where('professor_id', $professor->id)
-                    ->where('subject_id', $selectedSubject->id)
+                $allAttendanceRecords = ClassAttendance::where('subject_id', $selectedSubject->id)
+                    ->where('period_id', $period->id)
                     ->whereIn('class_date', $sundays)
                     ->get();
 
@@ -119,27 +119,29 @@ class AttendanceController extends Controller
             return redirect()->back()->with('error', 'No tienes acceso a esta materia.');
         }
 
-        // Guardar o actualizar registros de asistencia
+        $classDate = \Carbon\Carbon::parse($validated['class_date'])->format('Y-m-d');
+
+        // Guardar o actualizar: una fila por materia + alumno + fecha + periodo (professor_id = último que guardó)
         foreach ($validated['attendance'] as $attendanceData) {
             ClassAttendance::updateOrCreate(
                 [
-                    'professor_id' => $professor->id,
                     'subject_id' => $validated['subject_id'],
                     'student_id' => $attendanceData['student_id'],
-                    'class_date' => $validated['class_date']
+                    'class_date' => $classDate,
+                    'period_id' => $period->id,
                 ],
                 [
+                    'professor_id' => $professor->id,
                     'attendance_status' => $attendanceData['attendance_status'],
                     'bible_verse_delivered' => $attendanceData['bible_verse_delivered'] ?? false,
-                    'notes' => $attendanceData['notes'] ?? null
+                    'notes' => $attendanceData['notes'] ?? null,
                 ]
             );
         }
 
-        // Redirigir manteniendo los parámetros de la materia y fecha
         return redirect()->route('attendance.index', [
             'subject_id' => $validated['subject_id'],
-            'class_date' => $validated['class_date']
+            'class_date' => $classDate,
         ])->with('success', 'Asistencia guardada exitosamente.');
     }
 
