@@ -1,0 +1,19 @@
+{
+  "name": "CEI Bruselas",
+  "short_name": "CEI",
+  "description": "Escuela bíblica CEI Bruselas — calificaciones, asistencia y cursos.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/images/logo-cei.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
