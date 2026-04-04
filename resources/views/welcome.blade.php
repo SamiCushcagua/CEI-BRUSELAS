@@ -1,83 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    .edit-button {
-        background-color: #3b82f6;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 4px;
-        border: none;
-        cursor: pointer;
-        font-weight: bold;
-        width: 50%;
-    }
-    .edit-button:hover {
-        background-color: #2563eb;
-    }
-    .delete-button {
-        background-color: #ef4444;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 4px;
-        border: none;
-        cursor: pointer;
-        font-weight: bold;
-        width: 50%;
-    }
-    .delete-button:hover {
-        background-color: #dc2626;
-    }
-    .button-container {
-        margin-top: 16px;
-        display: flex;
-        width: 100%;
-    }
-    /* Botones de acceso rápido - responsive para móvil */
-    .welcome-quick-buttons {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        margin: 24px 0;
-        padding: 0 4px;
-    }
-    .welcome-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 18px 28px;
-        background: #3b82f6;
-        color: white;
-        text-decoration: none;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 16px;
-        transition: background 0.2s;
-        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-    }
-    .welcome-btn:hover {
-        background:rgb(0, 238, 255);
-        color: white;
-    }
-    @media (max-width: 480px) {
-        .welcome-quick-buttons {
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin: 20px 0;
-            padding: 0;
-        }
-        .welcome-btn {
-            width: 80%;
-            height: 80%;
-            padding: 8px 24px;
-            font-size: 16px;
-        }
-    }
-</style>
 
-
-
-<div class="container">
+<div class="container welcome-page">
     <!-- Main Content -->
     <div class="main-container">
         <!-- Authentication Status -->
@@ -91,44 +16,59 @@
             </div>
         @endauth
 
-        <!-- Accesos rápidos para profesores -->
         @auth
-        @if (Auth::user()->isProfessor())
-        <div class="welcome-quick-buttons">
-            <a href="{{ route('professors.subjects', Auth::user()) }}" class="welcome-btn">
-                📚 Mi materia
-            </a>
-            <a href="{{ route('professors.students', Auth::user()) }}" class="welcome-btn">
-                👥 Mis estudiantes
-            </a>
-            <a href="{{ route('grades.index') }}" class="welcome-btn">
-                📝 Calificaciones
-            </a>
-         <!--   <a href="{{ route('grade-reports.index') }}" class="welcome-btn">
-                📊 Reportes
-            </a>-->
+        {{-- Todos los usuarios con sesión: enlaces comunes --}}
+        <div class="welcome-quick-section">
+            <h2 class="welcome-quick-section-title">Accesos generales</h2>
+            <div class="welcome-quick-buttons">
+                <a href="{{ route('profile.edit') }}" class="welcome-btn">👤 Mi perfil</a>
+                <a href="{{ route('bible.index') }}" class="welcome-btn">📖 Biblia</a>
+                <a href="{{ route('FAQ') }}" class="welcome-btn">❓ FAQ</a>
+                <a href="{{ route('about') }}" class="welcome-btn">ℹ️ Sobre nosotros</a>
+            </div>
+        </div>
 
-            <a href="{{ route('attendance.index') }}" class="welcome-btn">
-                📅 Asistencia 
-            </a>
-            
+        @if (Auth::user()->is_admin)
+        <div class="welcome-quick-section">
+            <h2 class="welcome-quick-section-title">Administración</h2>
+            <div class="welcome-quick-buttons">
+                <a href="{{ route('contact-forum') }}" class="welcome-btn">✉️ Contacto</a>
+                <a href="{{ route('subjects.create') }}" class="welcome-btn">📖 Materias</a>
+                <a href="{{ route('dashboard_cursos') }}" class="welcome-btn">🎓 Dashboard Cursos</a>
+                <a href="{{ route('periods.index') }}" class="welcome-btn">📆 Periodos</a>
+                <a href="{{ route('admin.period-subject-dashboard') }}" class="welcome-btn">🗂️ Tablero Admin</a>
+                <a href="{{ route('admin.subject-enrollment-outcomes') }}" class="welcome-btn">✅ Aprobados y diplomas</a>
+                <a href="{{ route('professors.index') }}" class="welcome-btn">👨‍🏫 Profesores</a>
+                <a href="{{ route('students.index') }}" class="welcome-btn">👨‍🎓 Estudiantes</a>
+                <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a>
+            </div>
+        </div>
+        @endif
+
+        @if (Auth::user()->isProfessor())
+        <div class="welcome-quick-section">
+            <h2 class="welcome-quick-section-title">Profesor</h2>
+            <div class="welcome-quick-buttons">
+                <a href="{{ route('professors.subjects', Auth::user()) }}" class="welcome-btn">📚 Mi materia</a>
+                <a href="{{ route('professors.students', Auth::user()) }}" class="welcome-btn">👥 Mis estudiantes</a>
+                <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a>
+                <a href="{{ route('grade-reports.index') }}" class="welcome-btn">📊 Reportes</a>
+                <a href="{{ route('attendance.index') }}" class="welcome-btn">📅 Asistencia</a>
+            </div>
+        </div>
+        @endif
+
+        @if (Auth::user()->isStudent())
+        <div class="welcome-quick-section">
+            <h2 class="welcome-quick-section-title">Estudiante</h2>
+            <div class="welcome-quick-buttons">
+                <a href="{{ route('students.subjects', Auth::user()) }}" class="welcome-btn">📚 Mi curso</a>
+                <a href="{{ route('students.professors', Auth::user()) }}" class="welcome-btn">👥 Mis profesores</a>
+                <a href="{{ route('attendance.index') }}" class="welcome-btn">📅 Asistencia</a>
+            </div>
         </div>
         @endif
         @endauth
-
-@auth
-        @if (Auth::user()->isStudent())
-                <div class="welcome-quick-buttons">
-                    <a href="{{ route('students.subjects', Auth::user()) }}" class="welcome-btn">
-                        📚 Mi curso
-                    </a>
-                    <a href="{{ route('students.professors', Auth::user()) }}" class="welcome-btn">
-                        👥 Mis profesores
-                    </a>
-                    <a href="{{ route('attendance.index') }}" class="welcome-btn">📅 Asistencia </a>
-                </div>
-                @endif
-@endauth
         <!-- Products Section -->
         <div class="products-grid">
 

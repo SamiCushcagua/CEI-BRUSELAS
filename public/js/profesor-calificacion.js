@@ -4,6 +4,7 @@
 let currentSubjectId = null;
 let currentTrimester = null;
 let currentYear = null;
+let currentPeriodId = null;
 
 // Inicialización cuando se carga el DOM
 document.addEventListener('DOMContentLoaded', function() {
@@ -27,7 +28,12 @@ function initializeGradeSystem() {
     if (yearElement) {
         currentYear = yearElement.dataset.year;
     }
-    
+
+    const periodEl = document.querySelector('#grade-data[data-period-id]');
+    if (periodEl && periodEl.dataset.periodId) {
+        currentPeriodId = periodEl.dataset.periodId;
+    }
+
     // Inicializar eventos
     initializeGradeInputs();
     initializeSettingsForm();
@@ -104,6 +110,9 @@ function saveStudentGrade(studentId) {
         return;
     }
 
+    const passedEl = document.querySelector(`[data-student-id="${studentId}"][data-field="passed"]`);
+    const diplomaEl = document.querySelector(`[data-student-id="${studentId}"][data-field="diploma_delivered"]`);
+
     const formData = {
         student_id: studentId,
         subject_id: currentSubjectId,
@@ -115,8 +124,14 @@ function saveStudentGrade(studentId) {
         participation_score: document.querySelector(`[data-student-id="${studentId}"][data-field="participation_score"]`)?.value || null,
         bible_score: document.querySelector(`[data-student-id="${studentId}"][data-field="bible_score"]`)?.value || null,
         text_score: document.querySelector(`[data-student-id="${studentId}"][data-field="text_score"]`)?.value || null,
-        other_score: document.querySelector(`[data-student-id="${studentId}"][data-field="other_score"]`)?.value || null
+        other_score: document.querySelector(`[data-student-id="${studentId}"][data-field="other_score"]`)?.value || null,
+        passed: passedEl ? !!passedEl.checked : false,
+        diploma_delivered: diplomaEl ? !!diplomaEl.checked : false,
     };
+
+    if (currentPeriodId) {
+        formData.period_id = parseInt(currentPeriodId, 10);
+    }
 
     const saveBtn = document.querySelector(`[data-student-id="${studentId}"].save-btn`);
     if (saveBtn) {

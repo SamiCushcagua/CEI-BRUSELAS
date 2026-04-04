@@ -289,6 +289,8 @@
                         <th>Texto</th>
                         <th>Otro</th>
                         <th>Promedio</th>
+                        <th>Aprobó trim.</th>
+                        <th>Diploma entregado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -296,6 +298,7 @@
                     @foreach($students as $student)
                     @php
                         $studentGrade = $grades->where('student_id', $student->id)->first();
+                        $diplomaOk = (bool) ($student->pivot->diploma_delivered ?? false);
                     @endphp
                     <tr>
                         <td class="sticky-col">
@@ -338,6 +341,17 @@
                             </span>
                         </td>
 
+                        <td class="text-center">
+                            <input type="checkbox" class="grade-checkbox"
+                                data-student-id="{{ $student->id }}" data-field="passed"
+                                @checked($studentGrade && $studentGrade->passed)>
+                        </td>
+                        <td class="text-center">
+                            <input type="checkbox" class="grade-checkbox"
+                                data-student-id="{{ $student->id }}" data-field="diploma_delivered"
+                                @checked($diplomaOk)>
+                        </td>
+
                         <td>
                             <button
                                 onclick="saveStudentGrade(this.dataset.studentId)"
@@ -361,7 +375,7 @@
     </div>
 
     <!-- Datos para JavaScript (POST /grades) -->
-    <div style="display: none;" data-subject-id="{{ $selectedSubject->id }}" data-trimester="{{ $currentTrimester }}" data-year="{{ $currentYear }}" id="grade-data"></div>
+    <div style="display: none;" data-subject-id="{{ $selectedSubject->id }}" data-trimester="{{ $currentTrimester }}" data-year="{{ $currentYear }}" data-period-id="{{ $period->id }}" id="grade-data"></div>
 
     @endif
 

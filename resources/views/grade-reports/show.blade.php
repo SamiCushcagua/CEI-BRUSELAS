@@ -67,6 +67,7 @@
                         <th>Texto</th>
                         <th>Otro</th>
                         <th>Promedio</th>
+                        <th>Aprobó trim.</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -95,6 +96,7 @@
                                 {{ number_format($grade->average_score, 2) }}
                             </span>
                         </td>
+                        <td>{{ $grade->passed ? 'Sí' : 'No' }}</td>
                     </tr>
                     @endforeach
                 </tbody>

@@ -30,6 +30,7 @@ class Subject extends Model
     {
         return $this->belongsToMany(User::class, 'subject_student', 'subject_id', 'student_id')
             ->wherePivot('period_id', $period->id)
+            ->withPivot('period_id', 'diploma_delivered')
             ->where('is_profesor', false)
             ->where('is_admin', false);
     }
@@ -44,6 +45,7 @@ class Subject extends Model
     public function students()
     {
         return $this->belongsToMany(User::class, 'subject_student', 'subject_id', 'student_id')
+            ->withPivot('period_id', 'diploma_delivered')
             ->where('is_profesor', false)
             ->where('is_admin', false);
     }

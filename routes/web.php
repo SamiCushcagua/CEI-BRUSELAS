@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\BibleController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\AdminPeriodSubjectDashboardController;
+use App\Http\Controllers\AdminSubjectEnrollmentOutcomeController;
 // Public Routes
 Route::get('/', function () {
     return view('welcome', ['users' => User::all()]);
@@ -117,6 +118,10 @@ Route::get('/admin/period-subject-dashboard', [AdminPeriodSubjectDashboardContro
 Route::post('/admin/period-subject-dashboard/attendance/save', [AdminPeriodSubjectDashboardController::class, 'saveAttendance'])
     ->name('admin.period-subject-dashboard.attendance.save');
 
+Route::get('/admin/subject-enrollment-outcomes', [AdminSubjectEnrollmentOutcomeController::class, 'index'])
+    ->name('admin.subject-enrollment-outcomes');
+Route::post('/admin/subject-enrollment-outcomes', [AdminSubjectEnrollmentOutcomeController::class, 'update'])
+    ->name('admin.subject-enrollment-outcomes.update');
 
 // Calificaciones
 Route::get('/calificaciones', [CalificacionesController::class, 'index'])
@@ -150,7 +155,7 @@ Route::prefix('grades')->name('grades.')->middleware('auth')->group(function () 
     // Rutas principales de calificaciones
     Route::get('/', [App\Http\Controllers\GradeController::class, 'index'])->name('index');
     Route::get('/subject/{subject}', [App\Http\Controllers\GradeController::class, 'show'])->name('show');
-    
+
     // CRUD de calificaciones
     Route::post('/', [App\Http\Controllers\GradeController::class, 'store'])->name('store');
     Route::put('/{grade}', [App\Http\Controllers\GradeController::class, 'update'])->name('update');

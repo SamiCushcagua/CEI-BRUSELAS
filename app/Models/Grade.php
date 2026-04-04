@@ -19,7 +19,8 @@ class Grade extends Model
         'bible_score',
         'text_score',
         'other_score',
-        'notes'
+        'notes',
+        'passed',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class Grade extends Model
         'bible_score' => 'decimal:2',
         'text_score' => 'decimal:2',
         'other_score' => 'decimal:2',
+        'passed' => 'boolean',
     ];
 
     public function student(): BelongsTo

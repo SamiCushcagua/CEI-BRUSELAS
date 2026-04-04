@@ -76,7 +76,10 @@ class GradeController extends Controller
             'bible_score' => 'nullable|numeric|min:0|max:100',
             'text_score' => 'nullable|numeric|min:0|max:100',
             'other_score' => 'nullable|numeric|min:0|max:100',
-            'notes' => 'nullable|string|max:1000'
+            'notes' => 'nullable|string|max:1000',
+            'passed' => 'nullable|boolean',
+            'diploma_delivered' => 'nullable|boolean',
+            'period_id' => 'nullable|exists:periods,id',
         ]);
 
         // Verificar que el usuario es profesor de esta materia o que es admin
@@ -92,18 +95,34 @@ class GradeController extends Controller
         try {
             DB::beginTransaction();
 
+            $attributes = $request->only([
+                'task_score', 'exam_score1', 'exam_score2', 'participation_score',
+                'bible_score', 'text_score', 'other_score', 'notes',
+            ]);
+            if ($request->has('passed')) {
+                $attributes['passed'] = $request->boolean('passed');
+            }
+
             $grade = Grade::updateOrCreate(
                 [
                     'student_id' => $request->student_id,
                     'subject_id' => $request->subject_id,
                     'trimester' => $request->trimester,
-                    'year' => $request->year
+                    'year' => $request->year,
                 ],
-                $request->only([
-                    'task_score', 'exam_score1', 'exam_score2', 'participation_score',
-                    'bible_score', 'text_score', 'other_score', 'notes'
-                ])
+                $attributes
             );
+
+            if ($request->has('diploma_delivered') && $request->filled('period_id')) {
+                DB::table('subject_student')
+                    ->where('subject_id', $request->subject_id)
+                    ->where('student_id', $request->student_id)
+                    ->where('period_id', $request->period_id)
+                    ->update([
+                        'diploma_delivered' => $request->boolean('diploma_delivered'),
+                        'updated_at' => now(),
+                    ]);
+            }
 
             DB::commit();
 
@@ -136,8 +155,8 @@ class GradeController extends Controller
      */
     public function update(Request $request, Grade $grade)
     {
-        // Verificar que el usuario es profesor de esta materia
-        if (!$grade->subject->professors()->where('professor_id', Auth::id())->exists()) {
+        $user = Auth::user();
+        if (! $user?->is_admin && ! $grade->subject->professors()->where('professor_id', Auth::id())->exists()) {
             abort(403, 'No tienes permisos para modificar esta calificación');
         }
 
@@ -149,14 +168,19 @@ class GradeController extends Controller
             'bible_score' => 'nullable|numeric|min:0|max:100',
             'text_score' => 'nullable|numeric|min:0|max:100',
             'other_score' => 'nullable|numeric|min:0|max:100',
-            'notes' => 'nullable|string|max:1000'
+            'notes' => 'nullable|string|max:1000',
+            'passed' => 'nullable|boolean',
         ]);
 
         try {
-            $grade->update($request->only([
-                'task_score', 'exam_score1', 'exam_score2 ', 'participation_score',
-                'bible_score', 'text_score', 'other_score', 'notes'
-            ]));
+            $payload = $request->only([
+                'task_score', 'exam_score1', 'exam_score2', 'participation_score',
+                'bible_score', 'text_score', 'other_score', 'notes',
+            ]);
+            if ($request->has('passed')) {
+                $payload['passed'] = $request->boolean('passed');
+            }
+            $grade->update($payload);
 
             if ($request->ajax()) {
                 return response()->json([
