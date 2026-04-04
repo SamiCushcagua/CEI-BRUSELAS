@@ -1896,18 +1896,18 @@ body {
 }
 
 /* ========== Página de inicio (welcome) ========== */
-/* Anclado a .main-container para que siempre aplique dentro del contenido (y no dependa solo de .welcome-page). */
+/* Alcance .welcome-page: coincide con el div exterior de welcome.blade (no solo .main-container). */
 .welcome-page {
     max-width: 1100px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.main-container .welcome-quick-section {
+.welcome-page .welcome-quick-section {
     margin-bottom: 12px;
 }
 
-.main-container .welcome-quick-section-title {
+.welcome-page .welcome-quick-section-title {
     font-size: 1.1rem;
     font-weight: 700;
     color: #1e3a5f;
@@ -1918,11 +1918,11 @@ body {
 }
 
 /* Primera sección de accesos justo debajo del mensaje de bienvenida */
-.main-container > .auth-message + .welcome-quick-section .welcome-quick-section-title {
+.welcome-page .main-container > .auth-message + .welcome-quick-section .welcome-quick-section-title {
     margin-top: 0.5rem;
 }
 
-.main-container .welcome-quick-buttons {
+.welcome-page .welcome-quick-buttons {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
@@ -1930,7 +1930,8 @@ body {
     padding: 0 2px;
 }
 
-.main-container a.welcome-btn {
+/* Enlace con aspecto de botón (evita depender solo del padre .main-container) */
+.welcome-page a.welcome-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1948,20 +1949,20 @@ body {
     text-align: center;
 }
 
-.main-container a.welcome-btn:hover {
+.welcome-page a.welcome-btn:hover {
     background: #05d9ff;
     color: #fff !important;
     box-shadow: 0 4px 12px rgb(37, 100, 235);
 }
 
 @media (max-width: 480px) {
-    .main-container .welcome-quick-buttons {
+    .welcome-page .welcome-quick-buttons {
         grid-template-columns: 1fr;
         gap: 12px;
         margin: 12px 0 20px 0;
     }
 
-    .main-container a.welcome-btn {
+    .welcome-page a.welcome-btn {
         width: 100%;
         max-width: 100%;
         min-height: 48px;

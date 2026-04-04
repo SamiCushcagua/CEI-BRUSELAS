@@ -18,7 +18,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Styles -->
-    <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/styles.css') }}?v={{ filemtime(public_path('css/styles.css')) }}" rel="stylesheet">
 </head>
 
 <body>
@@ -52,7 +52,7 @@
                 <a href="{{ route('professors.index') }}" class="nav-link {{ request()->routeIs('professors.index') ? 'active' : '' }}">Profesores</a>
                 <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.index') ? 'active' : '' }}">Estudiantes</a>
                 <a href="{{ route('grades.index') }}" class="nav-link {{ request()->routeIs('grades.*') ? 'active' : '' }}">Calificaciones</a>
-                <a href="{{ route('grade-reports.index') }}" class="nav-link {{ request()->routeIs('grade-reports.*') ? 'active' : '' }}">Reportes</a>
+               <!-- <a href="{{ route('grade-reports.index') }}" class="nav-link {{ request()->routeIs('grade-reports.*') ? 'active' : '' }}">Reportes</a>-->
                 @endif
                 @if (Auth::user()->isProfessor())
                 <a href="{{ route('professors.subjects', Auth::user()) }}" class="{{ request()->routeIs('professors.subjects') ? 'active' : '' }}">Mi materia</a>
