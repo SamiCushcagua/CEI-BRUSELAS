@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Period;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class Subject extends Model
 {
@@ -28,9 +29,23 @@ class Subject extends Model
     }
     public function studentsForPeriod(Period $period)
     {
-        return $this->belongsToMany(User::class, 'subject_student', 'subject_id', 'student_id')
-            ->wherePivot('period_id', $period->id)
-            ->withPivot('period_id', 'diploma_delivered')
+        $relation = $this->belongsToMany(User::class, 'subject_student', 'subject_id', 'student_id');
+
+        if (Schema::hasColumn('subject_student', 'period_id')) {
+            $relation->wherePivot('period_id', $period->id);
+        }
+
+        $pivot = [];
+        foreach (['period_id', 'diploma_delivered'] as $col) {
+            if (Schema::hasColumn('subject_student', $col)) {
+                $pivot[] = $col;
+            }
+        }
+        if ($pivot !== []) {
+            $relation->withPivot(...$pivot);
+        }
+
+        return $relation
             ->where('is_profesor', false)
             ->where('is_admin', false);
     }
@@ -44,8 +59,19 @@ class Subject extends Model
     // Relación con estudiantes (many-to-many)
     public function students()
     {
-        return $this->belongsToMany(User::class, 'subject_student', 'subject_id', 'student_id')
-            ->withPivot('period_id', 'diploma_delivered')
+        $relation = $this->belongsToMany(User::class, 'subject_student', 'subject_id', 'student_id');
+
+        $pivot = [];
+        foreach (['period_id', 'diploma_delivered'] as $col) {
+            if (Schema::hasColumn('subject_student', $col)) {
+                $pivot[] = $col;
+            }
+        }
+        if ($pivot !== []) {
+            $relation->withPivot(...$pivot);
+        }
+
+        return $relation
             ->where('is_profesor', false)
             ->where('is_admin', false);
     }

@@ -132,7 +132,6 @@
     </div>
     @endif
     @endif
-    @endif
 
     @else
 
