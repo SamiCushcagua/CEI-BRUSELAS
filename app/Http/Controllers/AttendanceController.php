@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ClassAttendance;
 use App\Models\Subject;
@@ -33,16 +34,17 @@ class AttendanceController extends Controller
         $currentTrimester = $period->trimester;
 
         // Solo materias asignadas al profesor en el periodo activo (evita duplicados por otros trimestres)
-        $subjects = $professor->subjects()
-            ->wherePivot('period_id', $period->id)
-            ->orderBy('subjects.name')
-            ->get();
+        $professorSubjects = $professor->subjects();
+        if (Schema::hasColumn('subject_professor', 'period_id')) {
+            $professorSubjects->wherePivot('period_id', $period->id);
+        }
+        $subjects = $professorSubjects->orderBy('subjects.name')->get();
 
         $defaultSunday = $this->getClosestSunday($sundays);
 
         $selectedSubject = null;
         $selectedDateRaw = $request->get('class_date', $defaultSunday);
-        $selectedDate = $selectedDateRaw ? \Carbon\Carbon::parse($selectedDateRaw)->format('Y-m-d') : null;
+        $selectedDate = $this->parseDateParam($selectedDateRaw);
         $students = collect();
         $attendanceRecords = collect();
         $attendanceData = [];
@@ -100,14 +102,33 @@ class AttendanceController extends Controller
     }
 
     /**
+     * Evita 500 si class_date viene vacío o inválido en la query (?class_date=).
+     */
+    private function parseDateParam(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (is_string($value) && trim($value) === '') {
+            return null;
+        }
+        try {
+            return Carbon::parse($value)->format('Y-m-d');
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
      * Vista solo lectura: el estudiante ve sus asistencias del periodo activo por materia.
      */
     private function studentAttendanceIndex(Request $request, User $student, Period $period, array $sundays)
     {
-        $subjects = $student->subjectsAsStudent()
-            ->wherePivot('period_id', $period->id)
-            ->orderBy('subjects.name')
-            ->get();
+        $subjectsQuery = $student->subjectsAsStudent();
+        if (Schema::hasColumn('subject_student', 'period_id')) {
+            $subjectsQuery->wherePivot('period_id', $period->id);
+        }
+        $subjects = $subjectsQuery->orderBy('subjects.name')->get();
 
         $selectedSubject = null;
         $studentAttendanceByDate = [];
@@ -124,7 +145,15 @@ class AttendanceController extends Controller
 
                 foreach ($sundays as $d) {
                     $studentAttendanceByDate[$d] = $records->first(function ($r) use ($d) {
-                        return $r->class_date->format('Y-m-d') === $d;
+                        if (! $r->class_date) {
+                            return false;
+                        }
+
+                        try {
+                            return Carbon::parse($r->class_date)->toDateString() === $d;
+                        } catch (\Throwable) {
+                            return false;
+                        }
                     });
                 }
             }
@@ -170,11 +199,15 @@ class AttendanceController extends Controller
         // Verificar que el profesor tenga acceso a esta materia en el periodo activo
         $period = Period::active()->firstOrFail();
         $subject = Subject::find($validated['subject_id']);
-        $hasAccess = $professor->subjects()
-            ->wherePivot('period_id', $period->id)
-            ->where('subjects.id', $subject->id)
-            ->exists();
-        if (!$subject || !$hasAccess) {
+        if (! $subject) {
+            return redirect()->back()->with('error', 'Materia no encontrada.');
+        }
+        $accessQuery = $professor->subjects()->where('subjects.id', $subject->id);
+        if (Schema::hasColumn('subject_professor', 'period_id')) {
+            $accessQuery->wherePivot('period_id', $period->id);
+        }
+        $hasAccess = $accessQuery->exists();
+        if (! $hasAccess) {
             return redirect()->back()->with('error', 'No tienes acceso a esta materia.');
         }
 
