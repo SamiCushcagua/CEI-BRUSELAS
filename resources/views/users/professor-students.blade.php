@@ -10,6 +10,11 @@
     <div class="grades-header">
         <div>
             <h1 class="grades-title">Estudiantes del Profesor: {{ $professor->name }}</h1>
+            @isset($period)
+            <p class="grades-subtitle" style="margin-top: 0.35rem; opacity: 0.95;">
+                📅 <strong>Periodo activo:</strong> {{ $period->name }} — {{ $period->year }} · Trimestre {{ $period->trimester }}
+            </p>
+            @endisset
         </div>
         <div class="grades-info">
             <div><span>Total Estudiantes:</span> {{ $students->count() }}</div>
@@ -70,7 +75,7 @@
                     <tr>
                         <th>Estudiante</th>
                         <th>Email</th>
-                        <th>Materias</th>
+                        <th>Materias (periodo actual)</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -94,7 +99,7 @@
                             </td>
                             <td>
                                 <span class="subject-count">
-                                    {{ $student->subjectsAsStudent->count() }} materia(s)
+                                    {{ $subjectCounts[$student->id] ?? 0 }} materia(s) con este profesor
                                 </span>
                             </td>
                             <td>
@@ -121,7 +126,7 @@
                                 <div class="empty-state">
                                     <div class="empty-icon">👥</div>
                                     <h3 class="empty-title">No hay estudiantes asignados</h3>
-                                    <p class="empty-description">Este profesor no tiene estudiantes asignados actualmente.</p>
+                                    <p class="empty-description">No hay estudiantes compartiendo materia con este profesor en el periodo activo.</p>
                                 </div>
                             </td>
                         </tr>

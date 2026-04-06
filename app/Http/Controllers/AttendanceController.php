@@ -8,6 +8,8 @@ use App\Models\ClassAttendance;
 use App\Models\Subject;
 use Illuminate\Support\Facades\Log;
 use App\Models\Period;
+use App\Models\User;
+use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -19,7 +21,7 @@ class AttendanceController extends Controller
 
     public function index(Request $request)
     {
-        $professor = Auth::user();
+        $professor = User::query()->findOrFail(Auth::id());
 
         $period = Period::active()->firstOrFail();
         $currentTrimester = $period->trimester;
@@ -96,7 +98,7 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        $professor = Auth::user();
+        $professor = User::query()->findOrFail(Auth::id());
 
         $validated = $request->validate([
             'subject_id' => 'required|integer|exists:subjects,id',
@@ -165,24 +167,66 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Obtener los domingos del trimestre actual
+     * Domingos de clase dentro del periodo. Usa start_date / end_date cuando existen.
+     * El cálculo solo por trimestre+meses ignoraba esas fechas (p. ej. T2 → solo mayo–ago).
      */
-    private function getSundaysForPeriod(Period $period)
+    private function getSundaysForPeriod(Period $period): array
+    {
+        if ($period->start_date && $period->end_date) {
+            return $this->getSundaysBetween(
+                Carbon::parse($period->start_date)->startOfDay(),
+                Carbon::parse($period->end_date)->startOfDay()
+            );
+        }
+
+        return $this->getSundaysFromLegacyTrimesterMonths($period);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getSundaysBetween(Carbon $start, Carbon $end): array
+    {
+        if ($start->gt($end)) {
+            return [];
+        }
+
+        $cursor = $start->copy();
+        while (! $cursor->isSunday()) {
+            $cursor->addDay();
+            if ($cursor->gt($end)) {
+                return [];
+            }
+        }
+
+        $sundays = [];
+        while ($cursor->lte($end)) {
+            $sundays[] = $cursor->format('Y-m-d');
+            $cursor->addWeek();
+        }
+
+        return $sundays;
+    }
+
+    /**
+     * Compatibilidad: periodos sin start_date / end_date en BD.
+     */
+    private function getSundaysFromLegacyTrimesterMonths(Period $period): array
     {
         $year = $period->year;
         $currentTrimester = $period->trimester;
-    
+
         $sundays = [];
         $monthRanges = [
             1 => [1, 2, 3, 4],
             2 => [5, 6, 7, 8],
-            3 => [9, 10, 11, 12]
+            3 => [9, 10, 11, 12],
         ];
-        $months = $monthRanges[$currentTrimester];
-    
+        $months = $monthRanges[$currentTrimester] ?? [1, 2, 3, 4];
+
         foreach ($months as $month) {
             $startDate = new \DateTime("$year-$month-01");
-            $endDate = new \DateTime("$year-$month-" . $startDate->format('t'));
+            $endDate = new \DateTime("$year-$month-".$startDate->format('t'));
             while ($startDate->format('N') != 7) {
                 $startDate->add(new \DateInterval('P1D'));
             }
@@ -191,6 +235,7 @@ class AttendanceController extends Controller
                 $startDate->add(new \DateInterval('P7D'));
             }
         }
+
         return $sundays;
     }
 

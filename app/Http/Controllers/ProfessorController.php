@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Period;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProfessorController extends Controller
 {
@@ -24,16 +26,52 @@ class ProfessorController extends Controller
 
     public function students(User $professor)
     {
-        $students = $professor->students()->get();
-        
-        // Obtener estudiantes disponibles para asignar (que no están ya asignados)
-        $assignedStudentIds = $students->pluck('id');
+        $period = Period::active()->firstOrFail();
+
+        $studentIds = DB::table('subject_student as ss')
+            ->join('subject_professor as sp', function ($join) {
+                $join->on('sp.subject_id', '=', 'ss.subject_id')
+                    ->on('sp.period_id', '=', 'ss.period_id');
+            })
+            ->where('sp.professor_id', $professor->id)
+            ->where('ss.period_id', $period->id)
+            ->distinct()
+            ->pluck('ss.student_id');
+
+        $students = User::whereIn('id', $studentIds)
+            ->where('is_profesor', false)
+            ->where('is_admin', false)
+            ->orderBy('name')
+            ->get();
+
+        $subjectCounts = collect();
+        if ($studentIds->isNotEmpty()) {
+            $subjectCounts = DB::table('subject_student as ss')
+                ->join('subject_professor as sp', function ($join) {
+                    $join->on('sp.subject_id', '=', 'ss.subject_id')
+                        ->on('sp.period_id', '=', 'ss.period_id');
+                })
+                ->where('sp.professor_id', $professor->id)
+                ->where('ss.period_id', $period->id)
+                ->whereIn('ss.student_id', $studentIds)
+                ->groupBy('ss.student_id')
+                ->select('ss.student_id', DB::raw('COUNT(DISTINCT ss.subject_id) as cnt'))
+                ->pluck('cnt', 'student_id');
+        }
+
         $availableStudents = User::where('is_profesor', false)
             ->where('is_admin', false)
-            ->whereNotIn('id', $assignedStudentIds)
+            ->whereNotIn('id', $studentIds)
+            ->orderBy('name')
             ->get();
-        
-        return view('users.professor-students', compact('professor', 'students', 'availableStudents'));
+
+        return view('users.professor-students', compact(
+            'professor',
+            'students',
+            'availableStudents',
+            'period',
+            'subjectCounts'
+        ));
     }
 
     /**
