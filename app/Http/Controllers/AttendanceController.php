@@ -21,9 +21,15 @@ class AttendanceController extends Controller
 
     public function index(Request $request)
     {
-        $professor = User::query()->findOrFail(Auth::id());
-
+        $user = User::query()->findOrFail(Auth::id());
         $period = Period::active()->firstOrFail();
+        $sundays = $this->getSundaysForPeriod($period);
+
+        if ($user->isStudent()) {
+            return $this->studentAttendanceIndex($request, $user, $period, $sundays);
+        }
+
+        $professor = $user;
         $currentTrimester = $period->trimester;
 
         // Solo materias asignadas al profesor en el periodo activo (evita duplicados por otros trimestres)
@@ -31,8 +37,7 @@ class AttendanceController extends Controller
             ->wherePivot('period_id', $period->id)
             ->orderBy('subjects.name')
             ->get();
-        
-        $sundays = $this->getSundaysForPeriod($period);
+
         $defaultSunday = $this->getClosestSunday($sundays);
 
         $selectedSubject = null;
@@ -91,7 +96,55 @@ class AttendanceController extends Controller
             'attendanceRecords',
             'attendanceData',
             'period'
-        ));
+        ))->with('isStudentView', false);
+    }
+
+    /**
+     * Vista solo lectura: el estudiante ve sus asistencias del periodo activo por materia.
+     */
+    private function studentAttendanceIndex(Request $request, User $student, Period $period, array $sundays)
+    {
+        $subjects = $student->subjectsAsStudent()
+            ->wherePivot('period_id', $period->id)
+            ->orderBy('subjects.name')
+            ->get();
+
+        $selectedSubject = null;
+        $studentAttendanceByDate = [];
+
+        if ($request->filled('subject_id')) {
+            $selectedSubject = Subject::find($request->get('subject_id'));
+            if ($selectedSubject && $subjects->contains('id', $selectedSubject->id)) {
+                $records = ClassAttendance::query()
+                    ->where('subject_id', $selectedSubject->id)
+                    ->where('period_id', $period->id)
+                    ->where('student_id', $student->id)
+                    ->whereIn('class_date', $sundays)
+                    ->get();
+
+                foreach ($sundays as $d) {
+                    $studentAttendanceByDate[$d] = $records->first(function ($r) use ($d) {
+                        return $r->class_date->format('Y-m-d') === $d;
+                    });
+                }
+            }
+        }
+
+        return view('attendance.index', [
+            'isStudentView' => true,
+            'studentUser' => $student,
+            'subjects' => $subjects,
+            'sundays' => $sundays,
+            'period' => $period,
+            'currentTrimester' => $period->trimester,
+            'selectedSubject' => $selectedSubject,
+            'studentAttendanceByDate' => $studentAttendanceByDate,
+            'defaultSunday' => null,
+            'selectedDate' => null,
+            'students' => collect(),
+            'attendanceRecords' => collect(),
+            'attendanceData' => [],
+        ]);
     }
     /**
      * Guardar los registros de asistencia
@@ -99,6 +152,10 @@ class AttendanceController extends Controller
     public function store(Request $request)
     {
         $professor = User::query()->findOrFail(Auth::id());
+
+        if ($professor->isStudent()) {
+            abort(403, 'Solo el personal autorizado puede registrar asistencia.');
+        }
 
         $validated = $request->validate([
             'subject_id' => 'required|integer|exists:subjects,id',

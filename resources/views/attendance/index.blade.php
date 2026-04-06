@@ -10,8 +10,13 @@
     </div>
     <div class="grades-header">
         <div>
+            @if($isStudentView ?? false)
+            <h1 class="grades-title">Mi asistencia</h1>
+            <p class="grades-subtitle">Consulta tu registro de asistencia por materia (solo lectura)</p>
+            @else
             <h1 class="grades-title">Control de Asistencia</h1>
             <p class="grades-subtitle">Registra la asistencia semanal de tus estudiantes</p>
+            @endif
             @isset($period)
             <p class="grades-subtitle" style="margin-top: 0.35rem; opacity: 0.95;">
                 📅 <strong>Periodo vigente:</strong> {{ $period->name }} — {{ $period->year }} · Trimestre {{ $period->trimester }}
@@ -31,6 +36,105 @@
         {{ session('error') }}
     </div>
     @endif
+
+    @if($isStudentView ?? false)
+    @if($subjects->isEmpty())
+    <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <h3 class="empty-title">Sin materias en este periodo</h3>
+        <p class="empty-description">No estás inscrito en ninguna materia para el periodo activo.</p>
+    </div>
+    @else
+    <div class="form-container">
+        <div class="form-header">
+            <h2 class="form-title">Elegir materia</h2>
+        </div>
+        <div class="form-content">
+            <form method="GET" action="{{ route('attendance.index') }}" class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Materia</label>
+                    <select name="subject_id" class="form-select" required onchange="this.form.submit()">
+                        <option value="">Seleccionar materia...</option>
+                        @foreach($subjects as $subject)
+                        <option value="{{ $subject->id }}" {{ (string) request('subject_id') === (string) $subject->id ? 'selected' : '' }}>
+                            {{ $subject->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary">📋 Ver tabla de fechas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if($selectedSubject && count($sundays) > 0)
+    <div class="grades-table-container">
+        <div class="grades-table-header">
+            <h3 class="grades-table-title">{{ $selectedSubject->name }} — todas las clases (domingos) del periodo</h3>
+        </div>
+        <div class="grades-table-wrapper" style="overflow-x: auto;">
+            <table class="grades-table">
+                <thead>
+                    <tr>
+                        <th class="sticky-col">Concepto</th>
+                        @foreach($sundays as $sunday)
+                        <th class="text-center">{{ \Carbon\Carbon::parse($sunday)->format('d/m/Y') }}</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="sticky-col" scope="row">Asistencia</th>
+                        @foreach($sundays as $sunday)
+                        @php $rec = $studentAttendanceByDate[$sunday] ?? null; @endphp
+                        <td class="text-center">
+                            @if($rec)
+                                @if($rec->attendance_status == 'present')
+                                <span class="status-badge status-approved" title="Presente">✅</span>
+                                @elseif($rec->attendance_status == 'late')
+                                <span class="status-badge stat-yellow" title="Tarde">⏰</span>
+                                @else
+                                <span class="status-badge stat-red" title="Ausente">❌</span>
+                                @endif
+                            @else
+                                <span class="status-badge stat-red" title="Sin registro">—</span>
+                            @endif
+                        </td>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <th class="sticky-col" scope="row">Versículo</th>
+                        @foreach($sundays as $sunday)
+                        @php $rec = $studentAttendanceByDate[$sunday] ?? null; @endphp
+                        <td class="text-center">
+                            @if($rec)
+                                @if($rec->bible_verse_delivered)
+                                <span class="status-badge stat-green" title="Entregado">📖</span>
+                                @else
+                                <span class="status-badge stat-red" title="No entregado">📖</span>
+                                @endif
+                            @else
+                                <span class="status-badge stat-red">—</span>
+                            @endif
+                        </td>
+                        @endforeach
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @elseif($selectedSubject && count($sundays) === 0)
+    <div class="empty-state">
+        <p>No hay fechas de clase (domingos) definidas para este periodo.</p>
+    </div>
+    @endif
+    @endif
+    @endif
+
+    @else
 
     <!-- Formulario de selección -->
     <div class="form-container">
@@ -253,6 +357,8 @@
         <h3 class="empty-title">No hay estudiantes inscritos</h3>
         <p class="empty-description">Esta materia no tiene estudiantes inscritos.</p>
     </div>
+    @endif
+
     @endif
 </div>
 @endsection
