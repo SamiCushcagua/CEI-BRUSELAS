@@ -23,6 +23,7 @@ use App\Http\Controllers\BibleController;
 use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\AdminPeriodSubjectDashboardController;
 use App\Http\Controllers\AdminSubjectEnrollmentOutcomeController;
+use App\Http\Controllers\StudentGradesController;
 // Public Routes
 Route::get('/', function () {
     return view('welcome', ['users' => User::all()]);
@@ -110,6 +111,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/attendance', [App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
     Route::post('/attendance', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendance.store');
+    Route::get('/my-grades', [StudentGradesController::class, 'index'])->name('student.grades');
 });
 
 // Admin: Tablero por Periodo/Materia/Profesor (Asistencia + Calificaciones)

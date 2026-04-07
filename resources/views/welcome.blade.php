@@ -65,6 +65,7 @@
                 <a href="{{ route('students.subjects', Auth::user()) }}" class="welcome-btn">📚 Mi curso</a>
                 <a href="{{ route('students.professors', Auth::user()) }}" class="welcome-btn">👥 Mis profesores</a>
                 <a href="{{ route('attendance.index') }}" class="welcome-btn">📅 Asistencia</a>
+                <a href="{{ route('student.grades') }}" class="welcome-btn">📝 Mis calificaciones</a>
             </div>
         </div>
         @endif
