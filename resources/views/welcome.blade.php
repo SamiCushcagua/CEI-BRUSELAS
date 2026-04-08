@@ -41,6 +41,7 @@
                 <a href="{{ route('professors.index') }}" class="welcome-btn">👨‍🏫 Profesores</a>
                 <a href="{{ route('students.index') }}" class="welcome-btn">👨‍🎓 Estudiantes</a>
                 <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a>
+                <a href="{{ route('admin.graduates-overview') }}" class="welcome-btn">📋 Resumen aprobación</a>
             </div>
         </div>
         @endif

@@ -24,6 +24,7 @@ use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\AdminPeriodSubjectDashboardController;
 use App\Http\Controllers\AdminSubjectEnrollmentOutcomeController;
 use App\Http\Controllers\StudentGradesController;
+use App\Http\Controllers\AdminGraduatesOverviewController;
 // Public Routes
 Route::get('/', function () {
     return view('welcome', ['users' => User::all()]);
@@ -124,6 +125,11 @@ Route::get('/admin/subject-enrollment-outcomes', [AdminSubjectEnrollmentOutcomeC
     ->name('admin.subject-enrollment-outcomes');
 Route::post('/admin/subject-enrollment-outcomes', [AdminSubjectEnrollmentOutcomeController::class, 'update'])
     ->name('admin.subject-enrollment-outcomes.update');
+
+Route::get('/admin/graduates-overview', [AdminGraduatesOverviewController::class, 'index'])
+    ->name('admin.graduates-overview');
+Route::post('/admin/graduates-overview/pass', [AdminGraduatesOverviewController::class, 'updatePass'])
+    ->name('admin.graduates-overview.update-pass');
 
 // Calificaciones
 Route::get('/calificaciones', [CalificacionesController::class, 'index'])

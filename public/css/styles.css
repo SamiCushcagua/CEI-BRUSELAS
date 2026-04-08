@@ -1969,3 +1969,178 @@ body {
         padding: 14px 18px;
     }
 }
+
+/* ========== Admin: resumen aprobación (graduados_overview) ========== */
+.grad-overview-page {
+    max-width: 100%;
+    padding: 0 16px 32px;
+    box-sizing: border-box;
+}
+
+.grad-overview-top {
+    margin-bottom: 1rem;
+}
+
+.grad-overview-back {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.grad-overview-back:hover {
+    text-decoration: underline;
+}
+
+.grad-overview-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin: 0 0 0.5rem 0;
+}
+
+.grad-overview-desc {
+    margin: 0;
+    color: #4b5563;
+    line-height: 1.5;
+    max-width: 720px;
+}
+
+.grad-overview-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin: 1.25rem 0;
+    padding: 12px 14px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.grad-overview-search-label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.grad-overview-search-input {
+    min-width: 220px;
+    flex: 1;
+    max-width: 360px;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.grad-overview-search-hint {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.grad-overview-empty {
+    padding: 1rem;
+    color: #6b7280;
+}
+
+.grad-overview-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.grad-overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.grad-overview-table th,
+.grad-overview-table td {
+    border: 1px solid #e5e7eb;
+    padding: 8px 10px;
+    vertical-align: middle;
+}
+
+.grad-overview-table thead th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.grad-overview-th-sticky {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    min-width: 200px;
+    max-width: 260px;
+    text-align: left;
+    background: #f3f4f6 !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.06);
+}
+
+.grad-overview-th-subject {
+    min-width: 72px;
+    max-width: 120px;
+    text-align: center;
+    vertical-align: bottom;
+    padding: 8px 4px;
+}
+
+.grad-overview-th-text {
+    display: block;
+    max-height: 4.5em;
+    overflow: hidden;
+    line-height: 1.2;
+    font-size: 0.75rem;
+    word-break: break-word;
+}
+
+.grad-overview-td-sticky {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #fff !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.04);
+}
+
+.grad-overview-student-name {
+    display: block;
+    font-weight: 600;
+    color: #111827;
+}
+
+.grad-overview-student-email {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.grad-overview-td-cell {
+    text-align: center;
+    background: #fafafa;
+}
+
+.grad-overview-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #2563eb;
+}
+
+@media (max-width: 640px) {
+    .grad-overview-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .grad-overview-search-input {
+        max-width: none;
+    }
+}
