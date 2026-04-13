@@ -43,46 +43,46 @@ class AttendanceController extends Controller
         $defaultSunday = $this->getClosestSunday($sundays);
 
         $selectedSubject = null;
+        if ($subjects->count() === 1) {
+            $selectedSubject = $subjects->first();
+        } else {
+            $subjectId = $request->get('subject_id');
+            if ($subjectId && $subjects->contains('id', (int) $subjectId)) {
+                $selectedSubject = Subject::find($subjectId);
+            }
+        }
+
         $selectedDateRaw = $request->get('class_date', $defaultSunday);
         $selectedDate = $this->parseDateParam($selectedDateRaw);
         $students = collect();
         $attendanceRecords = collect();
         $attendanceData = [];
 
-        // Si se seleccionó una materia y fecha
-        if ($request->get('subject_id') && $selectedDate) {
-            $selectedSubject = Subject::find($request->get('subject_id'));
+        if ($selectedSubject && $selectedDate) {
+            $students = $selectedSubject->studentsForPeriod($period)->get();
 
-            if ($selectedSubject && $subjects->contains('id', $selectedSubject->id)) {
-                $students = $selectedSubject->studentsForPeriod($period)->get();
+            // Asistencia compartida: misma fila para todos los profesores de la materia en este periodo
+            $attendanceRecords = ClassAttendance::where('subject_id', $selectedSubject->id)
+                ->where('period_id', $period->id)
+                ->whereDate('class_date', $selectedDate)
+                ->get()
+                ->keyBy('student_id');
 
-                // Asistencia compartida: misma fila para todos los profesores de la materia en este periodo
-                $attendanceRecords = ClassAttendance::where('subject_id', $selectedSubject->id)
-                    ->where('period_id', $period->id)
-                    ->whereDate('class_date', $selectedDate)
-                    ->get()
-                    ->keyBy('student_id');
+            $allAttendanceRecords = ClassAttendance::where('subject_id', $selectedSubject->id)
+                ->where('period_id', $period->id)
+                ->whereIn('class_date', $sundays)
+                ->get();
 
-                $allAttendanceRecords = ClassAttendance::where('subject_id', $selectedSubject->id)
-                    ->where('period_id', $period->id)
-                    ->whereIn('class_date', $sundays)
-                    ->get();
+            // Organizar datos por estudiante y fecha
+            foreach ($students as $student) {
+                $attendanceData[$student->id] = [];
+                foreach ($sundays as $sunday) {
+                    $record = $allAttendanceRecords->where('student_id', $student->id)
+                        ->where('class_date', '>=', $sunday)
+                        ->where('class_date', '<', date('Y-m-d', strtotime($sunday . ' +1 day')))
+                        ->first();
 
-
-
-
-
-                // Organizar datos por estudiante y fecha
-                foreach ($students as $student) {
-                    $attendanceData[$student->id] = [];
-                    foreach ($sundays as $sunday) {
-                        $record = $allAttendanceRecords->where('student_id', $student->id)
-                            ->where('class_date', '>=', $sunday)
-                            ->where('class_date', '<', date('Y-m-d', strtotime($sunday . ' +1 day')))
-                            ->first();
-
-                        $attendanceData[$student->id][$sunday] = $record;
-                    }
+                    $attendanceData[$student->id][$sunday] = $record;
                 }
             }
         }

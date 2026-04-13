@@ -2,7 +2,7 @@
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}">
-<script src="{{ asset('js/profesor-calificacion.js') }}"></script>
+<script src="{{ asset('js/profesor-calificacion.js') }}?v={{ filemtime(public_path('js/profesor-calificacion.js')) }}"></script>
 
 <div class="grades-container">
     <div class="grades-header">

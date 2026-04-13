@@ -388,7 +388,8 @@ function handleGenerateReport(e) {
     const formData = new FormData(e.target);
     const params = new URLSearchParams(formData);
     
-    window.open(`/grade-reports/generate?${params.toString()}`, '_blank');
+    // Misma ventana: así se ve la vista actualizada del reporte (evita confusión con pestañas nuevas / bloqueo de popups).
+    window.location.href = `/grade-reports/generate?${params.toString()}`;
 }
 
 // Cargar estadísticas

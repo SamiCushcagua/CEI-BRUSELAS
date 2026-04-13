@@ -829,6 +829,22 @@
     display: none !important;
 }
 
-#grades-edit-panel[hidden] {
+#grades-edit-panel[hidden],
+#attendance-edit-panel[hidden] {
     display: none !important;
+}
+
+/* Resumen de asistencia por celda: asistencia y versículo en columna (menos ancho horizontal) */
+.attendance-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.attendance-summary .status-badge {
+    display: inline-flex;
+    line-height: 1;
 }

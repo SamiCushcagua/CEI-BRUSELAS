@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\Period;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,19 +19,24 @@ class GradeReportController extends Controller
     /**
      * Mostrar reportes de calificaciones
      */
- /**
- * Mostrar reportes de calificaciones
- */
-public function index()
-{
-    $subjects = Subject::whereHas('professors', function($query) {
-        $query->where('professor_id', Auth::id());
-    })->get();
-    
-    $currentTrimester = $this->getCurrentTrimester();
-    
-    return view('grade-reports.index', compact('subjects', 'currentTrimester'));
-}
+    public function index()
+    {
+        $subjects = Subject::whereHas('professors', function ($query) {
+            $query->where('professor_id', Auth::id());
+        })->get();
+
+        $currentTrimester = $this->getCurrentTrimester();
+
+        return view('grade-reports.index', compact('subjects', 'currentTrimester'));
+    }
+
+    /**
+     * Ruta legacy /grade-reports/show — redirige al listado de reportes.
+     */
+    public function show()
+    {
+        return redirect()->route('grade-reports.index');
+    }
 
     /**
      * Generar reporte de calificaciones
@@ -65,16 +71,38 @@ public function index()
 
         $grades = $query->get();
 
+        $period = Period::query()
+            ->where('year', $year)
+            ->where('trimester', $trimester)
+            ->first();
+
+        $students = collect();
+        if ($period) {
+            $students = $subject->studentsForPeriod($period)->orderBy('name')->get();
+        }
+        if ($students->isEmpty() && $grades->isNotEmpty()) {
+            $students = User::query()
+                ->whereIn('id', $grades->pluck('student_id')->unique()->all())
+                ->orderBy('name')
+                ->get();
+        }
+
         $statistics = [
-            'total_students' => $grades->count(),
-            'average_score' => $grades->avg('total_score'),
-            'highest_score' => $grades->max('total_score'),
-            'lowest_score' => $grades->min('total_score'),
-            'passing_students' => $grades->where('total_score', '>=', 70)->count(),
-            'failing_students' => $grades->where('total_score', '<', 70)->count(),
+            'total_students' => $students->count() > 0 ? $students->count() : $grades->count(),
+            'average_score' => $grades->count() ? $grades->avg(fn ($g) => $g->average_score) : 0,
+            'passing_students' => $grades->filter(fn ($g) => (bool) $g->passed)->count(),
+            'failing_students' => $grades->filter(fn ($g) => ! (bool) $g->passed)->count(),
         ];
 
-        return view('grade-reports.show', compact('subject', 'grades', 'statistics', 'year', 'trimester'));
+        return view('grade-reports.show', compact(
+            'subject',
+            'grades',
+            'statistics',
+            'year',
+            'trimester',
+            'students',
+            'period'
+        ));
     }
 
     /**
