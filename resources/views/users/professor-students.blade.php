@@ -33,8 +33,10 @@
         </div>
     @endif
 
+
+
     <!-- Formulario para asignar estudiante -->
-    <div class="form-container">
+<!--    <div class="form-container">
         <div class="form-header">
             <h2 class="form-title">Asignar Nuevo Estudiante</h2>
         </div>
@@ -58,7 +60,9 @@
                 </div>
             </form>
         </div>
-    </div>
+    </div>      
+
+-->
 
     <!-- Tabla de estudiantes -->
     <div class="grades-table-container">
@@ -113,9 +117,9 @@
                                     <form action="{{ route('professors.remove-student', ['professor' => $professor->id, 'student' => $student->id]) }}" method="POST" class="inline-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('¿Estás seguro de que deseas remover este estudiante?')">
+                                       <!-- <button type="submit" class="btn btn-danger btn-small" onclick="return confirm('¿Estás seguro de que deseas remover este estudiante?')">
                                             🗑️ Remover
-                                        </button>
+                                        </button> -->
                                     </form>
                                 </div>
                             </td>

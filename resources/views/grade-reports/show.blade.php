@@ -5,6 +5,8 @@
 <script src="{{ asset('js/profesor-calificacion.js') }}"></script>
 
 
+<h1>que fue loco</h1>
+
 <div class="grades-container">
     <div class="grades-header">
         <div>

@@ -23,10 +23,14 @@ class GradeController extends Controller
      */
     public function index()
     {
-        $subjects = Subject::whereHas('professors', function($query) {
+        $subjects = Subject::whereHas('professors', function ($query) {
             $query->where('professor_id', Auth::id());
         })->with(['students', 'grades'])->get();
-        
+
+        if ($subjects->count() === 1) {
+            return redirect()->route('grades.show', $subjects->first());
+        }
+
         return view('grades.index', compact('subjects'));
     }
 
@@ -148,6 +152,121 @@ class GradeController extends Controller
 
             return redirect()->back()->with('error', 'Error al guardar la calificación');
         }
+    }
+
+    /**
+     * Guardar todas las calificaciones del trimestre (vista grades/show, guardado masivo).
+     */
+    public function bulkStore(Request $request)
+    {
+        $validated = $request->validate([
+            'subject_id' => 'required|exists:subjects,id',
+            'trimester' => 'required|integer|min:1|max:3',
+            'year' => 'required|integer',
+            'period_id' => 'nullable|exists:periods,id',
+            'grades' => 'required|array',
+            'grades.*.student_id' => 'required|integer|exists:users,id',
+            'grades.*.task_score' => 'nullable|numeric|min:0|max:100',
+            'grades.*.exam_score1' => 'nullable|numeric|min:0|max:100',
+            'grades.*.exam_score2' => 'nullable|numeric|min:0|max:100',
+            'grades.*.participation_score' => 'nullable|numeric|min:0|max:100',
+            'grades.*.bible_score' => 'nullable|numeric|min:0|max:100',
+            'grades.*.text_score' => 'nullable|numeric|min:0|max:100',
+            'grades.*.other_score' => 'nullable|numeric|min:0|max:100',
+            'grades.*.passed' => 'nullable|boolean',
+            'grades.*.diploma_delivered' => 'nullable|boolean',
+        ]);
+
+        $subject = Subject::findOrFail($validated['subject_id']);
+        $user = Auth::user();
+
+        if (! $user || ! $user->is_admin) {
+            if (! $subject->professors()->where('professor_id', Auth::id())->exists()) {
+                abort(403, 'No tienes permisos para calificar esta materia');
+            }
+        }
+
+        $trimester = (int) $validated['trimester'];
+        $year = (int) $validated['year'];
+        $periodId = $request->filled('period_id') ? (int) $validated['period_id'] : null;
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($validated['grades'] as $row) {
+                $studentId = (int) $row['student_id'];
+                $student = User::query()->findOrFail($studentId);
+                if (! $student->isStudent()) {
+                    continue;
+                }
+
+                $attributes = [
+                    'task_score' => $this->nullableScore($row['task_score'] ?? null),
+                    'exam_score1' => $this->nullableScore($row['exam_score1'] ?? null),
+                    'exam_score2' => $this->nullableScore($row['exam_score2'] ?? null),
+                    'participation_score' => $this->nullableScore($row['participation_score'] ?? null),
+                    'bible_score' => $this->nullableScore($row['bible_score'] ?? null),
+                    'text_score' => $this->nullableScore($row['text_score'] ?? null),
+                    'other_score' => $this->nullableScore($row['other_score'] ?? null),
+                ];
+
+                $attributes['passed'] = array_key_exists('passed', $row)
+                    ? (bool) $row['passed']
+                    : false;
+
+                Grade::updateOrCreate(
+                    [
+                        'student_id' => $studentId,
+                        'subject_id' => (int) $subject->id,
+                        'trimester' => $trimester,
+                        'year' => $year,
+                    ],
+                    $attributes
+                );
+
+                if ($periodId !== null && array_key_exists('diploma_delivered', $row)) {
+                    DB::table('subject_student')
+                        ->where('subject_id', $subject->id)
+                        ->where('student_id', $studentId)
+                        ->where('period_id', $periodId)
+                        ->update([
+                            'diploma_delivered' => (bool) $row['diploma_delivered'],
+                            'updated_at' => now(),
+                        ]);
+                }
+            }
+
+            DB::commit();
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Calificaciones guardadas correctamente',
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Calificaciones guardadas correctamente');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al guardar: '.$e->getMessage(),
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Error al guardar las calificaciones');
+        }
+    }
+
+    private function nullableScore(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (float) $value;
     }
 
     /**

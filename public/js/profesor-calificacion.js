@@ -9,6 +9,7 @@ let currentPeriodId = null;
 // Inicialización cuando se carga el DOM
 document.addEventListener('DOMContentLoaded', function() {
     initializeGradeSystem();
+    initGradesShowBulkMode();
 });
 
 // Función principal de inicialización
@@ -539,9 +540,142 @@ function debounce(func, wait) {
     };
 }
 
+/**
+ * Vista grades/show: resumen visible; edición y guardado masivo.
+ */
+function initGradesShowBulkMode() {
+    const summary = document.getElementById('grades-summary-panel');
+    const edit = document.getElementById('grades-edit-panel');
+    const btnOpen = document.getElementById('btn-grade-edit-open');
+    const btnCancel = document.getElementById('btn-grade-edit-cancel');
+    const btnSave = document.getElementById('btn-grade-save-all');
+
+    if (!summary || !edit || !btnOpen) {
+        return;
+    }
+
+    function enterEditMode() {
+        summary.hidden = true;
+        edit.hidden = false;
+        btnOpen.hidden = true;
+        if (btnCancel) btnCancel.hidden = false;
+        if (btnSave) btnSave.hidden = false;
+    }
+
+    function leaveEditMode() {
+        summary.hidden = false;
+        edit.hidden = true;
+        btnOpen.hidden = false;
+        if (btnCancel) btnCancel.hidden = true;
+        if (btnSave) btnSave.hidden = true;
+    }
+
+    btnOpen.addEventListener('click', enterEditMode);
+    if (btnCancel) {
+        btnCancel.addEventListener('click', leaveEditMode);
+    }
+    if (btnSave) {
+        btnSave.addEventListener('click', saveAllGradesBulk);
+    }
+}
+
+function getGradeFieldValue(panel, studentId, field) {
+    const el = panel.querySelector(`[data-student-id="${studentId}"][data-field="${field}"]`);
+    if (!el) {
+        return null;
+    }
+    if (el.type === 'checkbox') {
+        return el.checked;
+    }
+    const v = el.value;
+    return v === '' ? null : v;
+}
+
+function saveAllGradesBulk() {
+    const panel = document.getElementById('grades-edit-panel');
+    const bulkEl = document.getElementById('grade-data');
+    if (!panel || !bulkEl || !bulkEl.dataset.bulkUrl) {
+        showNotification('No se puede guardar: datos incompletos', 'error');
+        return;
+    }
+    if (!currentSubjectId || currentTrimester == null || currentYear == null) {
+        showNotification('Falta información de materia o periodo', 'error');
+        return;
+    }
+
+    const inputs = panel.querySelectorAll('.grade-input[data-student-id]');
+    const ids = [...new Set(Array.from(inputs).map((i) => i.dataset.studentId))];
+
+    const grades = ids.map((sid) => ({
+        student_id: parseInt(sid, 10),
+        task_score: getGradeFieldValue(panel, sid, 'task_score'),
+        exam_score1: getGradeFieldValue(panel, sid, 'exam_score1'),
+        exam_score2: getGradeFieldValue(panel, sid, 'exam_score2'),
+        participation_score: getGradeFieldValue(panel, sid, 'participation_score'),
+        bible_score: getGradeFieldValue(panel, sid, 'bible_score'),
+        text_score: getGradeFieldValue(panel, sid, 'text_score'),
+        other_score: getGradeFieldValue(panel, sid, 'other_score'),
+        passed: !!getGradeFieldValue(panel, sid, 'passed'),
+        diploma_delivered: !!getGradeFieldValue(panel, sid, 'diploma_delivered'),
+    }));
+
+    const payload = {
+        subject_id: parseInt(currentSubjectId, 10),
+        trimester: parseInt(currentTrimester, 10),
+        year: parseInt(currentYear, 10),
+        grades: grades,
+    };
+    if (currentPeriodId) {
+        payload.period_id = parseInt(currentPeriodId, 10);
+    }
+
+    const token = document.querySelector('meta[name="csrf-token"]');
+    if (!token) {
+        showNotification('CSRF no encontrado', 'error');
+        return;
+    }
+
+    const btnSave = document.getElementById('btn-grade-save-all');
+    if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.textContent = '⏳ Guardando...';
+    }
+
+    fetch(bulkEl.dataset.bulkUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token.getAttribute('content'),
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify(payload),
+    })
+        .then((r) => r.json().then((data) => ({ ok: r.ok, status: r.status, data })))
+        .then((res) => {
+            if (res.ok && res.data.success) {
+                showNotification(res.data.message || 'Guardado correctamente', 'success');
+                window.location.reload();
+            } else {
+                showNotification(res.data.message || 'Error al guardar', 'error');
+            }
+        })
+        .catch((err) => {
+            console.error(err);
+            showNotification('Error de red al guardar', 'error');
+        })
+        .finally(() => {
+            if (btnSave) {
+                btnSave.disabled = false;
+                btnSave.textContent = 'Guardar cambios';
+            }
+        });
+}
+
 // Exportar funciones globales necesarias
 window.saveStudentGrade = saveStudentGrade;
 window.exportToPDF = exportToPDF;
 window.updateSetting = updateSetting;
 window.deleteSetting = deleteSetting;
 window.loadStatistics = loadStatistics;
+window.saveAllGradesBulk = saveAllGradesBulk;

@@ -53,7 +53,7 @@
                 <a href="{{ route('professors.subjects', Auth::user()) }}" class="welcome-btn">📚 Mi materia</a>
                 <a href="{{ route('professors.students', Auth::user()) }}" class="welcome-btn">👥 Mis estudiantes</a>
                 <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a>
-                <a href="{{ route('grade-reports.index') }}" class="welcome-btn">📊 Reportes</a>
+         <!--       <a href="{{ route('grade-reports.index') }}" class="welcome-btn">📊 Reportes</a>-->
                 <a href="{{ route('attendance.index') }}" class="welcome-btn">📅 Asistencia</a>
             </div>
         </div>

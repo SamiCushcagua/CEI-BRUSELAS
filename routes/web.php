@@ -165,6 +165,7 @@ Route::prefix('grades')->name('grades.')->middleware('auth')->group(function () 
     Route::get('/subject/{subject}', [App\Http\Controllers\GradeController::class, 'show'])->name('show');
 
     // CRUD de calificaciones
+    Route::post('/bulk', [App\Http\Controllers\GradeController::class, 'bulkStore'])->name('bulk');
     Route::post('/', [App\Http\Controllers\GradeController::class, 'store'])->name('store');
     Route::put('/{grade}', [App\Http\Controllers\GradeController::class, 'update'])->name('update');
     Route::delete('/{grade}', [App\Http\Controllers\GradeController::class, 'destroy'])->name('destroy');

@@ -21,109 +21,114 @@
         </div>
     </div>
 
-    <!-- Resumen de Estudiantes -->
-   <!-- Resumen de Estudiantes -->
-<div class="grades-table-container">
-    <div class="grades-table-header">
-        <h3>📊 Resumen de Estudiantes - {{ $subject->name }}</h3>
-        <div class="grades-table-actions">
-            <span class="subject-info">{{ $subject->name }} - {{ $currentYear }} - Trimestre {{ $currentTrimester }}</span>
-        </div>
+    <div class="grades-show-toolbar">
+        @if($students->count() > 0)
+        <button type="button" class="btn btn-primary" id="btn-grade-edit-open">Modificar resultados</button>
+        <button type="button" class="btn btn-secondary" id="btn-grade-edit-cancel" hidden>Cancelar</button>
+        <button type="button" class="btn btn-success" id="btn-grade-save-all" hidden>Guardar cambios</button>
+        @endif
+   <!--     <button type="button" onclick="exportToPDF()" class="btn btn-danger btn-small">📄 Exportar PDF</button> -->
+        <!-- <a href="{{ route('grade-settings.index', $subject) }}" class="btn btn-secondary btn-small">⚙️ Configuración</a> -->
     </div>
-    <div class="grades-table-wrapper" style="overflow-x: auto;">
-        <table class="grades-table">
-            <thead>
-                <tr>
-                    <th class="sticky-col">Estudiante</th>
-                    <th>Tareas</th>
-                    <th>Examen 1</th>
-                    <th>Examen 2</th>
-                    <th>Participación</th>
-                    <th>Biblia</th>
-                    <th>Texto</th>
-                    <th>Otro</th>
-                    <th>Promedio</th>
-                    <th>Aprobó (trim.)</th>
-                    <th>Diploma</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($students as $student)
-                    @php
-                        $studentGrade = $grades->where('student_id', $student->id)->first();
-                        $diplomaOk = (bool) ($student->pivot->diploma_delivered ?? false);
-                    @endphp
-                    <tr>
-                        <td class="sticky-col">
-                            <div class="student-info">
-                                <div class="student-avatar">
-                                    {{ substr($student->name, 0, 1) }}
-                                </div>
-                                <div class="student-details">
-                                    <h4>{{ $student->name }}</h4>
-                                    <p>{{ $student->email }}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="grade-display {{ $studentGrade && $studentGrade->task_score ? 'has-grade' : 'no-grade' }}">
-                                {{ $studentGrade && $studentGrade->task_score ? number_format($studentGrade->task_score, 2) : '-' }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="grade-display {{ $studentGrade && $studentGrade->exam_score1 ? 'has-grade' : 'no-grade' }}">
-                                {{ $studentGrade && $studentGrade->exam_score1 ? number_format($studentGrade->exam_score1, 2) : '-' }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="grade-display {{ $studentGrade && $studentGrade->exam_score2 ? 'has-grade' : 'no-grade' }}">
-                                {{ $studentGrade && $studentGrade->exam_score2 ? number_format($studentGrade->exam_score2, 2) : '-' }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="grade-display {{ $studentGrade && $studentGrade->participation_score ? 'has-grade' : 'no-grade' }}">
-                                {{ $studentGrade && $studentGrade->participation_score ? number_format($studentGrade->participation_score, 2) : '-' }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="grade-display {{ $studentGrade && $studentGrade->bible_score ? 'has-grade' : 'no-grade' }}">
-                                {{ $studentGrade && $studentGrade->bible_score ? number_format($studentGrade->bible_score, 2) : '-' }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="grade-display {{ $studentGrade && $studentGrade->text_score ? 'has-grade' : 'no-grade' }}">
-                                {{ $studentGrade && $studentGrade->text_score ? number_format($studentGrade->text_score, 2) : '-' }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="grade-display {{ $studentGrade && $studentGrade->other_score ? 'has-grade' : 'no-grade' }}">
-                                {{ $studentGrade && $studentGrade->other_score ? number_format($studentGrade->other_score, 2) : '-' }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="average-score">
-                                {{ $studentGrade ? number_format($studentGrade->average_score, 2) : '0.00' }}
-                            </span>
-                        </td>
-                        <td>{{ $studentGrade && $studentGrade->passed ? 'Sí' : 'No' }}</td>
-                        <td>{{ $diplomaOk ? 'Sí' : 'No' }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</div>
+
+    <div id="grades-summary-panel">
     <div class="grades-table-container">
         <div class="grades-table-header">
-            <h2 class="grades-table-title">Calificaciones del Trimestre</h2>
+            <h3>📊 Resumen de Estudiantes - {{ $subject->name }}</h3>
             <div class="grades-table-actions">
-                <button onclick="exportToPDF()" class="btn btn-danger btn-small">
-                    📄 Exportar PDF
-                </button>
-                <a href="{{ route('grade-settings.index', $subject) }}" class="btn btn-secondary btn-small">
-                    ⚙️ Configuración
-                </a>
+                <span class="subject-info">{{ $subject->name }} - {{ $currentYear }} - Trimestre {{ $currentTrimester }}</span>
             </div>
+        </div>
+        <div class="grades-table-wrapper" style="overflow-x: auto;">
+            <table class="grades-table">
+                <thead>
+                    <tr>
+                        <th class="sticky-col">Estudiante</th>
+                        <th>Tareas</th>
+                        <th>Examen 1</th>
+                        <th>Examen 2</th>
+                        <th>Participación</th>
+                        <th>Biblia</th>
+                        <th>Texto</th>
+                        <th>Otro</th>
+                        <th>Promedio</th>
+                        <th>Aprobó (trim.)</th>
+                        <th>Diploma</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($students as $student)
+                        @php
+                            $studentGrade = $grades->where('student_id', $student->id)->first();
+                            $diplomaOk = (bool) ($student->pivot->diploma_delivered ?? false);
+                        @endphp
+                        <tr>
+                            <td class="sticky-col">
+                                <div class="student-info">
+                                    <div class="student-avatar">
+                                        {{ substr($student->name, 0, 1) }}
+                                    </div>
+                                    <div class="student-details">
+                                        <h4>{{ $student->name }}</h4>
+                                        <p>{{ $student->email }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="grade-display {{ $studentGrade && $studentGrade->task_score ? 'has-grade' : 'no-grade' }}">
+                                    {{ $studentGrade && $studentGrade->task_score ? number_format($studentGrade->task_score, 2) : '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="grade-display {{ $studentGrade && $studentGrade->exam_score1 ? 'has-grade' : 'no-grade' }}">
+                                    {{ $studentGrade && $studentGrade->exam_score1 ? number_format($studentGrade->exam_score1, 2) : '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="grade-display {{ $studentGrade && $studentGrade->exam_score2 ? 'has-grade' : 'no-grade' }}">
+                                    {{ $studentGrade && $studentGrade->exam_score2 ? number_format($studentGrade->exam_score2, 2) : '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="grade-display {{ $studentGrade && $studentGrade->participation_score ? 'has-grade' : 'no-grade' }}">
+                                    {{ $studentGrade && $studentGrade->participation_score ? number_format($studentGrade->participation_score, 2) : '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="grade-display {{ $studentGrade && $studentGrade->bible_score ? 'has-grade' : 'no-grade' }}">
+                                    {{ $studentGrade && $studentGrade->bible_score ? number_format($studentGrade->bible_score, 2) : '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="grade-display {{ $studentGrade && $studentGrade->text_score ? 'has-grade' : 'no-grade' }}">
+                                    {{ $studentGrade && $studentGrade->text_score ? number_format($studentGrade->text_score, 2) : '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="grade-display {{ $studentGrade && $studentGrade->other_score ? 'has-grade' : 'no-grade' }}">
+                                    {{ $studentGrade && $studentGrade->other_score ? number_format($studentGrade->other_score, 2) : '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="average-score">
+                                    {{ $studentGrade ? number_format($studentGrade->average_score, 2) : '0.00' }}
+                                </span>
+                            </td>
+                            <td>{{ $studentGrade && $studentGrade->passed ? 'Sí' : 'No' }}</td>
+                            <td>{{ $diplomaOk ? 'Sí' : 'No' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+
+    <div id="grades-edit-panel" hidden>
+    <div class="grades-table-container">
+        <div class="grades-table-header">
+            <h2 class="grades-table-title">Calificaciones del Trimestre — edición</h2>
+            <p class="grades-subtitle" style="margin: 0;">Modifica los valores y pulsa <strong>Guardar cambios</strong> arriba.</p>
         </div>
 
         @if($students->count() > 0)
@@ -142,7 +147,6 @@
                         <th>Promedio</th>
                         <th>Aprobó trim.</th>
                         <th>Diploma entregado</th>
-                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -245,13 +249,6 @@
                                 data-field="diploma_delivered"
                                 @checked($diplomaOk)>
                         </td>
-                        <td>
-                            <button onclick="saveStudentGrade(this.dataset.studentId)"
-                                class="save-btn"
-                                data-student-id="{{ $student->id }}">
-                                💾 Guardar
-                            </button>
-                        </td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -265,6 +262,7 @@
         </div>
         @endif
     </div>
+    </div>
 
     <div class="mt-20">
         <a href="{{ route('grades.index') }}" class="btn btn-secondary">
@@ -273,14 +271,13 @@
     </div>
 </div>
 
-
-
 <!-- Datos para JavaScript -->
 <div style="display: none;"
     data-subject-id="{{ $subject->id }}"
     data-trimester="{{ $currentTrimester }}"
     data-year="{{ $currentYear }}"
     data-period-id="{{ $period->id }}"
+    data-bulk-url="{{ route('grades.bulk') }}"
     id="grade-data">
 </div>
 @endsection

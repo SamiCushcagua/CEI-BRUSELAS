@@ -814,3 +814,21 @@
         padding: 2px 8px;
     }
 }
+
+/* Barra de acciones en grades/show (resumen vs edición) */
+.grades-show-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 1.25rem;
+}
+
+/* .btn fuerza display:inline-block y anula el atributo HTML [hidden] en algunos navegadores */
+.grades-show-toolbar .btn[hidden] {
+    display: none !important;
+}
+
+#grades-edit-panel[hidden] {
+    display: none !important;
+}
