@@ -59,7 +59,7 @@
                 <a href="{{ route('professors.subjects', Auth::user()) }}" class="{{ request()->routeIs('professors.subjects') ? 'active' : '' }}">Mi materia</a>
                 <a href="{{ route('professors.students', Auth::user()) }}" class="{{ request()->routeIs('professors.students') ? 'active' : '' }}">Mis estudiantes</a>
                 <a href="{{ route('grades.index') }}" class="{{ request()->routeIs('grades.*') ? 'active' : '' }}">Calificaciones</a>
-                <a href="{{ route('grade-reports.index') }}" class="{{ request()->routeIs('grade-reports.*') ? 'active' : '' }}">Reportes</a>
+           <!--     <a href="{{ route('grade-reports.index') }}" class="{{ request()->routeIs('grade-reports.*') ? 'active' : '' }}">Reportes</a>-->
                 <a href="{{ route('attendance.index') }}" class="nav-link">📅 Asistencia </a>
                 @endif
                 @if (Auth::user()->isStudent())
