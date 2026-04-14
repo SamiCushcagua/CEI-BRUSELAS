@@ -17,7 +17,9 @@
         @endif
 
 
-
+        <div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
 
 
         @auth

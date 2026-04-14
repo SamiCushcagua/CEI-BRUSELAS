@@ -2,6 +2,10 @@
 
 @section('content')
 <div class="container">
+
+<div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
     <div class="edit-profile-card">
         @php
             $isAdminEditingOtherUser = Auth::check() && Auth::user()->is_admin && Auth::user()->id !== $user->id;
@@ -28,6 +32,7 @@
         @endif
 
         <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+            
             @csrf
             @method('patch')
             

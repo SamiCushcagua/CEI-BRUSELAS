@@ -2,6 +2,10 @@
 
 @section('content')
 <div class="container">
+
+<div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
     <div class="main-container">
         <h1 class="page-title">La Santa Biblia</h1>
         <!-- Navegación adicional -->

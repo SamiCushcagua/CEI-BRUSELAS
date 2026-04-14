@@ -32,11 +32,11 @@
             </div>
 
             <div class="nav-center" id="nav-links">
-                <a href="{{ route('welcome') }}" class="nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}">Home</a>
+                <a href="{{ route('welcome') }}" class="nav-link {{ request()->routeIs('welcome') ? 'active' : '' }}">Pagina principal</a>
                 <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">Sobre nosotros</a>
                 <!--   <a href="{{ route('Contact') }}" class="{{ request()->routeIs('Contact') ? 'active' : '' }}">Contact</a>--> <!-- CAhun no esta funcionando bien en el contacto -->
                 <a href="{{ route('usersAllShow') }}" class="{{ request()->routeIs('usersAllShow') ? 'active' : '' }}">Todos los usuarios</a>
-                <a href="{{ route('FAQ') }}" class="{{ request()->routeIs('FAQ') ? 'active' : '' }}">FAQ</a>
+             <!--   <a href="{{ route('FAQ') }}" class="{{ request()->routeIs('FAQ') ? 'active' : '' }}">FAQ</a>-->
                 <a href="{{ route('bible.index') }}" class="{{ request()->routeIs('bible.*') ? 'active' : '' }}">Biblia</a>
                 @auth
                 <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">Perfil</a>
@@ -45,7 +45,7 @@
 
                 <a href="{{ route('contact-forum') }}" class="{{ request()->routeIs('contact-forum') ? 'active' : '' }}">Contacto</a>
                 <a href="{{ route('subjects.create') }}" class="{{ request()->routeIs('subjects.create') ? 'active' : '' }}">Materias</a>
-                <a href="{{ route('dashboard_cursos') }}" class="{{ request()->routeIs('dashboard_cursos') ? 'active' : '' }}">Dashboard Cursos</a>
+                <a href="{{ route('dashboard_cursos') }}" class="{{ request()->routeIs('dashboard_cursos') ? 'active' : '' }}">Todo los Cursos</a>
                 <a href="{{ route('periods.index') }}" class="{{ request()->routeIs('periods.*') ? 'active' : '' }}">Periodos</a>
                 <a href="{{ route('admin.period-subject-dashboard') }}" class="{{ request()->routeIs('admin.period-subject-dashboard') ? 'active' : '' }}">Tablero Admin</a>
                 <a href="{{ route('admin.subject-enrollment-outcomes') }}" class="{{ request()->routeIs('admin.subject-enrollment-outcomes') ? 'active' : '' }}">Aprobados y diplomas</a>
@@ -72,10 +72,10 @@
                 @auth
                 <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                     @csrf
-                    <button type="submit" style="background: none; border: none; color: #2563eb; text-decoration: none; cursor: pointer;">Logout</button>
+                    <button type="submit" style="background: none; border: none; color: #2563eb; text-decoration: none; cursor: pointer;">Cerrar sesion</button>
                 </form>
                 @else
-                <a href="{{ route('login') }}" class="{{ request()->routeIs('login') ? 'active' : '' }}">Login</a>
+                <a href="{{ route('login') }}" class="{{ request()->routeIs('login') ? 'active' : '' }}">Iniciar sesion</a>
                 <!-- <a href="{{ route('register') }}" class="{{ request()->routeIs('register') ? 'active' : '' }}">Register</a>-->
                 @endauth
 
