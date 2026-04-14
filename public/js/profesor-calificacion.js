@@ -636,6 +636,24 @@ function saveAllGradesBulk() {
         return;
     }
 
+    const csrf = token.getAttribute('content');
+    payload._token = csrf;
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': csrf,
+    };
+    const xsrf = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]+)/);
+    if (xsrf) {
+        try {
+            headers['X-XSRF-TOKEN'] = decodeURIComponent(xsrf[1]);
+        } catch (e) {
+            headers['X-XSRF-TOKEN'] = xsrf[1];
+        }
+    }
+
     const btnSave = document.getElementById('btn-grade-save-all');
     if (btnSave) {
         btnSave.disabled = true;
@@ -644,28 +662,47 @@ function saveAllGradesBulk() {
 
     fetch(bulkEl.dataset.bulkUrl, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token.getAttribute('content'),
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-        },
+        headers: headers,
+        credentials: 'same-origin',
         body: JSON.stringify(payload),
     })
-        .then((r) => r.json().then((data) => ({ ok: r.ok, status: r.status, data })))
-        .then((res) => {
-            if (res.ok && res.data.success) {
+        .then(async function (r) {
+            const text = await r.text();
+            var data = {};
+            if (text) {
+                try {
+                    data = JSON.parse(text);
+                } catch (parseErr) {
+                    var hint =
+                        r.status === 419
+                            ? 'Sesión o token de seguridad caducado. Recarga la página (F5) e inténtalo de nuevo.'
+                            : r.status === 401 || r.status === 403
+                              ? 'No autorizado. Vuelve a iniciar sesión si hace falta.'
+                              : 'El servidor no devolvió JSON (error ' + r.status + '). Revisa la consola.';
+                    console.error('Respuesta no JSON:', r.status, text.slice(0, 400));
+                    throw new Error(hint);
+                }
+            }
+            return { ok: r.ok, status: r.status, data: data };
+        })
+        .then(function (res) {
+            if (res.ok && res.data && res.data.success) {
                 showNotification(res.data.message || 'Guardado correctamente', 'success');
                 window.location.reload();
-            } else {
-                showNotification(res.data.message || 'Error al guardar', 'error');
+                return;
             }
+            var msg = (res.data && res.data.message) || 'Error al guardar';
+            if (res.data && res.data.errors && typeof res.data.errors === 'object') {
+                var flat = Object.values(res.data.errors).flat();
+                if (flat[0]) msg = flat[0];
+            }
+            showNotification(msg, 'error');
         })
-        .catch((err) => {
+        .catch(function (err) {
             console.error(err);
-            showNotification('Error de red al guardar', 'error');
+            showNotification(err.message || 'Error de red al guardar', 'error');
         })
-        .finally(() => {
+        .finally(function () {
             if (btnSave) {
                 btnSave.disabled = false;
                 btnSave.textContent = 'Guardar cambios';
