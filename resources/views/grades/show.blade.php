@@ -277,7 +277,7 @@
     data-trimester="{{ $currentTrimester }}"
     data-year="{{ $currentYear }}"
     data-period-id="{{ $period->id }}"
-    data-bulk-url="{{ route('grades.bulk') }}"
+    data-bulk-url="{{ route('grades.bulk', [], false) }}"
     id="grade-data">
 </div>
 @endsection

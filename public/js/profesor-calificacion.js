@@ -660,7 +660,16 @@ function saveAllGradesBulk() {
         btnSave.textContent = '⏳ Guardando...';
     }
 
-    fetch(bulkEl.dataset.bulkUrl, {
+    // Misma origen que la página: evita "Failed to fetch" si APP_URL ≠ dominio real (www/https).
+    let bulkUrl = bulkEl.dataset.bulkUrl;
+    try {
+        const parsed = new URL(bulkUrl, window.location.href);
+        bulkUrl = parsed.pathname + parsed.search + parsed.hash;
+    } catch (e) {
+        /* usar data tal cual */
+    }
+
+    fetch(bulkUrl, {
         method: 'POST',
         headers: headers,
         credentials: 'same-origin',
