@@ -23,7 +23,10 @@ class AdminGraduatesOverviewController extends Controller
             ->orderBy('name')
             ->get();
 
-        $subjects = Subject::query()->orderBy('name')->get();
+        $subjects = Subject::query()
+            ->orderBy('Nivel')
+            ->orderBy('name')
+            ->get();
 
         $gradesOrdered = Grade::query()
             ->orderByDesc('year')

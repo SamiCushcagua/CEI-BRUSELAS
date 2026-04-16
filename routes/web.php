@@ -86,7 +86,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
     Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
     Route::get('/dashboard-cursos', function () {
-        $subjects = Subject::all();
+        $subjects = Subject::query()
+            ->orderBy('Nivel')
+            ->orderBy('name')
+            ->get();
         return view('subjects.dashboard_cursos', ['subjects' => $subjects]);
     })->name('dashboard_cursos');
 
