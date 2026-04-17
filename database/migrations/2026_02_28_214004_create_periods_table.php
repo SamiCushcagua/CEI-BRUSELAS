@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('periods')) {
+            return;
+        }
+
         Schema::create('periods', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -21,7 +25,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(false);
             $table->boolean('is_locked')->default(false);
             $table->timestamps();
- 
+
             $table->unique(['year', 'trimester']);
         });
     }
@@ -31,6 +35,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('periods')) {
+            return;
+        }
+
         Schema::dropIfExists('periods');
     }
 };
