@@ -256,77 +256,85 @@
             </div>
         </div>
 
-        <div class="grades-table-container">
-            <div class="grades-table-header">
-                <h3 class="grades-table-title">
-                    📊 Resumen del Trimestre - {{ $selectedSubject->name }}
-                </h3>
-            </div>
+        <div class="grades-show-toolbar quarter-summary-toolbar">
+            <button type="button" class="btn btn-secondary" id="btn-quarter-summary-show">📊 Mostrar tablero de resumen del trimestre</button>
+            <button type="button" class="btn btn-secondary" id="btn-quarter-summary-hide" hidden>Ocultar resumen del trimestre</button>
+        </div>
 
-            <div class="grades-table-wrapper" style="overflow-x: auto;">
-                <table class="grades-table">
-                    <thead>
-                        <tr>
-                            <th class="sticky-col">Estudiante</th>
-                            @foreach($sundays as $sunday)
-                            <th class="text-center">
-                                {{ \Carbon\Carbon::parse($sunday)->format('d/m') }}
-                            </th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($students as $student)
-                        @php
-                            $absentCount = 0;
-                            $studentRecords = $attendanceData[$student->id] ?? [];
-                            foreach ($studentRecords as $sunday => $record) {
-                                if ($record && $record->attendance_status === 'absent') {
-                                    $absentCount++;
+        <div id="quarter-summary-panel" hidden>
+            <div class="grades-table-container">
+                <div class="grades-table-header">
+                    <h3 class="grades-table-title">
+                        📊 Resumen del Trimestre - {{ $selectedSubject->name }}
+                    </h3>
+                </div>
+
+                <div class="grades-table-wrapper" style="overflow-x: auto;">
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th class="sticky-col">Estudiante</th>
+                                @foreach($sundays as $sunday)
+                                <th class="text-center">
+                                    {{ \Carbon\Carbon::parse($sunday)->format('d/m') }}
+                                </th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($students as $student)
+                            @php
+                                $absentCount = 0;
+                                $studentRecords = $attendanceData[$student->id] ?? [];
+                                foreach ($studentRecords as $sunday => $record) {
+                                    if ($record && $record->attendance_status === 'absent') {
+                                        $absentCount++;
+                                    }
                                 }
-                            }
-                        @endphp
-                        <tr class="{{ $absentCount >= 3 ? 'row-high-absent' : '' }}">
-                            <td class="sticky-col">
-                                <div class="student-info">
-                                    <div class="student-avatar">{{ substr($student->name, 0, 1) }}</div>
-                                    <div class="student-details">
-                                        <h4>{{ $student->name }}</h4>
-                                        <p>{{ $student->email }}</p>
+                            @endphp
+                            <tr class="{{ $absentCount >= 3 ? 'row-high-absent' : '' }}">
+                                <td class="sticky-col">
+                                    <div class="student-info">
+                                        <div class="student-avatar">{{ substr($student->name, 0, 1) }}</div>
+                                        <div class="student-details">
+                                            <h4>{{ $student->name }}</h4>
+                                            <p>{{ $student->email }}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
+                                </td>
 
-                            @foreach($sundays as $sunday)
-                            <td class="text-center">
-                                @php $record = $attendanceData[$student->id][$sunday] ?? null; @endphp
-                                @if($record)
-                                <div class="attendance-summary">
-                                    @if($record->attendance_status == 'present')
-                                    <span class="status-badge status-approved">✅</span>
-                                    @elseif($record->attendance_status == 'late')
-                                    <span class="status-badge stat-yellow">⏰</span>
+                                @foreach($sundays as $sunday)
+                                <td class="text-center">
+                                    @php $record = $attendanceData[$student->id][$sunday] ?? null; @endphp
+                                    @if($record)
+                                    <div class="attendance-summary">
+                                        @if($record->attendance_status == 'present')
+                                        <span class="status-badge status-approved">✅</span>
+                                        @elseif($record->attendance_status == 'late')
+                                        <span class="status-badge stat-yellow">⏰</span>
+                                        @else
+                                        <span class="status-badge stat-red">❌</span>
+                                        @endif
+                                        @if($record->bible_verse_delivered)
+                                        <span class="status-badge stat-green">📖</span>
+                                        @else
+                                        <span class="status-badge stat-red">📖</span>
+                                        @endif
+                                    </div>
                                     @else
-                                    <span class="status-badge stat-red">❌</span>
+                                    <span class="status-badge stat-red">-</span>
                                     @endif
-                                    @if($record->bible_verse_delivered)
-                                    <span class="status-badge stat-green">📖</span>
-                                    @else
-                                    <span class="status-badge stat-red">📖</span>
-                                    @endif
-                                </div>
-                                @else
-                                <span class="status-badge stat-red">-</span>
-                                @endif
-                            </td>
+                                </td>
+                                @endforeach
+                            </tr>
                             @endforeach
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
 
     <div id="attendance-edit-panel" hidden>
         <div class="grades-table-container">
@@ -368,6 +376,9 @@
 
                                 <td>
                                     <select name="attendance[{{ $student->id }}][attendance_status]" class="form-select">
+                                        <option value="none" {{ ! $attendance ? 'selected' : '' }}>
+                                            — Sin registro
+                                        </option>
                                         <option value="present" {{ ($attendance && $attendance->attendance_status == 'present') ? 'selected' : '' }}>
                                             ✅ Presente
                                         </option>
@@ -436,6 +447,24 @@
 
         btnOpen.addEventListener('click', enterEditMode);
         if (btnCancel) btnCancel.addEventListener('click', leaveEditMode);
+    })();
+
+    (function () {
+        const panel = document.getElementById('quarter-summary-panel');
+        const btnShow = document.getElementById('btn-quarter-summary-show');
+        const btnHide = document.getElementById('btn-quarter-summary-hide');
+        if (!panel || !btnShow || !btnHide) return;
+
+        btnShow.addEventListener('click', function () {
+            panel.hidden = false;
+            btnShow.hidden = true;
+            btnHide.hidden = false;
+        });
+        btnHide.addEventListener('click', function () {
+            panel.hidden = true;
+            btnShow.hidden = false;
+            btnHide.hidden = true;
+        });
     })();
     </script>
     @endif

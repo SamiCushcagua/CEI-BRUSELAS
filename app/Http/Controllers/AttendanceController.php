@@ -191,7 +191,7 @@ class AttendanceController extends Controller
             'class_date' => 'required|date',
             'attendance' => 'required|array',
             'attendance.*.student_id' => 'required|integer|exists:users,id',
-            'attendance.*.attendance_status' => 'required|in:present,absent,late',
+            'attendance.*.attendance_status' => 'required|in:none,present,absent,late',
             'attendance.*.bible_verse_delivered' => 'boolean',
             'attendance.*.notes' => 'nullable|string|max:500'
         ]);
@@ -213,15 +213,24 @@ class AttendanceController extends Controller
 
         $classDate = \Carbon\Carbon::parse($validated['class_date'])->format('Y-m-d');
 
-        // Guardar o actualizar: una fila por materia + alumno + fecha + periodo (professor_id = último que guardó)
+        // Guardar o actualizar: una fila por materia + alumno + fecha + periodo (professor_id = último que guardó).
+        // "none" = sin registro: elimina la fila si existía (misma semántica que la tabla de solo lectura).
         foreach ($validated['attendance'] as $attendanceData) {
+            $lookup = [
+                'subject_id' => $validated['subject_id'],
+                'student_id' => $attendanceData['student_id'],
+                'class_date' => $classDate,
+                'period_id' => $period->id,
+            ];
+
+            if ($attendanceData['attendance_status'] === 'none') {
+                ClassAttendance::where($lookup)->delete();
+
+                continue;
+            }
+
             ClassAttendance::updateOrCreate(
-                [
-                    'subject_id' => $validated['subject_id'],
-                    'student_id' => $attendanceData['student_id'],
-                    'class_date' => $classDate,
-                    'period_id' => $period->id,
-                ],
+                $lookup,
                 [
                     'professor_id' => $professor->id,
                     'attendance_status' => $attendanceData['attendance_status'],

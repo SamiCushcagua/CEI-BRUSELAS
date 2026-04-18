@@ -829,8 +829,14 @@
     display: none !important;
 }
 
+/* Botones del resumen trimestre: debajo de la tabla del día, encima del tablero trimestral */
+.quarter-summary-toolbar {
+    margin-top: 1.25rem;
+}
+
 #grades-edit-panel[hidden],
-#attendance-edit-panel[hidden] {
+#attendance-edit-panel[hidden],
+#quarter-summary-panel[hidden] {
     display: none !important;
 }
 
