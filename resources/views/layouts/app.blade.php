@@ -51,7 +51,7 @@
                 <a href="{{ route('admin.subject-enrollment-outcomes') }}" class="{{ request()->routeIs('admin.subject-enrollment-outcomes') ? 'active' : '' }}">Aprobados y diplomas</a>
                 <a href="{{ route('admin.graduates-overview') }}" class="{{ request()->routeIs('admin.graduates-overview') ? 'active' : '' }}">Resumen aprobación</a>
                 <a href="{{ route('professors.index') }}" class="nav-link {{ request()->routeIs('professors.index') ? 'active' : '' }}">Profesores</a>
-                <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.index') ? 'active' : '' }}">Estudiantes</a>
+                <a href="{{ route('students.index') }}" class="nav-link {{ request()->routeIs('students.index') ? 'active' : '' }}">Estudiantes (sin asignar)</a>
                 <a href="{{ route('grades.index') }}" class="nav-link {{ request()->routeIs('grades.*') ? 'active' : '' }}">Calificaciones</a>
                <!-- <a href="{{ route('grade-reports.index') }}" class="nav-link {{ request()->routeIs('grade-reports.*') ? 'active' : '' }}">Reportes</a>-->
                 @endif
