@@ -27,4 +27,38 @@ class Period extends Model
     {
         return $query->where('is_active', true);
     }
+
+    /**
+     * Periodo marcado como activo (si hay varios, el primero por año/trimestre).
+     */
+    public static function currentAcademic(): ?self
+    {
+        return static::query()
+            ->where('is_active', true)
+            ->orderBy('year')
+            ->orderBy('trimester')
+            ->first();
+    }
+
+    /**
+     * Periodo académico inmediatamente anterior al dado (mismo orden año + trimestre).
+     */
+    public static function previousChronologicalTo(?self $period): ?self
+    {
+        if (! $period) {
+            return null;
+        }
+
+        $periods = static::query()
+            ->orderBy('year')
+            ->orderBy('trimester')
+            ->get();
+
+        $idx = $periods->search(fn (self $p) => (int) $p->id === (int) $period->id);
+        if ($idx === false || $idx < 1) {
+            return null;
+        }
+
+        return $periods[$idx - 1];
+    }
 }

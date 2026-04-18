@@ -3,7 +3,9 @@
 @section('content')
 <div class="grad-overview-page">
     <div class="grad-overview-top">
-        <a href="{{ route('welcome') }}" class="grad-overview-back">← Página principal</a>
+        <div class="page-main-btn-wrapper">
+            <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+        </div>
         <h1 class="grad-overview-title">Resumen de aprobación por materia</h1>
         <p class="grad-overview-desc">
             Cada casilla refleja el <strong>último estado</strong> registrado en calificaciones (aprobó / no aprobó).

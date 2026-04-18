@@ -2,6 +2,9 @@
 
 @section('content')
 <div class="page-container" style="padding: 20px;">
+    <div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
     <div style="display:flex; align-items:center; justify-content:space-between; gap: 16px; margin-bottom: 16px;">
         <div>
             <h1 style="margin:0;">Periodos escolares</h1>

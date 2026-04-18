@@ -5,6 +5,9 @@
 
 <div class="grades-container">
     <div class="grades-header">
+        <div class="page-main-btn-wrapper">
+            <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+        </div>
         <div>
             <h1 class="grades-title">Inscripciones: aprobación y diplomas</h1>
             <p class="grades-subtitle">Alumnos inscritos por materia y periodo (trimestre). Marca aprobación del trimestre y entrega de diploma; pulsa <strong>Guardar</strong> por fila.</p>

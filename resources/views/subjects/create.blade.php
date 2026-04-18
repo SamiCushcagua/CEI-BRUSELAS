@@ -2,6 +2,9 @@
 
 @section('content')
 <div class="container">
+    <div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
     <h1>Crear Nueva Materia</h1>
 
     @if(session('success'))

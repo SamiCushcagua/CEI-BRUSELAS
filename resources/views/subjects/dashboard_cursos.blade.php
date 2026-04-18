@@ -6,8 +6,12 @@
     @php
         $period = \App\Models\Period::active()->firstOrFail();
     @endphp
-<h1>q fue</h1>
+    <div class="page-main-btn-wrapper">
+        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    </div>
+
     <div class="products-grid">
+        
         @foreach($subjects as $subject)
             <div class="product-card">
                 @if($subject->imagen)
