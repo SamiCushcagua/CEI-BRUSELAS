@@ -25,6 +25,7 @@ use App\Http\Controllers\AdminPeriodSubjectDashboardController;
 use App\Http\Controllers\AdminSubjectEnrollmentOutcomeController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\AdminGraduatesOverviewController;
+use App\Http\Controllers\HelpVideoController;
 // Public Routes
 Route::get('/', function () {
     return view('welcome', ['users' => User::all()]);
@@ -76,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::put('/users/{id}', [UserController::class, 'edit'])->name('users.edit');
     Route::post('/users/{id}/delete', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::get('/ayuda-videos', [HelpVideoController::class, 'index'])->name('help.videos');
 
     // Subject Routes
     Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects.index');

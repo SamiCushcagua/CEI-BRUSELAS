@@ -21,6 +21,8 @@
         <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
     </div>
 
+        
+
 
         @auth
             @if(Auth::user()->is_admin)
@@ -70,7 +72,40 @@
             @endif
         @endauth
 
-        
+        <div class="form-container user-filters">
+            <h2>Buscar y filtrar usuarios</h2>
+            <form method="GET" action="{{ route('usersAllShow') }}" class="filter-form">
+                <div class="form-group">
+                    <label for="q">Buscar por nombre o email</label>
+                    <input
+                        type="text"
+                        id="q"
+                        name="q"
+                        class="form-input"
+                        value="{{ $search ?? request('q') }}"
+                        placeholder="Ej: Maria o correo@ejemplo.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Rol</label>
+                    <select id="role" name="role" class="form-select">
+                        <option value="all" {{ ($role ?? request('role', 'all')) === 'all' ? 'selected' : '' }}>Todos</option>
+                        <option value="admin" {{ ($role ?? request('role', 'all')) === 'admin' ? 'selected' : '' }}>Administradores</option>
+                        <option value="profesor" {{ ($role ?? request('role', 'all')) === 'profesor' ? 'selected' : '' }}>Profesores</option>
+                        <option value="user" {{ ($role ?? request('role', 'all')) === 'user' ? 'selected' : '' }}>Usuarios</option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="form-button">Aplicar filtro</button>
+                    <a href="{{ route('usersAllShow') }}" class="btn btn-info">Limpiar</a>
+                </div>
+            </form>
+
+            <p class="filter-summary">
+                Mostrando {{ $allUser->count() }} usuario(s).
+            </p>
+        </div>
 
         <div class="users-grid">
             <!-- Administradores -->
@@ -230,6 +265,24 @@
                 flex-direction: column;
                 gap: 2rem;
                 padding: 1.5rem 0;
+            }
+            .user-filters {
+                margin: 1rem 0 1.25rem;
+            }
+            .filter-form {
+                display: grid;
+                gap: 0.75rem;
+            }
+            .filter-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                align-items: center;
+            }
+            .filter-summary {
+                margin: 0.5rem 0 0;
+                color: #555;
+                font-size: 0.95rem;
             }
 
             .user-category {

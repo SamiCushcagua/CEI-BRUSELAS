@@ -23,6 +23,7 @@
             <div class="welcome-quick-buttons">
                 <a href="{{ route('profile.edit') }}" class="welcome-btn">👤 Mi perfil</a>
                 <a href="{{ route('bible.index') }}" class="welcome-btn">📖 Biblia</a>
+                <a href="{{ route('help.videos') }}" class="welcome-btn">🎥 Centro de ayuda</a>
         <!--        <a href="{{ route('FAQ') }}" class="welcome-btn">❓ FAQ</a>-->
                <!-- <a href="{{ route('about') }}" class="welcome-btn">ℹ️ Sobre nosotros</a>-->
                <a href="{{ route('usersAllShow') }}" class="welcome-btn">Todos los usuarios</a>

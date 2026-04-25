@@ -9,10 +9,30 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return view('usersAllShow', ['allUser' => $users]);
+        $search = trim((string) $request->query('q', ''));
+        $role = (string) $request->query('role', 'all');
+
+        $users = User::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($nested) use ($search) {
+                    $nested->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%');
+                });
+            })
+            ->when($role === 'admin', fn ($query) => $query->where('is_admin', true))
+            ->when($role === 'profesor', fn ($query) => $query->where('is_profesor', true)->where('is_admin', false))
+            ->when($role === 'user', fn ($query) => $query->where('is_admin', false)->where('is_profesor', false))
+            ->orderBy('name')
+            ->orderBy('email')
+            ->get();
+
+        return view('usersAllShow', [
+            'allUser' => $users,
+            'search' => $search,
+            'role' => $role,
+        ]);
     }
 
     public function create(Request $request)
