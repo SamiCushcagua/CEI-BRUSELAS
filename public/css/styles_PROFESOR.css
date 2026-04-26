@@ -256,7 +256,9 @@
     z-index: 1;
     background: white;
     box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.1);
-    min-width: 15px;
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
 }
 
 .grades-table th.sticky-col {
@@ -676,6 +678,13 @@
     .grades-table td {
         padding: 8px;
     }
+
+    .grades-table th.sticky-col,
+    .grades-table td.sticky-col {
+        width: 100px;
+        min-width: 100px;
+        max-width: 100px;
+    }
     
     /* Ocultar avatar del estudiante en móvil/GSM */
     .student-avatar {
@@ -684,6 +693,13 @@
     
     .student-info .student-details {
         margin-left: 0;
+    }
+
+    .student-info .student-details h4 {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .setting-fields {
