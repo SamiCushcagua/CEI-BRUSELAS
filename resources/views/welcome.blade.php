@@ -8,11 +8,11 @@
         <!-- Authentication Status -->
         @auth
             <div class="auth-message success">
-                <p>Welcome, {{ auth()->user()->name }}</p>
+                <p>Bienvenido, {{ auth()->user()->name }}</p>
             </div>
         @else
             <div class="auth-message warning">
-                <p>Please log in to see all content.</p>
+                <p>Por favor, inicie sesión para ver todo el contenido.</p>
             </div>
         @endauth
 
@@ -55,9 +55,11 @@
             <div class="welcome-quick-buttons">
                 <a href="{{ route('professors.subjects', Auth::user()) }}" class="welcome-btn">📚 Mi materia</a>
                 <a href="{{ route('professors.students', Auth::user()) }}" class="welcome-btn">👥 Mis estudiantes</a>
-                <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a>
+
          <!--       <a href="{{ route('grade-reports.index') }}" class="welcome-btn">📊 Reportes</a>-->
                 <a href="{{ route('attendance.index') }}" class="welcome-btn">📅 Asistencia</a>
+                <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a>
+
 
 
             </div>

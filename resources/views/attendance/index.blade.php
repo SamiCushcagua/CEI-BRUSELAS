@@ -298,7 +298,7 @@
                                         <div class="student-avatar">{{ substr($student->name, 0, 1) }}</div>
                                         <div class="student-details">
                                             <h4>{{ $student->name }}</h4>
-                                            <p>{{ $student->email }}</p>
+                                        <!--    <p>{{ $student->email }}</p> -->
                                         </div>
                                     </div>
                                 </td>
@@ -369,7 +369,7 @@
                                         <div class="student-avatar">{{ substr($student->name, 0, 1) }}</div>
                                         <div class="student-details">
                                             <h4>{{ $student->name }}</h4>
-                                            <p>{{ $student->email }}</p>
+                                        <!--    <p>{{ $student->email }}</p> -->
                                         </div>
                                     </div>
                                 </td>
