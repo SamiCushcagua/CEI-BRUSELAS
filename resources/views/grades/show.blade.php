@@ -3,7 +3,7 @@
 @section('content')
 
 <!-- aqui se introduce los puntos de los estudiantes y ademas se ven los resultados :) -->
-<link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}">
+<link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}?v={{ filemtime(public_path('css/styles_PROFESOR.css')) }}">
 <script src="{{ asset('js/profesor-calificacion.js') }}?v={{ filemtime(public_path('js/profesor-calificacion.js')) }}"></script>
 <div class="page-main-btn-wrapper">
         <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>

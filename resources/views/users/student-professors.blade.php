@@ -3,7 +3,7 @@
 @section('content')
 
 <h1>Mis Profesores q fue</h1>
-<link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}">
+<link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}?v={{ filemtime(public_path('css/styles_PROFESOR.css')) }}">
 
 <div class="grades-container">
     <div class="page-main-btn-wrapper">
