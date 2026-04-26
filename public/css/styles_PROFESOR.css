@@ -284,6 +284,24 @@
     background-color: #f9fafb;
 }
 
+/* Tabla de asistencia (primera tabla en attendance/index): ancho configurable por columna */
+.attendance-overview-table {
+    --attendance-col-width: 95px;
+    --attendance-first-col-width: 150px;
+}
+
+.attendance-overview-table th:not(.sticky-col),
+.attendance-overview-table td {
+    min-width: var(--attendance-col-width);
+}
+
+.attendance-overview-table th.sticky-col,
+.attendance-overview-table td.sticky-col {
+    width: var(--attendance-first-col-width);
+    min-width: var(--attendance-first-col-width);
+    max-width: var(--attendance-first-col-width);
+}
+
 /* Fila con más de 3 ausencias en resumen trimestre */
 .grades-table tr.row-high-absent td {
     background-color: #fef2f2 !important;
@@ -700,6 +718,11 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .attendance-overview-table {
+        --attendance-col-width: 75px;
+        --attendance-first-col-width: 110px;
     }
     
     .setting-fields {

@@ -77,8 +77,8 @@
         <div class="grades-table-header">
             <h3 class="grades-table-title">{{ $selectedSubject->name }} — todas las clases (domingos) del periodo</h3>
         </div>
-        <div class="grades-table-wrapper" style="overflow-x: auto;">
-            <table class="grades-table">
+        <div class="grades-table-wrapper attendance-overview-wrapper" style="overflow-x: auto;">
+            <table class="grades-table attendance-overview-table">
                 <thead>
                     <tr>
                         <th class="sticky-col">Concepto</th>
