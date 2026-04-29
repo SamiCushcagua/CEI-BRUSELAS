@@ -46,7 +46,7 @@ class HelpVideoController extends Controller
                 [
                     'title' => 'Registro de asistencia',
                     'description' => 'Como registrar la asistencia de los estudiantes.',
-                    'url' => 'https://youtu.be/DKHraeF9uVI',
+                    'url' => 'https://www.youtube.com/watch?v=DKHraeF9uVI',
                 ],
          /*       [
                     'title' => 'Cargar calificaciones',
