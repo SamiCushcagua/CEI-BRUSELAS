@@ -13,8 +13,9 @@
         @else
             <div class="auth-message warning">
                 <p>Por favor, inicie sesión para ver todo el contenido.</p>
+                <a href="{{ route('login') }}" class="welcome-btn">Iniciar sesión</a>   
             </div>
-        @endauth
+        @endauth    
 
         @auth
         {{-- Todos los usuarios con sesión: enlaces comunes --}}
