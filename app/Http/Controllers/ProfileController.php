@@ -53,6 +53,9 @@ class ProfileController extends Controller
 
         $data = $request->validated();
 
+        $newPassword = $data['password'] ?? null;
+        unset($data['password'], $data['password_confirmation'], $data['user_id']);
+
         // Handle image upload
         if ($request->hasFile('image')) {
             // Delete old image if exists
@@ -66,6 +69,14 @@ class ProfileController extends Controller
         }
 
         $user->fill($data);
+
+        if ($request->has('user_id')
+            && Auth::user()->is_admin
+            && (int) $request->input('user_id') !== Auth::id()
+            && is_string($newPassword)
+            && $newPassword !== '') {
+            $user->password = $newPassword;
+        }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;

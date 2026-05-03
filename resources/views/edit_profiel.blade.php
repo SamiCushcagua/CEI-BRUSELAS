@@ -68,6 +68,33 @@
                 @enderror
             </div>
 
+            @if($isAdminEditingOtherUser)
+            <div class="form-group">
+                <label for="password">Nueva contraseña (solo administrador)</label>
+                <input type="password"
+                       name="password"
+                       id="password"
+                       class="form-input @error('password') form-input-error @enderror"
+                       autocomplete="new-password"
+                       placeholder="Dejar vacío para no cambiar">
+                @error('password')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="form-group">
+                <label for="password_confirmation">Confirmar contraseña</label>
+                <input type="password"
+                       name="password_confirmation"
+                       id="password_confirmation"
+                       class="form-input @error('password_confirmation') form-input-error @enderror"
+                       autocomplete="new-password">
+                @error('password_confirmation')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
+                <small class="form-help">Solo visible al editar el perfil de otro usuario. Si rellenas ambos campos, se actualiza la contraseña de esa cuenta.</small>
+            </div>
+            @endif
+
             <div class="form-group">
                 <label for="UsernameDummy">Nombre psaudo</label>
                 <input type="text" 
