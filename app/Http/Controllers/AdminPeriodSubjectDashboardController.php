@@ -209,6 +209,44 @@ class AdminPeriodSubjectDashboardController extends Controller
 
     private function getSundaysForPeriod(Period $period): array
     {
+        if ($period->start_date && $period->end_date) {
+            return $this->getSundaysBetween(
+                Carbon::parse($period->start_date)->startOfDay(),
+                Carbon::parse($period->end_date)->startOfDay()
+            );
+        }
+
+        return $this->getSundaysFromLegacyTrimesterMonths($period);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getSundaysBetween(Carbon $start, Carbon $end): array
+    {
+        if ($start->gt($end)) {
+            return [];
+        }
+
+        $cursor = $start->copy();
+        while (! $cursor->isSunday()) {
+            $cursor->addDay();
+            if ($cursor->gt($end)) {
+                return [];
+            }
+        }
+
+        $sundays = [];
+        while ($cursor->lte($end)) {
+            $sundays[] = $cursor->format('Y-m-d');
+            $cursor->addWeek();
+        }
+
+        return $sundays;
+    }
+
+    private function getSundaysFromLegacyTrimesterMonths(Period $period): array
+    {
         $year = (int) $period->year;
         $currentTrimester = (int) $period->trimester;
 
@@ -218,17 +256,14 @@ class AdminPeriodSubjectDashboardController extends Controller
             2 => [5, 6, 7, 8],
             3 => [9, 10, 11, 12],
         ];
-
-        $months = $monthRanges[$currentTrimester] ?? [];
+        $months = $monthRanges[$currentTrimester] ?? [1, 2, 3, 4];
 
         foreach ($months as $month) {
             $startDate = new \DateTime("$year-$month-01");
             $endDate = new \DateTime("$year-$month-" . $startDate->format('t'));
-
             while ($startDate->format('N') != 7) {
                 $startDate->add(new \DateInterval('P1D'));
             }
-
             while ($startDate <= $endDate) {
                 $sundays[] = $startDate->format('Y-m-d');
                 $startDate->add(new \DateInterval('P7D'));
