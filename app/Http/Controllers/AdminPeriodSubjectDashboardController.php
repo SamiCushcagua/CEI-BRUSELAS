@@ -7,9 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Period;
 use App\Models\Subject;
-use App\Models\User;
 use App\Models\ClassAttendance;
-use App\Models\Grade;
 use Carbon\Carbon;
 
 class AdminPeriodSubjectDashboardController extends Controller
@@ -40,17 +38,6 @@ class AdminPeriodSubjectDashboardController extends Controller
 
         $selectedSubject = $selectedSubjectId ? Subject::find($selectedSubjectId) : null;
 
-        $professors = collect();
-        $selectedProfessorId = $request->query('professor_id');
-        if ($selectedSubject) {
-            $professors = $selectedSubject->professorsForPeriod($period)->orderBy('name')->get();
-            if (!$selectedProfessorId) {
-                $selectedProfessorId = $professors->first()->id ?? null;
-            }
-        }
-
-        $selectedProfessor = $selectedProfessorId ? User::find($selectedProfessorId) : null;
-
         // Fechas (domingos) del periodo.
         $sundays = $this->getSundaysForPeriod($period);
         $defaultSunday = $this->getClosestSunday($sundays) ?? ($sundays[0] ?? null);
@@ -60,7 +47,7 @@ class AdminPeriodSubjectDashboardController extends Controller
         $students = collect();
         $attendanceRecords = collect();
         $attendanceData = [];
-        $grades = collect();
+        $allSubjectSummaries = collect();
 
         if ($selectedSubject && $selectedDate) {
             $students = $selectedSubject->studentsForPeriod($period)->get();
@@ -92,12 +79,47 @@ class AdminPeriodSubjectDashboardController extends Controller
                 }
             }
 
-            // Grades del periodo seleccionado.
-            $grades = Grade::where('subject_id', $selectedSubject->id)
-                ->where('year', $period->year)
-                ->where('trimester', $period->trimester)
-                ->get();
         }
+
+        // Resumen global del trimestre: todas las materias con profesor asignado en el periodo.
+        $subjectsWithProfessor = Subject::whereIn('id', function ($q) use ($period) {
+                $q->select('subject_id')
+                    ->from('subject_professor')
+                    ->where('period_id', $period->id);
+            })
+            ->orderByRaw('CASE WHEN Nivel IS NULL OR Nivel = "" THEN 1 ELSE 0 END')
+            ->orderBy('Nivel')
+            ->orderBy('name')
+            ->get();
+
+        $allSubjectSummaries = $subjectsWithProfessor->map(function (Subject $subject) use ($period, $sundays) {
+            $courseStudents = $subject->studentsForPeriod($period)->get();
+            $courseProfessors = $subject->professorsForPeriod($period)->orderBy('name')->get(['users.id', 'users.name', 'users.email']);
+
+            $allCourseAttendance = ClassAttendance::where('subject_id', $subject->id)
+                ->where('period_id', $period->id)
+                ->whereIn('class_date', $sundays)
+                ->get();
+
+            $map = $allCourseAttendance->mapWithKeys(function ($r) {
+                $dateKey = $this->normalizeClassDateKey($r->class_date);
+                return [$r->student_id . '|' . $dateKey => $r];
+            });
+
+            $courseAttendanceData = [];
+            foreach ($courseStudents as $student) {
+                foreach ($sundays as $sunday) {
+                    $courseAttendanceData[$student->id][$sunday] = $map->get($student->id . '|' . $sunday);
+                }
+            }
+
+            return [
+                'subject' => $subject,
+                'professors' => $courseProfessors,
+                'students' => $courseStudents,
+                'attendanceData' => $courseAttendanceData,
+            ];
+        });
 
         return view('admin.period-subject-dashboard', [
             'periods' => $periods,
@@ -105,13 +127,11 @@ class AdminPeriodSubjectDashboardController extends Controller
             'sundays' => $sundays,
             'subjects' => $subjects,
             'selectedSubject' => $selectedSubject,
-            'selectedProfessor' => $selectedProfessor,
-            'professors' => $professors,
             'selectedDate' => $selectedDate,
             'students' => $students,
             'attendanceRecords' => $attendanceRecords,
             'attendanceData' => $attendanceData,
-            'grades' => $grades,
+            'allSubjectSummaries' => $allSubjectSummaries,
             'currentTrimester' => $period->trimester,
             'currentYear' => $period->year,
         ]);
