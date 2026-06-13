@@ -9,6 +9,7 @@ use App\Models\EvaluationType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Period;
 
 class GradeController extends Controller
@@ -19,48 +20,86 @@ class GradeController extends Controller
     }
 
     /**
-     * Mostrar lista de materias para calificaciones
+     * Vista única de calificaciones (selector de materia + tabla, como asistencia).
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::whereHas('professors', function ($query) {
-            $query->where('professor_id', Auth::id());
-        })->with(['students', 'grades'])->get();
-
-        if ($subjects->count() === 1) {
-            return redirect()->route('grades.show', $subjects->first());
-        }
-
-        return view('grades.index', compact('subjects'));
-    }
-
-    /**
-     * Mostrar calificaciones de una materia específica
-     */
-    public function show(Subject $subject)
-    {
-        // Verificar que el usuario es profesor de esta materia
-        if (!$subject->professors()->where('professor_id', Auth::id())->exists()) {
-            abort(403, 'No tienes permisos para ver estas calificaciones');
-        }
-
+        $user = Auth::user();
         $period = Period::active()->firstOrFail();
         $currentYear = $period->year;
         $currentTrimester = $period->trimester;
+        $isAdminView = (bool) $user->is_admin;
 
-        $students = $subject->studentsForPeriod($period)->get();
-        
-        // Obtener calificaciones agrupadas por estudiante
+        $subjects = $this->subjectsForGrades($user, $period);
 
-      $grades = Grade::where('subject_id', $subject->id)
-      ->where('year', $currentYear)
-      ->where('trimester', $currentTrimester)
-      ->get();
-        
-        // Obtener tipos de evaluación
+        $subject = null;
+        if ($subjects->count() === 1) {
+            $subject = $subjects->first();
+        } else {
+            $subjectId = $request->get('subject_id');
+            if ($subjectId && $subjects->contains('id', (int) $subjectId)) {
+                $subject = $subjects->firstWhere('id', (int) $subjectId);
+            } elseif ($isAdminView && $subjects->isNotEmpty()) {
+                $subject = $subjects->first();
+            }
+        }
+
+        $students = collect();
+        $grades = collect();
         $evaluationTypes = EvaluationType::active()->get();
-        
-        return view('grades.show', compact('subject', 'students', 'grades', 'evaluationTypes', 'currentYear', 'currentTrimester', 'period'));
+
+        if ($subject) {
+            $students = $subject->studentsForPeriod($period)->get();
+            $grades = Grade::where('subject_id', $subject->id)
+                ->where('year', $currentYear)
+                ->where('trimester', $currentTrimester)
+                ->get();
+        }
+
+        return view('grades.show', compact(
+            'subjects',
+            'subject',
+            'students',
+            'grades',
+            'evaluationTypes',
+            'currentYear',
+            'currentTrimester',
+            'period',
+            'isAdminView'
+        ));
+    }
+
+    /**
+     * Redirige a la vista única con la materia seleccionada.
+     */
+    public function show(Subject $subject)
+    {
+        $user = Auth::user();
+        if (! $user->is_admin && ! $subject->professors()->where('professor_id', $user->id)->exists()) {
+            abort(403, 'No tienes permisos para ver estas calificaciones');
+        }
+
+        return redirect()->route('grades.index', ['subject_id' => $subject->id]);
+    }
+
+    private function subjectsForGrades(User $user, Period $period)
+    {
+        if ($user->is_admin) {
+            return Subject::whereIn('id', function ($q) use ($period) {
+                $q->select('subject_id')
+                    ->from('subject_professor')
+                    ->where('period_id', $period->id);
+            })
+                ->orderBy('name')
+                ->get();
+        }
+
+        $relation = $user->subjects();
+        if (Schema::hasColumn('subject_professor', 'period_id')) {
+            $relation->wherePivot('period_id', $period->id);
+        }
+
+        return $relation->orderBy('subjects.name')->get();
     }
 
     /**
@@ -328,8 +367,8 @@ class GradeController extends Controller
      */
     public function destroy(Grade $grade)
     {
-        // Verificar que el usuario es profesor de esta materia
-        if (!$grade->subject->professors()->where('professor_id', Auth::id())->exists()) {
+        $user = Auth::user();
+        if (! $user->is_admin && ! $grade->subject->professors()->where('professor_id', Auth::id())->exists()) {
             abort(403, 'No tienes permisos para eliminar esta calificación');
         }
 

@@ -40,10 +40,11 @@
                 <a href="{{ route('dashboard_cursos') }}" class="welcome-btn">🎓 Todos los Cursos</a>
                 <a href="{{ route('periods.index') }}" class="welcome-btn">📆 Periodos</a>
                 <a href="{{ route('admin.period-subject-dashboard') }}" class="welcome-btn">🗂️ Tablero Admin</a>
+                <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a>
                 <a href="{{ route('admin.subject-enrollment-outcomes') }}" class="welcome-btn">✅ Aprobados y diplomas</a>
             <!--    <a href="{{ route('professors.index') }}" class="welcome-btn">👨‍🏫 Profesores</a>
                 <a href="{{ route('students.index') }}" class="welcome-btn">👨‍🎓 Estudiantes</a>-->
-               <!-- <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a> -->
+                
                 <a href="{{ route('admin.graduates-overview') }}" class="welcome-btn">📋 Resumen aprobación</a>
                 <a href="{{ route('students.index') }}" class="welcome-btn">Alumnos sin asignar</a>
             </div>

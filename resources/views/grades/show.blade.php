@@ -5,30 +5,104 @@
 <!-- aqui se introduce los puntos de los estudiantes y ademas se ven los resultados :) -->
 <link rel="stylesheet" href="{{ asset('css/styles_PROFESOR.css') }}?v={{ filemtime(public_path('css/styles_PROFESOR.css')) }}">
 <script src="{{ asset('js/profesor-calificacion.js') }}?v={{ filemtime(public_path('js/profesor-calificacion.js')) }}"></script>
+
 <div class="page-main-btn-wrapper">
-        <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
-    </div>
+    <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+</div>
+
 <div class="grades-container">
     <div class="grades-header">
         <div>
-            <h1 class="grades-title">{{ $subject->name }}</h1>
+            <h1 class="grades-title">
+                @if($subject)
+                    {{ $subject->name }}
+                @else
+                    Sistema de Calificaciones
+                @endif
+            </h1>
+            @if($subject && $subject->description)
             <p class="grades-subtitle">{{ $subject->description }}</p>
+            @elseif($isAdminView ?? false)
+            <p class="grades-subtitle">Todas las materias del periodo activo — puedes ver y modificar calificaciones de cualquier clase</p>
+            @else
+            <p class="grades-subtitle">Registra y consulta las calificaciones de tus estudiantes</p>
+            @endif
+            @isset($period)
+            <p class="grades-subtitle" style="margin-top: 0.35rem; opacity: 0.95;">
+                📅 <strong>Periodo vigente:</strong> {{ $period->name }} — {{ $period->year }} · Trimestre {{ $period->trimester }}
+            </p>
+            @endisset
         </div>
         <div class="grades-info">
             <div><span>Trimestre:</span> {{ $currentTrimester }}</div>
             <div><span>Año:</span> {{ $currentYear }}</div>
+            @if($subject)
             <div><span>Estudiantes:</span> {{ $students->count() }}</div>
+            @endif
         </div>
     </div>
 
+    @if($subjects->isEmpty())
+    <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        @if($isAdminView ?? false)
+        <h3 class="empty-title">No hay materias con profesor asignado</h3>
+        <p class="empty-description">No hay clases con profesor asignado en el periodo activo ({{ $currentYear }} — Trimestre {{ $currentTrimester }}).</p>
+        <a href="{{ route('admin.period-subject-dashboard') }}" class="btn btn-primary">
+            Ir al Tablero Admin
+        </a>
+        @else
+        <h3 class="empty-title">No tienes materias asignadas</h3>
+        <p class="empty-description">Contacta al administrador para que te asignen materias como profesor.</p>
+        @endif
+    </div>
+    @else
+    <div class="form-container">
+        <div class="form-header">
+            <h2 class="form-title">Seleccionar materia</h2>
+            @if($subjects->count() === 1)
+            <p class="grades-subtitle" style="margin: 0.35rem 0 0;">Materia: <strong>{{ $subjects->first()->name }}</strong></p>
+            @endif
+        </div>
+        <div class="form-content">
+            <form method="GET" action="{{ route('grades.index') }}" class="form-grid">
+                @if($subjects->count() > 1)
+                <div class="form-group">
+                    <label class="form-label">Materia</label>
+                    <select name="subject_id" class="form-select" required onchange="this.form.submit()">
+                        <option value="">Seleccionar materia...</option>
+                        @foreach($subjects as $s)
+                        <option value="{{ $s->id }}" {{ $subject && (string) $subject->id === (string) $s->id ? 'selected' : '' }}>
+                            {{ $s->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+                @if($isAdminView ?? false)
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <p class="grades-subtitle" style="margin: 0;">
+                        @if($subject)
+                        Profesor(es):
+                        {{ $subject->professorsForPeriod($period)->orderBy('name')->pluck('name')->filter()->implode(', ') ?: 'Sin asignar' }}
+                        @else
+                        Elige una materia para ver sus calificaciones.
+                        @endif
+                    </p>
+                </div>
+                @endif
+            </form>
+        </div>
+    </div>
+
+    @if($subject)
     <div class="grades-show-toolbar">
         @if($students->count() > 0)
         <button type="button" class="btn btn-primary" id="btn-grade-edit-open">Modificar resultados</button>
         <button type="button" class="btn btn-secondary" id="btn-grade-edit-cancel" hidden>Cancelar</button>
         <button type="button" class="btn btn-success" id="btn-grade-save-all" hidden>Guardar cambios</button>
         @endif
-   <!--     <button type="button" onclick="exportToPDF()" class="btn btn-danger btn-small">📄 Exportar PDF</button> -->
-        <!-- <a href="{{ route('grade-settings.index', $subject) }}" class="btn btn-secondary btn-small">⚙️ Configuración</a> -->
     </div>
 
     <div id="grades-summary-panel">
@@ -57,7 +131,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($students as $student)
+                    @forelse($students as $student)
                         @php
                             $studentGrade = $grades->where('student_id', $student->id)->first();
                             $diplomaOk = (bool) ($student->pivot->diploma_delivered ?? false);
@@ -70,7 +144,6 @@
                                     </div>
                                     <div class="student-details">
                                         <h4>{{ $student->name }}</h4>
-                                    <!--    <p>{{ $student->email }}</p> -->
                                     </div>
                                 </div>
                             </td>
@@ -117,7 +190,11 @@
                             <td>{{ $studentGrade && $studentGrade->passed ? 'Sí' : 'No' }}</td>
                             <td>{{ $diplomaOk ? 'Sí' : 'No' }}</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="11" class="text-center">No hay estudiantes inscritos en esta materia.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -163,7 +240,6 @@
                                 </div>
                                 <div class="student-details">
                                     <h4>{{ $student->name }}</h4>
-                                <!--    <p>{{ $student->email }}</p> -->
                                 </div>
                             </div>
                         </td>
@@ -264,20 +340,21 @@
     </div>
     </div>
 
-    <div class="mt-20">
-        <a href="{{ route('grades.index') }}" class="btn btn-secondary">
-            ← Volver a Materias
-        </a>
+    <div style="display: none;"
+        data-subject-id="{{ $subject->id }}"
+        data-trimester="{{ $currentTrimester }}"
+        data-year="{{ $currentYear }}"
+        data-period-id="{{ $period->id }}"
+        data-bulk-url="{{ route('grades.bulk', [], false) }}"
+        id="grade-data">
     </div>
-</div>
-
-<!-- Datos para JavaScript -->
-<div style="display: none;"
-    data-subject-id="{{ $subject->id }}"
-    data-trimester="{{ $currentTrimester }}"
-    data-year="{{ $currentYear }}"
-    data-period-id="{{ $period->id }}"
-    data-bulk-url="{{ route('grades.bulk', [], false) }}"
-    id="grade-data">
+    @elseif($subjects->count() > 1)
+    <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3 class="empty-title">Selecciona una materia</h3>
+        <p class="empty-description">Elige la materia en el desplegable de arriba para ver y modificar las calificaciones.</p>
+    </div>
+    @endif
+    @endif
 </div>
 @endsection
