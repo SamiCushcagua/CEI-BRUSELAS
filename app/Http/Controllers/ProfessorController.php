@@ -6,6 +6,7 @@ use App\Models\Period;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ProfessorController extends Controller
 {
@@ -20,8 +21,18 @@ class ProfessorController extends Controller
 
     public function subjects(User $professor)
     {
-        $subjects = $professor->subjects;
-        return view('subjects.professor-subjects', compact('professor', 'subjects'));
+        $period = Period::active()->first();
+        $subjects = collect();
+
+        if ($period) {
+            $relation = $professor->subjects();
+            if (Schema::hasColumn('subject_professor', 'period_id')) {
+                $relation->wherePivot('period_id', $period->id);
+            }
+            $subjects = $relation->orderBy('subjects.name')->get();
+        }
+
+        return view('subjects.professor-subjects', compact('professor', 'subjects', 'period'));
     }
 
     public function students(User $professor)

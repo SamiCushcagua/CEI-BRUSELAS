@@ -25,10 +25,48 @@ use App\Http\Controllers\AdminPeriodSubjectDashboardController;
 use App\Http\Controllers\AdminSubjectEnrollmentOutcomeController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\AdminGraduatesOverviewController;
+use App\Http\Controllers\AdminCoursePlanOverviewController;
 use App\Http\Controllers\HelpVideoController;
+use App\Http\Controllers\CoursePlanController;
+use App\Models\Period;
+use Illuminate\Support\Facades\Schema;
 // Public Routes
 Route::get('/', function () {
-    return view('welcome', ['users' => User::all()]);
+    $data = ['users' => User::all()];
+
+    $user = Auth::user();
+    if ($user && $user->isProfessor()) {
+        $period = Period::active()->first();
+        $subjects = collect();
+
+        if ($period) {
+            $relation = $user->subjects();
+            if (Schema::hasColumn('subject_professor', 'period_id')) {
+                $relation->wherePivot('period_id', $period->id);
+            }
+            $subjects = $relation->orderBy('subjects.name')->get();
+        }
+
+        $data['professorSubjects'] = $subjects;
+        $data['activePeriod'] = $period;
+    }
+
+    if ($user && $user->isStudent()) {
+        $period = Period::active()->first();
+        $subjects = collect();
+
+        if ($period) {
+            $relation = $user->subjectsAsStudent();
+            if (Schema::hasColumn('subject_student', 'period_id')) {
+                $relation->wherePivot('period_id', $period->id);
+            }
+            $subjects = $relation->orderBy('subjects.name')->get();
+        }
+
+        $data['studentSubjects'] = $subjects;
+    }
+
+    return view('welcome', $data);
 })->name('welcome');
 
 Route::get('/about', function () {
@@ -101,6 +139,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/subjects/{subject}/enroll-student', [SubjectRelationshipController::class, 'enrollStudent'])->name('subjects.enroll-student');
     Route::delete('/subjects/{subject}/remove-student/{student}', [SubjectRelationshipController::class, 'removeStudent'])->name('subjects.remove-student');
 
+    Route::get('/subjects/{subject}/course-plan/edit', [CoursePlanController::class, 'edit'])->name('course-plans.edit');
+    Route::put('/subjects/{subject}/course-plan', [CoursePlanController::class, 'update'])->name('course-plans.update');
+    Route::get('/subjects/{subject}/course-plan', [CoursePlanController::class, 'show'])->name('course-plans.show');
+
     // Professor Routes
     Route::get('/professors', [ProfessorController::class, 'index'])->name('professors.index');
     Route::get('/professors/{professor}/subjects', [ProfessorController::class, 'subjects'])->name('professors.subjects');
@@ -125,6 +167,9 @@ Route::get('/admin/period-subject-dashboard', [AdminPeriodSubjectDashboardContro
     ->name('admin.period-subject-dashboard');
 Route::post('/admin/period-subject-dashboard/attendance/save', [AdminPeriodSubjectDashboardController::class, 'saveAttendance'])
     ->name('admin.period-subject-dashboard.attendance.save');
+
+Route::get('/admin/course-plans', [AdminCoursePlanOverviewController::class, 'index'])
+    ->name('admin.course-plans.index');
 
 Route::get('/admin/subject-enrollment-outcomes', [AdminSubjectEnrollmentOutcomeController::class, 'index'])
     ->name('admin.subject-enrollment-outcomes');

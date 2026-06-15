@@ -110,6 +110,11 @@ class Subject extends Model
             ->with('success', 'Estudiante desinscrito exitosamente.');
     }
 
+public function coursePlans()
+{
+    return $this->hasMany(CoursePlan::class);
+}
+
 // Relaciones para calificaciones
 public function grades()
 {

@@ -67,6 +67,9 @@
                     </div>
 
                     <div class="action-buttons">
+                        <a href="{{ route('course-plans.show', $subject) }}" class="btn btn-primary btn-small">
+                            📋 Ver plan de curso
+                        </a>
                         @if($subject->Archivo)
                             <a href="{{ asset('storage/' . $subject->Archivo) }}" target="_blank" class="btn btn-secondary btn-small">
                                 📄 Ver Documento

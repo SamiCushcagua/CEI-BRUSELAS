@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Subject;
 use App\Models\User;
 use App\Models\Period;
+use App\Services\CoursePlanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -72,6 +73,8 @@ class SubjectRelationshipController extends Controller
                 ]
             );
         }
+
+        app(CoursePlanService::class)->findOrCreateForSubjectPeriod($subject, $period);
 
         return back()->with('success', 'Profesores asignados exitosamente.');
     }

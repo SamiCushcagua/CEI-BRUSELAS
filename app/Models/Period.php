@@ -43,6 +43,11 @@ class Period extends Model
     /**
      * Periodo académico inmediatamente anterior al dado (mismo orden año + trimestre).
      */
+    public function coursePlans()
+    {
+        return $this->hasMany(CoursePlan::class);
+    }
+
     public static function previousChronologicalTo(?self $period): ?self
     {
         if (! $period) {

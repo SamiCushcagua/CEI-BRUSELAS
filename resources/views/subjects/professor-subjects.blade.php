@@ -28,6 +28,12 @@
         </div>
     @endif
 
+    @if($period ?? null)
+        <p class="grades-subtitle" style="margin-bottom: 1rem;">
+            Periodo vigente: <strong>{{ $period->name }}</strong>
+        </p>
+    @endif
+
     <div class="subjects-grid">
         @forelse($subjects as $subject)
             <div class="subject-card">
@@ -55,6 +61,12 @@
                         </a>
                     </div>
                 @endif
+
+                <div class="subject-actions" style="margin-top: 0.75rem;">
+                    <a href="{{ route('course-plans.show', $subject) }}" class="btn btn-primary btn-small">
+                        📋 Plan de curso
+                    </a>
+                </div>
                 
         <!--       <div class="subject-actions">
                     <form action="{{ route('subjects.remove-professor', ['subject' => $subject->id, 'professor' => $professor->id]) }}" method="POST" class="btn-flex">

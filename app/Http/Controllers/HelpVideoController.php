@@ -48,11 +48,11 @@ class HelpVideoController extends Controller
                     'description' => 'Como registrar la asistencia de los estudiantes.',
                     'url' => 'https://www.youtube.com/embed/DKHraeF9uVI',
                 ],
-         /*       [
+               [
                     'title' => 'Cargar calificaciones',
                     'description' => 'Guia para registrar notas de forma correcta.',
-                    'url' => 'https://www.youtube.com/embed/tgbNymZ7vqY',
-                ],*/
+                   'url' => 'https://www.youtube-nocookie.com/embed/rU7CsXetnmo',
+                ],
             ];
         } elseif ($user->isStudent()) {
             $roleLabel = 'Estudiante';

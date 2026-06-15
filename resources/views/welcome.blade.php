@@ -40,6 +40,7 @@
                 <a href="{{ route('dashboard_cursos') }}" class="welcome-btn">🎓 Todos los Cursos</a>
                 <a href="{{ route('periods.index') }}" class="welcome-btn">📆 Periodos</a>
                 <a href="{{ route('admin.period-subject-dashboard') }}" class="welcome-btn">🗂️ Tablero Admin</a>
+                <a href="{{ route('admin.course-plans.index') }}" class="welcome-btn">📋 Planes de curso</a>
                 <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a>
                 <a href="{{ route('admin.subject-enrollment-outcomes') }}" class="welcome-btn">✅ Aprobados y diplomas</a>
             <!--    <a href="{{ route('professors.index') }}" class="welcome-btn">👨‍🏫 Profesores</a>
@@ -61,9 +62,11 @@
          <!--       <a href="{{ route('grade-reports.index') }}" class="welcome-btn">📊 Reportes</a>-->
                 <a href="{{ route('attendance.index') }}" class="welcome-btn">📅 Asistencia</a>
                 <a href="{{ route('grades.index') }}" class="welcome-btn">📝 Calificaciones</a>
-
-
-
+                @if(isset($professorSubjects) && $professorSubjects->count() === 1)
+                    <a href="{{ route('course-plans.show', $professorSubjects->first()) }}" class="welcome-btn">📋 Plan de curso</a>
+                @elseif(isset($professorSubjects) && $professorSubjects->count() > 0)
+                    <a href="{{ route('professors.subjects', Auth::user()) }}" class="welcome-btn">📋 Plan de curso</a>
+                @endif
             </div>
         </div>
         @endif
@@ -76,6 +79,11 @@
                 <a href="{{ route('students.professors', Auth::user()) }}" class="welcome-btn">👥 Mis profesores</a>
                 <a href="{{ route('attendance.index') }}" class="welcome-btn">📅 Asistencia</a>
                 <a href="{{ route('student.grades') }}" class="welcome-btn">📝 Mis calificaciones</a>
+                @if(isset($studentSubjects) && $studentSubjects->count() === 1)
+                    <a href="{{ route('course-plans.show', $studentSubjects->first()) }}" class="welcome-btn">📋 Plan de curso</a>
+                @elseif(isset($studentSubjects) && $studentSubjects->count() > 0)
+                    <a href="{{ route('students.subjects', Auth::user()) }}" class="welcome-btn">📋 Plan de curso</a>
+                @endif
             </div>
         </div>
         @endif

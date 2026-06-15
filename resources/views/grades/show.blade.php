@@ -8,6 +8,9 @@
 
 <div class="page-main-btn-wrapper">
     <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+    @if($subject ?? false)
+        <a href="{{ route('course-plans.show', $subject) }}" class="btn btn-secondary">📋 Plan de curso</a>
+    @endif
 </div>
 
 <div class="grades-container">
