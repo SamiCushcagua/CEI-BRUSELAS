@@ -10,6 +10,7 @@ let currentPeriodId = null;
 document.addEventListener('DOMContentLoaded', function() {
     initializeGradeSystem();
     initGradesShowBulkMode();
+    initGradesShowAllSubjectsView();
 });
 
 // Función principal de inicialización
@@ -556,6 +557,9 @@ function initGradesShowBulkMode() {
     }
 
     function enterEditMode() {
+        if (typeof window.showSingleSubjectView === 'function') {
+            window.showSingleSubjectView();
+        }
         summary.hidden = true;
         edit.hidden = false;
         btnOpen.hidden = true;
@@ -571,12 +575,49 @@ function initGradesShowBulkMode() {
         if (btnSave) btnSave.hidden = true;
     }
 
+    window.leaveGradesEditMode = leaveEditMode;
+
     btnOpen.addEventListener('click', enterEditMode);
     if (btnCancel) {
         btnCancel.addEventListener('click', leaveEditMode);
     }
     if (btnSave) {
         btnSave.addEventListener('click', saveAllGradesBulk);
+    }
+}
+
+function initGradesShowAllSubjectsView() {
+    const btnViewAll = document.getElementById('btn-grades-view-all');
+    const btnViewSingle = document.getElementById('btn-grades-view-single');
+    const allPanel = document.getElementById('grades-all-subjects-panel');
+    const singlePanel = document.getElementById('grades-single-subject-panel');
+
+    if (!btnViewAll || !allPanel || !singlePanel) {
+        return;
+    }
+
+    function showAllSubjectsView() {
+        if (typeof window.leaveGradesEditMode === 'function') {
+            window.leaveGradesEditMode();
+        }
+        singlePanel.hidden = true;
+        allPanel.hidden = false;
+        btnViewAll.hidden = true;
+        if (btnViewSingle) btnViewSingle.hidden = false;
+    }
+
+    function showSingleSubjectView() {
+        singlePanel.hidden = false;
+        allPanel.hidden = true;
+        btnViewAll.hidden = false;
+        if (btnViewSingle) btnViewSingle.hidden = true;
+    }
+
+    window.showSingleSubjectView = showSingleSubjectView;
+
+    btnViewAll.addEventListener('click', showAllSubjectsView);
+    if (btnViewSingle) {
+        btnViewSingle.addEventListener('click', showSingleSubjectView);
     }
 }
 

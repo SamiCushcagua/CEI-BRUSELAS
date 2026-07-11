@@ -56,11 +56,23 @@ class GradeController extends Controller
                 ->get();
         }
 
+        $allSubjectsData = $subjects->map(function (Subject $s) use ($period, $currentYear, $currentTrimester) {
+            return [
+                'subject' => $s,
+                'students' => $s->studentsForPeriod($period)->get(),
+                'grades' => Grade::where('subject_id', $s->id)
+                    ->where('year', $currentYear)
+                    ->where('trimester', $currentTrimester)
+                    ->get(),
+            ];
+        });
+
         return view('grades.show', compact(
             'subjects',
             'subject',
             'students',
             'grades',
+            'allSubjectsData',
             'evaluationTypes',
             'currentYear',
             'currentTrimester',

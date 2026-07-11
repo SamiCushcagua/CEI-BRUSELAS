@@ -145,7 +145,7 @@
                         <th>Examen 2</th>
                         <th>Participación</th>
                         <th>Biblia</th>
-                        <th>Texto</th>
+                        <th>Versiculos</th>
                         <th>Otro</th>
                         <th>Promedio</th>
                         <th>Aprobó trim.</th>

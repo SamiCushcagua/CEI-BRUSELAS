@@ -99,109 +99,26 @@
         </div>
     </div>
 
-    @if($subject)
-    <div class="grades-show-toolbar">
-        @if($students->count() > 0)
+  
+
+    @if($subject && $students->count() > 0)
+    <div class="grades-show-toolbar" id="grades-edit-toolbar">
         <button type="button" class="btn btn-primary" id="btn-grade-edit-open">Modificar resultados</button>
         <button type="button" class="btn btn-secondary" id="btn-grade-edit-cancel" hidden>Cancelar</button>
         <button type="button" class="btn btn-success" id="btn-grade-save-all" hidden>Guardar cambios</button>
-        @endif
     </div>
+    @endif
 
+    <div id="grades-single-subject-panel">
+    @if($subject)
     <div id="grades-summary-panel">
-    <div class="grades-table-container">
-        <div class="grades-table-header">
-            <h3>📊 Resumen de Estudiantes - {{ $subject->name }}</h3>
-            <div class="grades-table-actions">
-                <span class="subject-info">{{ $subject->name }} - {{ $currentYear }} - Trimestre {{ $currentTrimester }}</span>
-            </div>
-        </div>
-        <div class="grades-table-wrapper" style="overflow-x: auto;">
-            <table class="grades-table">
-                <thead>
-                    <tr>
-                        <th class="sticky-col">Estudiante</th>
-                        <th>Tareas</th>
-                        <th>Examen 1</th>
-                        <th>Examen 2</th>
-                        <th>Participación</th>
-                        <th>Biblia</th>
-                        <th>Texto</th>
-                        <th>Otro</th>
-                        <th>Promedio</th>
-                        <th>Aprobó (trim.)</th>
-                        <th>Diploma</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($students as $student)
-                        @php
-                            $studentGrade = $grades->where('student_id', $student->id)->first();
-                            $diplomaOk = (bool) ($student->pivot->diploma_delivered ?? false);
-                        @endphp
-                        <tr>
-                            <td class="sticky-col">
-                                <div class="student-info">
-                                    <div class="student-avatar">
-                                        {{ substr($student->name, 0, 1) }}
-                                    </div>
-                                    <div class="student-details">
-                                        <h4>{{ $student->name }}</h4>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="grade-display {{ $studentGrade && $studentGrade->task_score ? 'has-grade' : 'no-grade' }}">
-                                    {{ $studentGrade && $studentGrade->task_score ? number_format($studentGrade->task_score, 2) : '-' }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="grade-display {{ $studentGrade && $studentGrade->exam_score1 ? 'has-grade' : 'no-grade' }}">
-                                    {{ $studentGrade && $studentGrade->exam_score1 ? number_format($studentGrade->exam_score1, 2) : '-' }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="grade-display {{ $studentGrade && $studentGrade->exam_score2 ? 'has-grade' : 'no-grade' }}">
-                                    {{ $studentGrade && $studentGrade->exam_score2 ? number_format($studentGrade->exam_score2, 2) : '-' }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="grade-display {{ $studentGrade && $studentGrade->participation_score ? 'has-grade' : 'no-grade' }}">
-                                    {{ $studentGrade && $studentGrade->participation_score ? number_format($studentGrade->participation_score, 2) : '-' }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="grade-display {{ $studentGrade && $studentGrade->bible_score ? 'has-grade' : 'no-grade' }}">
-                                    {{ $studentGrade && $studentGrade->bible_score ? number_format($studentGrade->bible_score, 2) : '-' }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="grade-display {{ $studentGrade && $studentGrade->text_score ? 'has-grade' : 'no-grade' }}">
-                                    {{ $studentGrade && $studentGrade->text_score ? number_format($studentGrade->text_score, 2) : '-' }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="grade-display {{ $studentGrade && $studentGrade->other_score ? 'has-grade' : 'no-grade' }}">
-                                    {{ $studentGrade && $studentGrade->other_score ? number_format($studentGrade->other_score, 2) : '-' }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="average-score">
-                                    {{ $studentGrade ? number_format($studentGrade->average_score, 2) : '0.00' }}
-                                </span>
-                            </td>
-                            <td>{{ $studentGrade && $studentGrade->passed ? 'Sí' : 'No' }}</td>
-                            <td>{{ $diplomaOk ? 'Sí' : 'No' }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="11" class="text-center">No hay estudiantes inscritos en esta materia.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
+        @include('grades.partials.summary-table', [
+            'subject' => $subject,
+            'students' => $students,
+            'grades' => $grades,
+            'currentYear' => $currentYear,
+            'currentTrimester' => $currentTrimester,
+        ])
     </div>
 
     <div id="grades-edit-panel" hidden>
@@ -222,7 +139,7 @@
                         <th>Examen 2</th>
                         <th>Participación</th>
                         <th>Biblia</th>
-                        <th>Texto</th>
+                        <th>Versiculos</th>
                         <th>Otro</th>
                         <th>Promedio</th>
                         <th>Aprobó trim.</th>
@@ -352,10 +269,48 @@
         id="grade-data">
     </div>
     @elseif($subjects->count() > 1)
-    <div class="empty-state">
+    <div class="empty-state" id="grades-select-subject-empty">
         <div class="empty-icon">📋</div>
         <h3 class="empty-title">Selecciona una materia</h3>
         <p class="empty-description">Elige la materia en el desplegable de arriba para ver y modificar las calificaciones.</p>
+    </div>
+    @endif
+    </div>
+
+    @if($subjects->count() > 1)
+    <div class="grades-show-toolbar grades-all-toggle-toolbar">
+        <button type="button" class="btn btn-secondary" id="btn-grades-view-all">
+            📚 Ver todas las materias
+        </button>
+        <button type="button" class="btn btn-secondary" id="btn-grades-view-single" hidden>
+            📋 Volver a una materia
+        </button>
+    </div>
+    @endif
+
+    @if($subjects->count() > 1)
+    <div id="grades-all-subjects-panel" hidden>
+        <div class="grades-all-subjects-header">
+            <h2 class="form-title">Todas las materias — solo consulta</h2>
+            <p class="grades-subtitle" style="margin: 0.35rem 0 0;">
+                Resultados del trimestre {{ $currentTrimester }} · {{ $currentYear }}.
+            </p>
+        </div>
+        @foreach($allSubjectsData as $subjectData)
+        <section class="grades-all-subject-block">
+            <div class="grades-all-subject-heading">
+                <h3>{{ $subjectData['subject']->name }}</h3>
+                <span class="grades-all-subject-meta">{{ $subjectData['students']->count() }} estudiante(s)</span>
+            </div>
+            @include('grades.partials.summary-table', [
+                'subject' => $subjectData['subject'],
+                'students' => $subjectData['students'],
+                'grades' => $subjectData['grades'],
+                'currentYear' => $currentYear,
+                'currentTrimester' => $currentTrimester,
+            ])
+        </section>
+        @endforeach
     </div>
     @endif
     @endif

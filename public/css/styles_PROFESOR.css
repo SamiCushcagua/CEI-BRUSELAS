@@ -875,8 +875,47 @@
 
 #grades-edit-panel[hidden],
 #attendance-edit-panel[hidden],
-#quarter-summary-panel[hidden] {
+#quarter-summary-panel[hidden],
+#grades-all-subjects-panel[hidden],
+#grades-single-subject-panel[hidden] {
     display: none !important;
+}
+
+.grades-all-toggle-toolbar {
+    margin-top: 0;
+}
+
+.grades-all-subjects-header {
+    margin-bottom: 1.25rem;
+}
+
+.grades-all-subject-block {
+    margin-bottom: 2rem;
+}
+
+.grades-all-subject-block:last-child {
+    margin-bottom: 0;
+}
+
+.grades-all-subject-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+.grades-all-subject-heading h3 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.grades-all-subject-meta {
+    font-size: 0.9rem;
+    opacity: 0.85;
 }
 
 /* Resumen de asistencia por celda: asistencia y versículo en columna (menos ancho horizontal) */
