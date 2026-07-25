@@ -28,20 +28,31 @@
 
     <!-- Formulario para agregar estudiante -->
     <div class="add-student-section">
-        <h3><i class="fas fa-user-plus"></i> Agregar Estudiante</h3>
+        <h3><i class="fas fa-user-plus"></i> Agregar Estudiante test</h3>
         
         @if($availableStudents->count() > 0)
             <form action="{{ route('subjects.enroll-student', $subject) }}" method="POST">
                 @csrf
-                <div class="form-group">
-                    <label for="student_id">Seleccionar Estudiante:</label>
-                    <select name="student_id" id="student_id" class="form-control" required>
-                        <option value="">Seleccionar estudiante...</option>
-                        @foreach($availableStudents as $student)
-                            <option value="{{ $student->id }}">{{ $student->name }} ({{ $student->email }})</option>
-                        @endforeach
-                    </select>
+                <div class="student-filter-row">
+                    <div class="form-group">
+                        <label for="student_search">Buscar:</label>
+                        <input type="text"
+                               id="student_search"
+                               class="form-control"
+                               placeholder="Nombre o email..."
+                               autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="student_id">Seleccionar Estudiante:</label>
+                        <select name="student_id" id="student_id" class="form-control" required>
+                            <option value="">Seleccionar estudiante...</option>
+                            @foreach($availableStudents as $student)
+                                <option value="{{ $student->id }}">{{ $student->name }} ({{ $student->email }})</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
+                <small id="student_search_hint" class="search-hint"></small>
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Inscribir Estudiante
                 </button>
@@ -156,6 +167,31 @@
 
 .form-group {
     margin-bottom: 1.5rem;
+}
+
+.student-filter-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 0.5rem;
+}
+
+.student-filter-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.student-filter-row .form-group:first-child {
+    flex: 0 0 40%;
+    max-width: 280px;
+}
+
+.search-hint {
+    display: block;
+    margin-bottom: 1rem;
+    color: #6c757d;
+    font-size: 0.85rem;
+    min-height: 1.2em;
 }
 
 .form-control {
@@ -337,6 +373,16 @@
 }
 
 @media (max-width: 768px) {
+    .student-filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .student-filter-row .form-group:first-child {
+        flex: 1;
+        max-width: none;
+    }
+
     .students-grid {
         grid-template-columns: 1fr;
     }
@@ -353,4 +399,48 @@
     }
 }
 </style>
+
+@if($availableStudents->count() > 0)
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var searchInput = document.getElementById('student_search');
+    var select = document.getElementById('student_id');
+    var hint = document.getElementById('student_search_hint');
+    var options = Array.prototype.slice.call(select.querySelectorAll('option')).filter(function (option) {
+        return option.value !== '';
+    });
+
+    searchInput.addEventListener('input', function () {
+        var query = searchInput.value.trim().toLowerCase();
+        var visibleCount = 0;
+        var selectedStillVisible = false;
+
+        options.forEach(function (option) {
+            var matches = query === '' || option.textContent.toLowerCase().indexOf(query) !== -1;
+            option.hidden = !matches;
+            option.disabled = !matches;
+
+            if (matches) {
+                visibleCount++;
+                if (option.selected) {
+                    selectedStillVisible = true;
+                }
+            }
+        });
+
+        if (!selectedStillVisible) {
+            select.value = '';
+        }
+
+        if (query === '') {
+            hint.textContent = '';
+        } else if (visibleCount === 0) {
+            hint.textContent = 'No se encontraron estudiantes.';
+        } else {
+            hint.textContent = visibleCount + (visibleCount === 1 ? ' coincidencia' : ' coincidencias');
+        }
+    });
+});
+</script>
+@endif
 @endsection
