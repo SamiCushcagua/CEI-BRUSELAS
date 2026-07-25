@@ -93,8 +93,8 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">Primer Profesor</label>
-                                    <select name="professor1" class="form-control form-control-sm" required>
-                                        <option value="">Seleccionar...</option>
+                                    <select name="professor1" class="form-control form-control-sm">
+                                        <option value="">Sin profesor</option>
                                         @foreach(App\Models\User::where('is_profesor', true)->get() as $professor)
                                             <option value="{{ $professor->id }}" 
                                                     {{ ($professor1SelectedId !== null && $professor->id == $professor1SelectedId) ? 'selected' : '' }}>
@@ -106,7 +106,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Segundo Profesor</label>
                                     <select name="professor2" class="form-control form-control-sm">
-                                        <option value="">Seleccionar...</option>
+                                        <option value="">Sin profesor</option>
                                         @foreach(App\Models\User::where('is_profesor', true)->get() as $professor)
                                             <option value="{{ $professor->id }}" 
                                                     {{ ($professor2SelectedId !== null && $professor->id == $professor2SelectedId) ? 'selected' : '' }}>

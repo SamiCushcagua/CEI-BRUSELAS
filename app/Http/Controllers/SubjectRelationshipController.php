@@ -16,48 +16,51 @@ class SubjectRelationshipController extends Controller
     public function assignProfessor(Request $request, Subject $subject)
     {
         $request->validate([
-            'professor1' => 'required|exists:users,id',
-            'professor2' => 'nullable|exists:users,id'
+            'professor1' => 'nullable|exists:users,id',
+            'professor2' => 'nullable|exists:users,id',
         ]);
 
         $period = Period::active()->firstOrFail();
 
         // Reemplazo por periodo: eliminar cualquier asignación previa para este subject+period
         // para que el cambio de maestro se refleje correctamente y no se acumulen filas.
+        // Si ambos selects van vacíos, la materia queda sin profesores en el periodo activo.
         DB::table('subject_professor')
             ->where('subject_id', $subject->id)
             ->where('period_id', $period->id)
             ->delete();
 
-        // Asignar primer profesor
-        $professor1 = User::findOrFail($request->professor1);
-        
-        if (!$professor1->is_profesor) {
-            return back()->with('error', 'El primer usuario seleccionado no es un profesor.');
+        $professor1Id = $request->filled('professor1') ? (int) $request->professor1 : null;
+        $professor2Id = $request->filled('professor2') ? (int) $request->professor2 : null;
+
+        if ($professor1Id) {
+            $professor1 = User::findOrFail($professor1Id);
+
+            if (!$professor1->is_profesor) {
+                return back()->with('error', 'El primer usuario seleccionado no es un profesor.');
+            }
+
+            DB::table('subject_professor')->updateOrInsert(
+                [
+                    'subject_id'   => $subject->id,
+                    'professor_id' => $professor1->id,
+                    'period_id'    => $period->id,
+                ],
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
-        DB::table('subject_professor')->updateOrInsert(
-            [
-                'subject_id'   => $subject->id,
-                'professor_id' => $professor1->id,
-                'period_id'    => $period->id,
-            ],
-            [
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        );
+        if ($professor2Id) {
+            $professor2 = User::findOrFail($professor2Id);
 
-        // Asignar segundo profesor si se proporciona
-        if ($request->professor2) {
-            $professor2 = User::findOrFail($request->professor2);
-            
             if (!$professor2->is_profesor) {
                 return back()->with('error', 'El segundo usuario seleccionado no es un profesor.');
             }
 
-            // Evitar asignar el mismo profesor como profesor1 y profesor2
-            if ($professor2->id === $professor1->id) {
+            if ($professor1Id && $professor2->id === $professor1Id) {
                 return back()->with('error', 'El segundo profesor no puede ser el mismo que el primero.');
             }
 
@@ -74,9 +77,12 @@ class SubjectRelationshipController extends Controller
             );
         }
 
-        app(CoursePlanService::class)->findOrCreateForSubjectPeriod($subject, $period);
+        if ($professor1Id || $professor2Id) {
+            app(CoursePlanService::class)->findOrCreateForSubjectPeriod($subject, $period);
+            return back()->with('success', 'Profesores asignados exitosamente.');
+        }
 
-        return back()->with('success', 'Profesores asignados exitosamente.');
+        return back()->with('success', 'Profesores desasignados exitosamente.');
     }
     // Remover profesor de una materia (solo del periodo activo)
     public function removeProfessor(Subject $subject, User $professor)
