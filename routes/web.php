@@ -152,6 +152,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Student Routes
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+    Route::post('/students/{student}/assign-subject', [StudentController::class, 'assignToSubject'])->name('students.assign-subject');
     Route::get('/students/{student}/subjects', [SubjectRelationshipController::class, 'getStudentSubjects'])->name('students.subjects');
     Route::get('/students/{student}/professors', [SubjectRelationshipController::class, 'getStudentProfessors'])->name('students.professors');
 

@@ -28,7 +28,7 @@
 
     <!-- Formulario para agregar estudiante -->
     <div class="add-student-section">
-        <h3><i class="fas fa-user-plus"></i> Agregar Estudiante test</h3>
+        <h3><i class="fas fa-user-plus"></i> Agregar Estudiante</h3>
         
         @if($availableStudents->count() > 0)
             <form action="{{ route('subjects.enroll-student', $subject) }}" method="POST">
