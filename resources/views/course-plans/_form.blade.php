@@ -53,6 +53,8 @@
     .course-plan-input,
     .course-plan-textarea {
         width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         border: 1px solid #ced4da;
         border-radius: 6px;
         padding: 0.5rem 0.65rem;
@@ -64,14 +66,16 @@
         resize: vertical;
     }
 
-    .course-plan-list-item {
-        margin-bottom: 0.5rem;
+    .course-plan-table-scroll {
+        overflow-x: auto;
+        max-width: 100%;
     }
 
     .course-plan-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.9rem;
+        table-layout: fixed;
     }
 
     .course-plan-table th,
@@ -79,11 +83,123 @@
         border: 1px solid #dee2e6;
         padding: 0.55rem;
         vertical-align: top;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .course-plan-lessons-table .col-class {
+        width: 4.5rem;
+    }
+
+    .course-plan-lessons-table .col-date {
+        width: 6.5rem;
+    }
+
+    .course-plan-lessons-table .col-topic {
+        width: 32%;
+    }
+
+    .course-plan-lessons-table .col-assignment {
+        width: auto;
+    }
+
+    .course-plan-lessons-table td input,
+    .course-plan-lessons-table td textarea {
+        display: block;
+        margin: 0;
+    }
+
+    @media (max-width: 768px) {
+        .course-plan-table-scroll {
+            overflow-x: visible;
+        }
+
+        .course-plan-lessons-table,
+        .course-plan-lessons-table tbody {
+            display: block;
+            width: 100%;
+        }
+
+        .course-plan-lessons-table thead {
+            display: none;
+        }
+
+        .course-plan-lessons-table tr {
+            display: block;
+            margin-bottom: 1rem;
+            padding: 0.85rem;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            background: #f8f9fa;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .course-plan-lessons-table tr:last-child {
+            margin-bottom: 0;
+        }
+
+        .course-plan-lessons-table td {
+            display: block;
+            width: 100% !important;
+            border: none;
+            padding: 0;
+        }
+
+        .course-plan-lessons-table td.col-class,
+        .course-plan-lessons-table td.col-date {
+            display: inline-block;
+            width: auto !important;
+            margin-right: 1rem;
+            margin-bottom: 0.65rem;
+            font-size: 0.85rem;
+            color: #495057;
+        }
+
+        .course-plan-lessons-table td.col-class::before,
+        .course-plan-lessons-table td.col-date::before {
+            content: attr(data-label) ": ";
+            font-weight: 600;
+            color: #6c757d;
+        }
+
+        .course-plan-lessons-table td.col-topic,
+        .course-plan-lessons-table td.col-assignment {
+            margin-bottom: 0.75rem;
+        }
+
+        .course-plan-lessons-table td.col-assignment {
+            margin-bottom: 0;
+        }
+
+        .course-plan-lessons-table td.col-topic::before,
+        .course-plan-lessons-table td.col-assignment::before {
+            content: attr(data-label);
+            display: block;
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #374151;
+            margin-bottom: 0.35rem;
+        }
+
+        .course-plan-lessons-table .course-plan-input {
+            font-size: 1rem;
+            padding: 0.6rem 0.75rem;
+        }
+
+        .course-plan-lessons-table .course-plan-textarea {
+            min-height: 100px;
+            font-size: 1rem;
+            padding: 0.6rem 0.75rem;
+        }
     }
 
     .course-plan-table th {
         background: #f1f3f5;
         text-align: left;
+    }
+
+    .course-plan-list-item {
+        margin-bottom: 0.5rem;
     }
 
     .course-plan-readonly {
@@ -128,7 +244,7 @@
 
 <div class="course-plan-meta">
     <div class="course-plan-meta-item">
-        <strong>Clase / Título</strong>
+        <strong>Clase test / Título</strong>
         <span>{{ $auto['title'] }}</span>
     </div>
     <div class="course-plan-meta-item">
@@ -150,6 +266,11 @@
     @csrf
     @method('PUT')
     <input type="hidden" name="period_id" value="{{ $period->id }}">
+    <div class="course-plan-actions">
+        <button type="submit" name="status" value="published" class="btn btn-primary">
+            Publicar plan
+        </button>
+    </div>
 @endif
 
 <section class="course-plan-section">
@@ -194,8 +315,8 @@
 
 <section class="course-plan-section">
     <h2>III. Requisitos de la materia</h2>
-    @php $requirements = $padList(old('requirements', $plan->requirements), 4); @endphp
-    @for($i = 0; $i < 4; $i++)
+    @php $requirements = $padList(old('requirements', $plan->requirements), 8); @endphp
+    @for($i = 0; $i < 8; $i++)
         <div class="course-plan-list-item">
             @if($editable ?? false)
                 <input type="text" name="requirements[]" class="course-plan-input"
@@ -233,42 +354,35 @@
 
 <section class="course-plan-section">
     <h2>V. Parcelación de la materia</h2>
-    <div style="overflow-x: auto;">
-        <table class="course-plan-table">
+    <div class="course-plan-table-scroll">
+        <table class="course-plan-table course-plan-lessons-table">
             <thead>
                 <tr>
-                    <th>Clase</th>
-                    <th>Fecha</th>
-                    <th>Tema</th>
-                    <th>Asignaciones</th>
-                    @if($editable ?? false)
-                        <th>Tarea</th>
-                    @endif
+                    <th class="col-class">Clase</th>
+                    <th class="col-date">Fecha</th>
+                    <th class="col-topic">Tema</th>
+                    <th class="col-assignment">Asignaciones</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($plan->lessons as $index => $lesson)
                     <tr>
-                        <td>{{ $lesson->class_number }}</td>
-                        <td>{{ $lesson->class_date->format('d/m/Y') }}</td>
+                        <td class="col-class" data-label="Clase">{{ $lesson->class_number }}</td>
+                        <td class="col-date" data-label="Fecha">{{ $lesson->class_date->format('d/m/Y') }}</td>
                         @if($editable ?? false)
-                            <td>
+                            <td class="col-topic" data-label="Tema">
                                 <input type="hidden" name="lessons[{{ $index }}][id]" value="{{ $lesson->id }}">
                                 <input type="text" name="lessons[{{ $index }}][topic]" class="course-plan-input"
                                     value="{{ old('lessons.'.$index.'.topic', $lesson->topic) }}"
                                     placeholder="Tema de la clase">
                             </td>
-                            <td>
+                            <td class="col-assignment" data-label="Asignaciones">
                                 <textarea name="lessons[{{ $index }}][assignment]" class="course-plan-textarea"
-                                    placeholder="Asignación">{{ old('lessons.'.$index.'.assignment', $lesson->assignment) }}</textarea>
-                            </td>
-                            <td style="text-align: center;">
-                                <input type="checkbox" name="lessons[{{ $index }}][has_homework]" value="1"
-                                    @checked(old('lessons.'.$index.'.has_homework', $lesson->has_homework))>
+                                    placeholder="Versiculos, llenar carpeta, traer biblia, ...">{{ old('lessons.'.$index.'.assignment', $lesson->assignment) }}</textarea>
                             </td>
                         @else
-                            <td>{{ $lesson->topic ?: '—' }}</td>
-                            <td>{{ $lesson->assignment ?: '—' }}</td>
+                            <td class="col-topic" data-label="Tema">{{ $lesson->topic ?: '—' }}</td>
+                            <td class="col-assignment" data-label="Asignaciones">{{ $lesson->assignment ?: '—' }}</td>
                         @endif
                     </tr>
                 @endforeach
@@ -277,15 +391,12 @@
     </div>
 </section>
 
+{{--
 <section class="course-plan-section">
     <h2>Datos complementarios</h2>
-    @if($editable ?? false)
-        <textarea name="complementary_data" class="course-plan-textarea"
-            placeholder="Teléfono, e-mail del maestro, etc.">{{ old('complementary_data', $plan->complementary_data) }}</textarea>
-    @else
-        <p class="course-plan-readonly">{!! nl2br(e($plan->complementary_data ?: '—')) !!}</p>
-    @endif
+    ...
 </section>
+--}}
 
 <section class="course-plan-section">
     <h2>Descripción de las tareas</h2>
@@ -320,8 +431,8 @@
 
 <section class="course-plan-section">
     <h2>VI. Bibliografía</h2>
-    @php $bibliography = $padList(old('bibliography', $plan->bibliography), 8); @endphp
-    @for($i = 0; $i < 8; $i++)
+    @php $bibliography = $padList(old('bibliography', $plan->bibliography), 3); @endphp
+    @for($i = 0; $i < 3; $i++)
         <div class="course-plan-list-item">
             @if($editable ?? false)
                 <textarea name="bibliography[]" class="course-plan-textarea"
@@ -334,13 +445,5 @@
 </section>
 
 @if($editable ?? false)
-    <div class="course-plan-actions">
-        <button type="submit" name="status" value="draft" class="btn btn-secondary">
-            Guardar borrador
-        </button>
-        <button type="submit" name="status" value="published" class="btn btn-primary">
-            Publicar plan
-        </button>
-    </div>
 </form>
 @endif

@@ -127,7 +127,7 @@ class CoursePlanService
             'Examen 2' => '100%',
             'Participación' => '100%',
             'Biblia' => '100%',
-            'Texto' => '100%',
+            'Versículos' => '100%',
             'Otro' => '100%',
         ];
     }

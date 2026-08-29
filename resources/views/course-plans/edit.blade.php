@@ -58,10 +58,10 @@
 
     @include('course-plans._form', ['editable' => $editable])
 
-    <div class="course-plan-actions">
+    <!-- <div class="course-plan-actions">
         <a href="{{ route('course-plans.show', $subject) }}" class="btn btn-secondary">
             Vista previa (como lo ven los alumnos)
         </a>
-    </div>
+    </div> -->
 </div>
 @endsection

@@ -70,7 +70,7 @@ class CoursePlanController extends Controller
             'general_notes' => 'nullable|array|max:10',
             'general_notes.*' => 'nullable|string|max:1000',
             'complementary_data' => 'nullable|string|max:5000',
-            'bibliography' => 'nullable|array|max:10',
+            'bibliography' => 'nullable|array|max:3',
             'bibliography.*' => 'nullable|string|max:1000',
             'status' => 'required|in:draft,published',
             'lessons' => 'nullable|array',
@@ -111,9 +111,16 @@ class CoursePlanController extends Controller
             ? 'Plan de curso publicado correctamente.'
             : 'Plan de curso guardado como borrador.';
 
-        return redirect()
-            ->route('course-plans.edit', $subject)
-            ->with('success', $message);
+        $redirectRoute = $validated['status'] === CoursePlan::STATUS_PUBLISHED
+            ? 'course-plans.show'
+            : 'course-plans.edit';
+
+        return redirect()->route($redirectRoute, array_filter([
+            'subject' => $subject,
+            'period_id' => ($user->is_admin && $request->filled('period_id'))
+                ? $request->integer('period_id')
+                : null,
+        ]))->with('success', $message);
     }
 
     public function show(Request $request, Subject $subject): View|RedirectResponse

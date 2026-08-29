@@ -38,7 +38,13 @@
     <p style="margin-bottom: 1rem; color: #555;">
         <strong>Periodo vigente:</strong> {{ $period->name }}
     </p>
-
+    @if($canEdit ?? false)
+        <div class="course-plan-actions">
+            <a href="{{ route('course-plans.edit', $subject) }}" class="btn btn-primary">
+                Editar plan de curso
+            </a>
+        </div>
+    @endif
     @if($period->is_locked && ! auth()->user()->is_admin)
         <div class="alert alert-error" style="background: #fff3cd; border-color: #ffc107; color: #856404;">
             Este periodo está bloqueado. Solo puedes consultar el plan (no editarlo).
