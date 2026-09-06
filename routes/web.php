@@ -26,6 +26,7 @@ use App\Http\Controllers\AdminSubjectEnrollmentOutcomeController;
 use App\Http\Controllers\StudentGradesController;
 use App\Http\Controllers\AdminGraduatesOverviewController;
 use App\Http\Controllers\AdminCoursePlanOverviewController;
+use App\Http\Controllers\AdminPeriodHistoryController;
 use App\Http\Controllers\HelpVideoController;
 use App\Http\Controllers\CoursePlanController;
 use App\Models\Period;
@@ -182,6 +183,9 @@ Route::get('/admin/graduates-overview', [AdminGraduatesOverviewController::class
     ->name('admin.graduates-overview');
 Route::post('/admin/graduates-overview/pass', [AdminGraduatesOverviewController::class, 'updatePass'])
     ->name('admin.graduates-overview.update-pass');
+
+Route::get('/admin/period-history', [AdminPeriodHistoryController::class, 'index'])
+    ->name('admin.period-history');
 
 // Calificaciones
 Route::get('/calificaciones', [CalificacionesController::class, 'index'])

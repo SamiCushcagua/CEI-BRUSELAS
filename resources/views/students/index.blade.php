@@ -32,19 +32,30 @@
             Los ya asignados quedan listados abajo; puedes cambiar la materia o volver a “No asignado”.
         </p>
 
-        @if($filterSubjects->isNotEmpty())
-            <form method="get" action="{{ route('students.index') }}" class="students-filter-form" style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;">
-                <label for="subject_id" style="font-weight: 500;">Filtrar por materia (periodo anterior):</label>
-                <select name="subject_id" id="subject_id" onchange="this.form.submit()" style="min-width: 220px; padding: 0.35rem 0.5rem;">
-                    <option value="">Todas</option>
-                    @foreach($filterSubjects as $subject)
-                        <option value="{{ $subject->id }}" @selected((string) $filterSubjectId === (string) $subject->id)>
-                            {{ $subject->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </form>
-        @endif
+        <div class="students-filters-bar" style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.25rem;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;">
+                <label for="student_name_filter" style="font-weight: 500;">Buscar alumno:</label>
+                <input type="search"
+                       id="student_name_filter"
+                       placeholder="Nombre o email..."
+                       autocomplete="off"
+                       style="min-width: 220px; padding: 0.35rem 0.5rem; border: 1px solid #d1d5db; border-radius: 6px;">
+                <span id="student_name_filter_hint" style="font-size: 0.85rem; color: #6b7280;"></span>
+            </div>
+            @if($filterSubjects->isNotEmpty())
+                <form method="get" action="{{ route('students.index') }}" class="students-filter-form" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;">
+                    <label for="subject_id" style="font-weight: 500;">Filtrar por materia (periodo anterior):</label>
+                    <select name="subject_id" id="subject_id" onchange="this.form.submit()" style="min-width: 220px; padding: 0.35rem 0.5rem;">
+                        <option value="">Todas</option>
+                        @foreach($filterSubjects as $subject)
+                            <option value="{{ $subject->id }}" @selected((string) $filterSubjectId === (string) $subject->id)>
+                                {{ $subject->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            @endif
+        </div>
     @else
         <div class="alert alert-success" style="background: #fef3c7; border-color: #fcd34d; color: #92400e;">
             No hay ningún periodo marcado como <strong>activo</strong>. Activa un periodo en la administración para ver la lista de pendientes.
@@ -255,6 +266,44 @@ document.addEventListener('DOMContentLoaded', function () {
             btn.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
     });
+
+    var nameInput = document.getElementById('student_name_filter');
+    var hint = document.getElementById('student_name_filter_hint');
+    if (!nameInput) return;
+
+    function applyNameFilter() {
+        var q = (nameInput.value || '').trim().toLowerCase();
+        var rows = document.querySelectorAll('.pending-student-row');
+        var visible = 0;
+
+        rows.forEach(function (row) {
+            var hay = row.getAttribute('data-student-search') || '';
+            var show = !q || hay.indexOf(q) !== -1;
+            row.style.display = show ? '' : 'none';
+
+            var historyId = row.querySelector('[data-toggle-history]');
+            if (historyId) {
+                var detail = document.getElementById(historyId.getAttribute('data-toggle-history'));
+                if (detail) {
+                    if (!show) {
+                        detail.style.display = 'none';
+                    } else {
+                        detail.style.display = '';
+                    }
+                }
+            }
+
+            if (show) visible++;
+        });
+
+        if (hint) {
+            hint.textContent = q
+                ? (visible + ' coincidencia' + (visible === 1 ? '' : 's'))
+                : '';
+        }
+    }
+
+    nameInput.addEventListener('input', applyNameFilter);
 });
 </script>
 @endsection

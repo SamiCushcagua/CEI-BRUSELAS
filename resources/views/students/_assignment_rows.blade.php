@@ -4,7 +4,9 @@
     $historyId = $historyPrefix.'-history-'.$student->id;
     $selectedSubjectId = $row->assignedSubjectId ?? null;
 @endphp
-<tr class="pending-student-row" data-student-id="{{ $student->id }}">
+<tr class="pending-student-row"
+    data-student-id="{{ $student->id }}"
+    data-student-search="{{ strtolower($student->name.' '.$student->email) }}">
     <td>
         <button type="button"
             class="pending-student-toggle"
