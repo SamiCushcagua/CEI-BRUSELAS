@@ -14,7 +14,7 @@
         <div>
             @if($isStudentView ?? false)
             <h1 class="grades-title">Mi asistencia</h1>
-            <p class="grades-subtitle">Consulta tu registro de asistencia por materia (solo lectura)</p>
+            <p class="grades-subtitle">Solo el periodo vigente (solo lectura)</p>
             @else
             <h1 class="grades-title">Control de Asistencia</h1>
             <p class="grades-subtitle">Registra la asistencia semanal de tus estudiantes</p>
@@ -22,6 +22,9 @@
             @isset($period)
             <p class="grades-subtitle" style="margin-top: 0.35rem; opacity: 0.95;">
                 📅 <strong>Periodo vigente:</strong> {{ $period->name }} — {{ $period->year }} · Trimestre {{ $period->trimester }}
+                @if($isStudentView ?? false)
+                    <span class="status-badge status-approved" style="margin-left: 0.35rem;">Actual</span>
+                @endif
             </p>
             @endisset
         </div>
@@ -40,16 +43,24 @@
     @endif
 
     @if($isStudentView ?? false)
+    <div class="page-main-btn-wrapper" style="margin-bottom: 1rem;">
+        <a href="{{ route('students.subjects', auth()->user()) }}" class="btn btn-secondary">📚 Mi curso / historial</a>
+    </div>
+    <p class="grades-subtitle" style="margin: 0 0 1rem;">
+        Aquí solo ves la asistencia del trimestre actual.
+        Para periodos anteriores: <a href="{{ route('students.subjects', auth()->user()) }}">Mi curso → Historial → Ver detalle</a>.
+    </p>
     @if($subjects->isEmpty())
     <div class="empty-state">
         <div class="empty-icon">📚</div>
         <h3 class="empty-title">Sin materias en este periodo</h3>
-        <p class="empty-description">No estás inscrito en ninguna materia para el periodo activo.</p>
+        <p class="empty-description">No estás inscrito en ninguna materia para el periodo vigente.</p>
     </div>
     @else
+    @if($subjects->count() > 1)
     <div class="form-container">
         <div class="form-header">
-            <h2 class="form-title">Elegir materia</h2>
+            <h2 class="form-title">Elegir materia (periodo actual)</h2>
         </div>
         <div class="form-content">
             <form method="GET" action="{{ route('attendance.index') }}" class="form-grid">
@@ -58,7 +69,7 @@
                     <select name="subject_id" class="form-select" required onchange="this.form.submit()">
                         <option value="">Seleccionar materia...</option>
                         @foreach($subjects as $subject)
-                        <option value="{{ $subject->id }}" {{ (string) request('subject_id') === (string) $subject->id ? 'selected' : '' }}>
+                        <option value="{{ $subject->id }}" {{ $selectedSubject && (string) $selectedSubject->id === (string) $subject->id ? 'selected' : '' }}>
                             {{ $subject->name }}
                         </option>
                         @endforeach
@@ -66,16 +77,21 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary">📋 Ver tabla de fechas</button>
+                    <button type="submit" class="btn btn-primary">📋 Ver asistencia</button>
                 </div>
             </form>
         </div>
     </div>
+    @elseif($selectedSubject)
+    <p class="grades-subtitle" style="margin: 0 0 1rem;">
+        Materia actual: <strong>{{ $selectedSubject->name }}</strong>
+    </p>
+    @endif
 
     @if($selectedSubject && count($sundays) > 0)
     <div class="grades-table-container">
         <div class="grades-table-header">
-            <h3 class="grades-table-title">{{ $selectedSubject->name }} — todas las clases (domingos) del periodo</h3>
+            <h3 class="grades-table-title">{{ $selectedSubject->name }} — clases del periodo vigente</h3>
         </div>
         <div class="grades-table-wrapper attendance-overview-wrapper" style="overflow-x: auto;">
             <table class="grades-table attendance-overview-table">

@@ -5,16 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Grade;
 use App\Models\Period;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 class StudentGradesController extends Controller
 {
     /**
-     * Solo estudiantes: calificaciones del usuario autenticado (solo lectura).
+     * Solo estudiantes: calificaciones del periodo vigente (solo lectura).
      */
-    public function index(Request $request)
+    public function index()
     {
         $user = User::query()->findOrFail(Auth::id());
 
@@ -22,25 +21,14 @@ class StudentGradesController extends Controller
             abort(403, 'Solo los estudiantes pueden ver esta página.');
         }
 
-        $periods = Period::orderBy('year')->orderBy('trimester')->get();
-        $activePeriod = Period::active()->first();
+        $period = Period::currentAcademic() ?? Period::active()->first();
 
-        $period = null;
-        if ($request->filled('period_id')) {
-            $period = Period::findOrFail($request->get('period_id'));
-        } else {
-            $period = Period::active()->first()
-                ?? Period::orderByDesc('year')->orderByDesc('trimester')->first();
-
-            if (! $period) {
-                return view('student.my-grades', [
-                    'period' => null,
-                    'periods' => $periods,
-                    'activePeriod' => $activePeriod,
-                    'rows' => collect(),
-                    'noPeriodConfigured' => true,
-                ]);
-            }
+        if (! $period) {
+            return view('student.my-grades', [
+                'period' => null,
+                'rows' => collect(),
+                'noPeriodConfigured' => true,
+            ]);
         }
 
         $subjectsQuery = $user->subjectsAsStudent();
@@ -68,7 +56,6 @@ class StudentGradesController extends Controller
                 ->where('trimester', (int) $period->trimester)
                 ->whereIn('subject_id', $subjectIds)
                 ->get()
-                // Claves enteras: keyBy('subject_id') suele dejar string y get($subject->id) falla.
                 ->keyBy(fn (Grade $g) => (int) $g->subject_id);
         }
 
@@ -88,8 +75,6 @@ class StudentGradesController extends Controller
 
         return view('student.my-grades', [
             'period' => $period,
-            'periods' => $periods,
-            'activePeriod' => $activePeriod,
             'rows' => $rows,
             'noPeriodConfigured' => false,
         ]);

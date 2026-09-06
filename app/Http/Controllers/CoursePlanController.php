@@ -149,10 +149,19 @@ class CoursePlanController extends Controller
                 ->with('error', 'Esta materia aún no tiene plan de curso para este periodo.');
         }
 
-        if (! $user->is_admin
+        $unpublishedForStudent = ! $user->is_admin
             && ! $this->isProfessorForPeriod($user, $subject, $period)
-            && ! $plan->isPublished()) {
-            abort(403, 'El plan de curso aún no ha sido publicado.');
+            && ! $plan->isPublished();
+
+        if ($unpublishedForStudent) {
+            return view('course-plans.show', [
+                'subject' => $subject,
+                'period' => $period,
+                'plan' => $plan,
+                'auto' => $this->coursePlanService->autoFilledData($subject, $period),
+                'canEdit' => false,
+                'unpublishedForStudent' => true,
+            ]);
         }
 
         $auto = $this->coursePlanService->autoFilledData($subject, $period);

@@ -120,7 +120,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Vista solo lectura: el estudiante ve sus asistencias del periodo activo por materia.
+     * Vista solo lectura: el estudiante ve sus asistencias del periodo vigente.
      */
     private function studentAttendanceIndex(Request $request, User $student, Period $period, array $sundays)
     {
@@ -133,29 +133,35 @@ class AttendanceController extends Controller
         $selectedSubject = null;
         $studentAttendanceByDate = [];
 
-        if ($request->filled('subject_id')) {
-            $selectedSubject = Subject::find($request->get('subject_id'));
-            if ($selectedSubject && $subjects->contains('id', $selectedSubject->id)) {
-                $records = ClassAttendance::query()
-                    ->where('subject_id', $selectedSubject->id)
-                    ->where('period_id', $period->id)
-                    ->where('student_id', $student->id)
-                    ->whereIn('class_date', $sundays)
-                    ->get();
+        if ($subjects->count() === 1) {
+            $selectedSubject = $subjects->first();
+        } elseif ($request->filled('subject_id')) {
+            $candidate = Subject::find($request->get('subject_id'));
+            if ($candidate && $subjects->contains('id', $candidate->id)) {
+                $selectedSubject = $candidate;
+            }
+        }
 
-                foreach ($sundays as $d) {
-                    $studentAttendanceByDate[$d] = $records->first(function ($r) use ($d) {
-                        if (! $r->class_date) {
-                            return false;
-                        }
+        if ($selectedSubject) {
+            $records = ClassAttendance::query()
+                ->where('subject_id', $selectedSubject->id)
+                ->where('period_id', $period->id)
+                ->where('student_id', $student->id)
+                ->whereIn('class_date', $sundays)
+                ->get();
 
-                        try {
-                            return Carbon::parse($r->class_date)->toDateString() === $d;
-                        } catch (\Throwable) {
-                            return false;
-                        }
-                    });
-                }
+            foreach ($sundays as $d) {
+                $studentAttendanceByDate[$d] = $records->first(function ($r) use ($d) {
+                    if (! $r->class_date) {
+                        return false;
+                    }
+
+                    try {
+                        return Carbon::parse($r->class_date)->toDateString() === $d;
+                    } catch (\Throwable) {
+                        return false;
+                    }
+                });
             }
         }
 

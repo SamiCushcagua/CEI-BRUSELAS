@@ -154,6 +154,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::post('/students/{student}/assign-subject', [StudentController::class, 'assignToSubject'])->name('students.assign-subject');
     Route::get('/students/{student}/subjects', [SubjectRelationshipController::class, 'getStudentSubjects'])->name('students.subjects');
+    Route::get('/students/{student}/subjects/{subject}/history', [SubjectRelationshipController::class, 'showStudentSubjectHistory'])->name('students.subject-history');
     Route::get('/students/{student}/professors', [SubjectRelationshipController::class, 'getStudentProfessors'])->name('students.professors');
 
 // Rutas de asistencia

@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Subject;
 use App\Models\User;
 use App\Models\Period;
+use App\Models\Grade;
+use App\Models\ClassAttendance;
 use App\Services\CoursePlanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class SubjectRelationshipController extends Controller
 {
@@ -175,11 +178,182 @@ class SubjectRelationshipController extends Controller
         return view('subjects.professor-subjects', compact('subjects', 'professor'));
     }
 
-    // Obtener materias de un estudiante
+    // Obtener materias de un estudiante (curso actual + historial)
     public function getStudentSubjects(User $student)
     {
-        $subjects = $student->subjectsAsStudent;
-        return view('subjects.student-subjects', compact('subjects', 'student'));
+        $this->authorizeStudentSubjectsAccess($student);
+
+        $currentPeriod = Period::currentAcademic() ?? Period::active()->first();
+
+        $currentSubjects = collect();
+        $historyRows = collect();
+
+        $pivotCols = array_values(array_filter(
+            ['period_id', 'diploma_delivered'],
+            fn ($c) => Schema::hasColumn('subject_student', $c)
+        ));
+
+        if ($currentPeriod && Schema::hasColumn('subject_student', 'period_id')) {
+            $currentQuery = $student->subjectsAsStudent();
+            if ($pivotCols !== []) {
+                $currentQuery->withPivot(...$pivotCols);
+            }
+            $currentSubjects = $currentQuery
+                ->wherePivot('period_id', $currentPeriod->id)
+                ->orderBy('subjects.Nivel')
+                ->orderBy('subjects.name')
+                ->get();
+
+            $historyEnrollments = DB::table('subject_student as ss')
+                ->join('subjects', 'subjects.id', '=', 'ss.subject_id')
+                ->join('periods', 'periods.id', '=', 'ss.period_id')
+                ->where('ss.student_id', $student->id)
+                ->where('ss.period_id', '!=', $currentPeriod->id)
+                ->select(
+                    'ss.subject_id',
+                    'ss.period_id',
+                    'subjects.name as subject_name',
+                    'subjects.Nivel as subject_nivel',
+                    'periods.name as period_name',
+                    'periods.year as period_year',
+                    'periods.trimester as period_trimester'
+                )
+                ->orderByDesc('periods.year')
+                ->orderByDesc('periods.trimester')
+                ->orderBy('subjects.name')
+                ->get();
+
+            $historyRows = $this->attachPassStatusToHistory($historyEnrollments, $student->id);
+        } else {
+            // Fallback sin period_id: todo como "actual", sin historial separado
+            $currentQuery = $student->subjectsAsStudent();
+            if ($pivotCols !== []) {
+                $currentQuery->withPivot(...$pivotCols);
+            }
+            $currentSubjects = $currentQuery->orderBy('subjects.name')->get();
+        }
+
+        return view('subjects.student-subjects', compact(
+            'student',
+            'currentPeriod',
+            'currentSubjects',
+            'historyRows'
+        ));
+    }
+
+    /**
+     * Detalle de un curso pasado: notas, asistencias y maestros de ese periodo.
+     */
+    public function showStudentSubjectHistory(User $student, Subject $subject, Request $request)
+    {
+        $this->authorizeStudentSubjectsAccess($student);
+
+        $period = Period::findOrFail($request->integer('period_id'));
+
+        $enrolled = DB::table('subject_student')
+            ->where('student_id', $student->id)
+            ->where('subject_id', $subject->id)
+            ->where('period_id', $period->id)
+            ->exists();
+
+        if (! $enrolled) {
+            abort(404, 'No hay inscripción de este alumno en esa materia para el periodo indicado.');
+        }
+
+        $grade = Grade::query()
+            ->where('student_id', $student->id)
+            ->where('subject_id', $subject->id)
+            ->where('year', (int) $period->year)
+            ->where('trimester', (int) $period->trimester)
+            ->first();
+
+        $professors = $subject->professorsForPeriod($period)->orderBy('users.name')->get();
+
+        $sundays = app(CoursePlanService::class)->getSundaysForPeriod($period);
+        $attendanceByDate = [];
+        if ($sundays !== []) {
+            $records = ClassAttendance::query()
+                ->where('student_id', $student->id)
+                ->where('subject_id', $subject->id)
+                ->where('period_id', $period->id)
+                ->whereIn('class_date', $sundays)
+                ->get()
+                ->keyBy(fn (ClassAttendance $r) => $r->class_date?->format('Y-m-d'));
+
+            foreach ($sundays as $date) {
+                $attendanceByDate[$date] = $records->get($date);
+            }
+        }
+
+        return view('subjects.student-subject-history', compact(
+            'student',
+            'subject',
+            'period',
+            'grade',
+            'professors',
+            'sundays',
+            'attendanceByDate'
+        ));
+    }
+
+    private function authorizeStudentSubjectsAccess(User $student): void
+    {
+        $user = Auth::user();
+        if (! $user) {
+            abort(403);
+        }
+
+        if ($user->is_admin || (int) $user->id === (int) $student->id) {
+            return;
+        }
+
+        abort(403, 'No tienes permiso para ver las materias de este estudiante.');
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, object>  $rows
+     * @return \Illuminate\Support\Collection<int, object>
+     */
+    private function attachPassStatusToHistory($rows, int $studentId)
+    {
+        if ($rows->isEmpty()) {
+            return collect();
+        }
+
+        $hasPassed = Schema::hasColumn('grades', 'passed');
+        $grades = collect();
+
+        if ($hasPassed) {
+            $years = $rows->pluck('period_year')->unique()->filter()->all();
+            $grades = Grade::query()
+                ->where('student_id', $studentId)
+                ->whereIn('year', $years)
+                ->whereIn('subject_id', $rows->pluck('subject_id')->unique())
+                ->get()
+                ->keyBy(fn (Grade $g) => $g->subject_id.'_'.$g->year.'_'.$g->trimester);
+        }
+
+        return $rows->map(function ($row) use ($grades, $hasPassed) {
+            $paso = '—';
+            if ($hasPassed) {
+                $key = $row->subject_id.'_'.$row->period_year.'_'.$row->period_trimester;
+                $grade = $grades->get($key);
+                if ($grade) {
+                    $paso = $grade->passed ? 'Sí' : 'No';
+                }
+            }
+
+            return (object) [
+                'subject_id' => (int) $row->subject_id,
+                'period_id' => (int) $row->period_id,
+                'subject_name' => $row->subject_name,
+                'subject_nivel' => $row->subject_nivel,
+                'period_name' => $row->period_name,
+                'period_year' => $row->period_year,
+                'period_trimester' => $row->period_trimester,
+                'paso' => $paso,
+            ];
+        });
     }
 
     // Obtener estudiantes de un profesor
