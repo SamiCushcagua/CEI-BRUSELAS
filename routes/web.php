@@ -186,6 +186,8 @@ Route::post('/admin/graduates-overview/pass', [AdminGraduatesOverviewController:
 
 Route::get('/admin/period-history', [AdminPeriodHistoryController::class, 'index'])
     ->name('admin.period-history');
+Route::post('/admin/period-history/update', [AdminPeriodHistoryController::class, 'updateCourse'])
+    ->name('admin.period-history.update');
 
 // Calificaciones
 Route::get('/calificaciones', [CalificacionesController::class, 'index'])
