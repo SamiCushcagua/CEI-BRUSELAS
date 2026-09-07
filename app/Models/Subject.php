@@ -50,11 +50,15 @@ class Subject extends Model
             ->where('is_admin', false);
     }
     
+    /**
+     * Profesores asignados a la materia en un periodo concreto.
+     * No filtra por is_profesor actual: el historial debe mostrar quién impartió
+     * aunque luego hayan dejado de ser maestros.
+     */
     public function professorsForPeriod(Period $period)
     {
         return $this->belongsToMany(User::class, 'subject_professor', 'subject_id', 'professor_id')
-            ->wherePivot('period_id', $period->id)
-            ->where('is_profesor', true);
+            ->wherePivot('period_id', $period->id);
     }
     // Relación con estudiantes (many-to-many)
     public function students()
