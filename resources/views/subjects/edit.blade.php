@@ -53,7 +53,7 @@
                    class="form-control @error('Nivel') is-invalid @enderror"
                    value="{{ old('Nivel', $subject->Nivel) }}"
                    min="1"
-                   max="20"
+                   max="200"
                    required>
             @error('Nivel')
                 <span class="invalid-feedback">{{ $message }}</span>

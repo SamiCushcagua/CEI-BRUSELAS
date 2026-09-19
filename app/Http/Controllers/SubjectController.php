@@ -36,7 +36,7 @@ class SubjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'Nivel' => 'required|numeric|min:1|max:20',
+            'Nivel' => 'required|numeric|min:1|max:200',
             'Archivo' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -97,7 +97,7 @@ class SubjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'Nivel' => 'required|numeric|min:1|max:20',
+            'Nivel' => 'required|numeric|min:1|max:200',
             'Archivo' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
