@@ -24,6 +24,7 @@ use App\Http\Controllers\PeriodController;
 use App\Http\Controllers\AdminPeriodSubjectDashboardController;
 use App\Http\Controllers\AdminSubjectEnrollmentOutcomeController;
 use App\Http\Controllers\StudentGradesController;
+use App\Http\Controllers\StudentTimelineController;
 use App\Http\Controllers\AdminGraduatesOverviewController;
 use App\Http\Controllers\AdminCoursePlanOverviewController;
 use App\Http\Controllers\AdminPeriodHistoryController;
@@ -163,6 +164,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/attendance', [App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
     Route::post('/attendance', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendance.store');
     Route::get('/my-grades', [StudentGradesController::class, 'index'])->name('student.grades');
+    Route::get('/mi-recorrido', [StudentTimelineController::class, 'index'])->name('student.timeline');
 });
 
 // Admin: Tablero por Periodo/Materia/Profesor (Asistencia + Calificaciones)

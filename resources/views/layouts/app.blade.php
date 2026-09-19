@@ -65,6 +65,7 @@
                 @endif
                 @if (Auth::user()->isStudent())
                 <a href="{{ route('students.subjects', Auth::user()) }}" class="{{ request()->routeIs('students.subjects') ? 'active' : '' }}">Mi curso</a>
+                <a href="{{ route('student.timeline') }}" class="{{ request()->routeIs('student.timeline') ? 'active' : '' }}">Mi recorrido</a>
                 <a href="{{ route('students.professors', Auth::user()) }}" class="{{ request()->routeIs('students.professors') ? 'active' : '' }}">Mis profesores</a>
                 @endif
                 @endauth

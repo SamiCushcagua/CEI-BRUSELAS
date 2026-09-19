@@ -6,6 +6,9 @@
 <div class="grades-container">
     <div class="page-main-btn-wrapper">
         <a href="{{ route('welcome') }}" class="btn btn-primary">🏠 Página principal</a>
+        @if(Auth::user()->isStudent() && (int) Auth::id() === (int) $student->id)
+            <a href="{{ route('student.timeline') }}" class="btn btn-secondary">🗺️ Mi recorrido</a>
+        @endif
     </div>
     <div class="grades-header">
         <div>
